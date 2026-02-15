@@ -6,65 +6,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
-
 body{
+    margin:0;
+    font-family:Arial;
     background:#141414;
     color:white;
 }
 
-/* NAVBAR */
 .navbar{
-    position:fixed;
-    top:0;
-    width:100%;
-    padding:20px 50px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:linear-gradient(to bottom, black, transparent);
-}
-
-.logo{
+    padding:20px;
+    background:black;
+    color:#e50914;
     font-size:28px;
     font-weight:bold;
-    color:#e50914;
 }
 
-/* HERO */
 .hero{
-    height:90vh;
-    display:flex;
-    align-items:center;
-    padding-left:50px;
-    background:linear-gradient(135deg,#1f1f1f,#000000);
-}
-
-.hero-content{
-    max-width:500px;
-}
-
-.hero h1{
-    font-size:50px;
-    margin-bottom:20px;
-}
-
-.hero p{
-    margin-bottom:20px;
+    padding:80px 40px;
+    background:linear-gradient(135deg,#1f1f1f,#000);
 }
 
 button{
     padding:10px 20px;
-    border:none;
     margin-right:10px;
-    font-weight:bold;
+    border:none;
     cursor:pointer;
     border-radius:4px;
+    font-weight:bold;
 }
 
 .play{
@@ -72,27 +40,10 @@ button{
     color:black;
 }
 
-.info{
-    background:rgba(109,109,110,0.7);
-    color:white;
-}
-
-button:hover{
-    opacity:0.8;
-}
-
-/* ROW */
-.row{
-    padding:40px 50px;
-}
-
-.row h2{
-    margin-bottom:15px;
-}
-
 .movies{
     display:flex;
-    gap:15px;
+    gap:20px;
+    padding:40px;
 }
 
 .movie{
@@ -100,6 +51,11 @@ button:hover{
     height:250px;
     background:#333;
     border-radius:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:white;
     transition:0.3s;
 }
 
@@ -112,27 +68,22 @@ button:hover{
 
 <body>
 
-<div class="navbar">
-    <div class="logo">YAMONFILM</div>
-</div>
+<div class="navbar">YAMONFILM</div>
 
 <section class="hero">
-    <div class="hero-content">
-        <h1>Medicopter</h1>
-        <p>Découvrez la serie le plus regardé du moment.</p>
+    <h1>Film Exclusif</h1>
+    <p>Le film le plus regardé du moment</p>
+
+    <!-- Lien vers film1.html -->
+    <a href="film1.html">
         <button class="play">▶ Lecture</button>
-        <button class="info">Plus d'infos</button>
-    </div>
+    </a>
 </section>
 
-<section class="row">
-    <h2>Tendances</h2>
-    <div class="movies">
-        <div class="movie"></div>
-        <div class="movie"></div>
-        <div class="movie"></div>
-        <div class="movie"></div>
-    </div>
+<section class="movies">
+    <a href="film1.html" class="movie">Film 1</a>
+    <a href="film2.html" class="movie">Film 2</a>
+    <a href="serie.html" class="movie">Série 1</a>
 </section>
 
 </body>
