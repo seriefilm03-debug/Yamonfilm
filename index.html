@@ -45,8 +45,8 @@ body{
     background:
         linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
         url("s-l1200.jpg");
-    background-size: cover;            /* Remplit tout l'écran */
-    background-position: center;       /* Centre l'image */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
 }
 
@@ -104,23 +104,40 @@ body{
     gap:20px;
 }
 
-/* CARTE */
+/* CARTE FILM */
 .movie{
     height:clamp(200px, 30vw, 300px);
-    background:#333;
     border-radius:8px;
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:center;
     text-decoration:none;
     color:white;
     font-weight:bold;
     transition:0.3s;
+    position:relative;
+    overflow:hidden;
+    background-size:cover;
+    background-position:center;
+}
+
+.movie span{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    z-index:2;
+    font-size:clamp(14px,1.5vw,18px);
+}
+
+.movie::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.3);
 }
 
 .movie:hover{
     transform:scale(1.05);
-    background:#555;
 }
 
 /* MOBILE */
@@ -128,9 +145,9 @@ body{
     .hero{
         align-items:center;
         text-align:center;
-        background-size: cover;       /* Plein écran mobile */
-        background-position: center;  /* Centre l'image */
-        height:100vh;                 /* Assure 100% hauteur */
+        background-size: cover;
+        background-position: center;
+        height:100vh;
     }
 
     .hero h1, .hero p{
@@ -142,13 +159,6 @@ body{
         font-size:16px;
     }
 }
-
-/* TV / GRAND ECRAN */
-@media(min-width:1600px){
-    .hero{
-        padding-left:10%;
-    }
-}
 </style>
 </head>
 
@@ -156,17 +166,21 @@ body{
 
 <div class="navbar">YAMONFILM</div>
 
+<!-- HERO avec lien -->
 <section class="hero">
     <h1>Serie Exclusif</h1>
-    <p>Découvrez la serie la plus regardé du moment.</p>
-    <button class="play">▶ Lecture</button>
+    <p>Découvrez la série la plus regardée du moment.</p>
+    <a href="lecture.html">
+        <button class="play">▶ Lecture</button>
+    </a>
 </section>
 
+<!-- SECTION FILMS -->
 <section class="movies">
-    <a href="#" class="movie">Film 1</a>
-    <a href="#" class="movie">Film 2</a>
-    <a href="#" class="movie">Film 3</a>
-    <a href="#" class="movie">Film 4</a>
+    <a href="film1.html" class="movie" style="background-image:url('film1.jpg')"><span>Film 1</span></a>
+    <a href="film2.html" class="movie" style="background-image:url('film2.jpg')"><span>Film 2</span></a>
+    <a href="film3.html" class="movie" style="background-image:url('film3.jpg')"><span>Film 3</span></a>
+    <a href="film4.html" class="movie" style="background-image:url('film4.jpg')"><span>Film 4</span></a>
 </section>
 
 </body>
