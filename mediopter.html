@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+background:#0f0f0f;
+color:white;
+}
+
+/* HEADER */
+header{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 20px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#ff2e2e;
+letter-spacing:2px;
+}
+
+.menu{
+display:flex;
+gap:15px;
+}
+
+.menu div{
+width:35px;
+height:35px;
+background:#1c1c1c;
+border-radius:10px;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+/* HERO SECTION */
+.hero{
+height:100vh;
+background:url('https://images.unsplash.com/photo-1581091870627-3f6c28a8c72b') center/cover no-repeat;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:linear-gradient(to top, #0f0f0f 10%, transparent 80%);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+}
+
+.hero h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.hero p{
+opacity:0.8;
+margin-bottom:25px;
+}
+
+/* BOUTON LECTURE */
+.btn-play{
+background:white;
+color:black;
+padding:15px 35px;
+border-radius:12px;
+font-size:18px;
+font-weight:bold;
+border:none;
+cursor:pointer;
+transition:0.3s;
+}
+
+.btn-play:hover{
+background:#ff2e2e;
+color:white;
+}
+
+/* SECTION SERIES */
+.section{
+padding:30px 20px;
+}
+
+.section h2{
+margin-bottom:20px;
+font-size:22px;
+}
+
+.cards{
+display:flex;
+overflow-x:auto;
+gap:15px;
+}
+
+.card{
+min-width:160px;
+background:#1a1a1a;
+border-radius:12px;
+overflow:hidden;
+cursor:pointer;
+transition:0.3s;
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.card h3{
+padding:10px;
+font-size:14px;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+/* FOOTER */
+footer{
+text-align:center;
+padding:20px;
+background:#111;
+margin-top:40px;
+font-size:14px;
+opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">YAMONFILM</div>
+<div class="menu">
+<div>🔍</div>
+<div>🔔</div>
+<div>☰</div>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-content">
+<h1>Série Exclusive</h1>
+<p>Découvrez la série la plus regardée du moment.</p>
+<button class="btn-play">▶ Lecture</button>
+</div>
+</section>
+
+<section class="section">
+<h2>Tendances</h2>
+<div class="cards">
+<div class="card">
+<img src="https://images.unsplash.com/photo-1505686994434-e3cc5abf1330">
+<h3>Arrow</h3>
+</div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1517602302552-471fe67acf66">
+<h3>Medicopter 117</h3>
+</div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1497032205916-ac775f0649ae">
+<h3>Action Urbaine</h3>
+</div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c">
+<h3>Crime City</h3>
+</div>
+</div>
+</section>
+
+<footer>
+© 2026 YAMONFILM - Tous droits réservés
+</footer>
+
+</body>
+</html>
+
