@@ -38,6 +38,46 @@ height:85vh;
 background-size:cover;
 background-position:center;
 display:flex;
+align-items:flex-end;<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM - Medicopter 117</title>
+
+<style>
+html{scroll-behavior:smooth;}
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#0b0f14;
+color:white;
+}
+
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:15px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+z-index:1000;
+}
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#e50914;
+}
+
+/* HERO */
+.hero{
+height:85vh;
+background-size:cover;
+background-position:center;
+display:flex;
 align-items:flex-end;
 padding:80px 60px;
 position:relative;
@@ -110,6 +150,11 @@ transition:0.3s;
 cursor:pointer;
 }
 .card:hover{transform:scale(1.05);}
+.card img{
+width:100%;
+height:160px;
+object-fit:cover;
+}
 .card-content{padding:15px;}
 .badge{
 display:inline-block;
@@ -130,9 +175,9 @@ margin-bottom:8px;
 
 <section class="hero" id="hero">
 <div class="hero-content">
-<h1 id="title">Medicopter 117</h1>
+<h1 id="title"></h1>
 <div class="meta" id="meta"></div>
-<p class="description" id="plot"></p>
+<p class="description" id="overview"></p>
 <button class="btn-main">▶ Regarder maintenant</button>
 </div>
 </section>
@@ -147,74 +192,63 @@ margin-bottom:8px;
 <div class="episodes" id="episodes"></div>
 
 <script>
-const apiKey = "ded42c99";
-const imdbID = "tt0165049"; // Medicopter 117
+const apiKey = "182c7173698e34803715eacab5c693a7";
+const seriesId = 19410; // Medicopter 117
+const imgBase = "https://image.tmdb.org/t/p/original";
 
 const hero = document.getElementById("hero");
 const title = document.getElementById("title");
 const meta = document.getElementById("meta");
-const plot = document.getElementById("plot");
-
-const seasonBtn = document.getElementById("seasonBtn");
+const overview = document.getElementById("overview");
 const seasonMenu = document.getElementById("seasonMenu");
+const seasonBtn = document.getElementById("seasonBtn");
 const episodesContainer = document.getElementById("episodes");
 
-// Infos principales
+// Charger infos série
 async function loadSeries(){
-const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${apiKey}`);
+const res = await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
 const data = await res.json();
 
-title.textContent = data.Title;
-meta.textContent = `⭐ ${data.imdbRating} • ${data.Year} • ${data.Genre} • ${data.totalSeasons} saisons`;
-plot.textContent = data.Plot;
+title.textContent = data.name;
+meta.textContent = `⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
+overview.textContent = data.overview;
+hero.style.backgroundImage = `url(${imgBase}${data.backdrop_path})`;
 
-hero.style.backgroundImage = `url(${data.Poster})`;
-
-loadSeasons(data.totalSeasons);
+loadSeasons(data.number_of_seasons);
 }
 
-// Saisons
-function loadSeasons(totalSeasons){
+// Charger saisons
+function loadSeasons(total){
 seasonMenu.innerHTML="";
-
-for(let i=1;i<=totalSeasons;i++){
+for(let i=1;i<=total;i++){
 const div=document.createElement("div");
 div.textContent="Saison "+i;
-div.dataset.season=i;
-
 div.onclick=()=>{
 seasonBtn.innerHTML="Saison "+i+" ▼";
 seasonMenu.classList.remove("show");
 loadEpisodes(i);
 };
-
 seasonMenu.appendChild(div);
 }
-
 loadEpisodes(1);
 }
 
-// Episodes
+// Charger épisodes
 async function loadEpisodes(season){
 episodesContainer.innerHTML="";
-
-const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&Season=${season}&apikey=${apiKey}`);
+const res = await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
 const data = await res.json();
 
-if(!data.Episodes){
-episodesContainer.innerHTML="<p>Aucun épisode trouvé.</p>";
-return;
-}
-
-data.Episodes.forEach(ep=>{
+data.episodes.forEach(ep=>{
 const card=document.createElement("div");
 card.className="card";
 
 card.innerHTML=`
+<img src="${ep.still_path ? imgBase+ep.still_path : imgBase+data.poster_path}">
 <div class="card-content">
-<span class="badge">IMDb ⭐ ${ep.imdbRating || "N/A"}</span>
-<h4>${ep.Episode}. ${ep.Title}</h4>
-<small>${ep.Released}</small>
+<span class="badge">⭐ ${ep.vote_average}</span>
+<h4>${ep.episode_number}. ${ep.name}</h4>
+<small>${ep.air_date}</small>
 </div>
 `;
 
