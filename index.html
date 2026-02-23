@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>YAMONFILM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM</title>
 
 <style>
 *{
@@ -24,68 +24,67 @@ body{
     top:0;
     width:100%;
     padding:20px 5%;
-    font-size:clamp(20px, 3vw, 28px);
+    font-size:clamp(18px, 3vw, 30px);
     font-weight:bold;
     color:#e50914;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
     z-index:1000;
 }
 
-/* HERO */
+/* HERO RESPONSIVE */
 .hero{
     position:relative;
-    min-height:100vh;
-    padding:120px 5%;
+    height:100vh;
+    width:100%;
     display:flex;
     flex-direction:column;
     justify-content:center;
+    padding:0 5%;
+    
     background:
         linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
-        url("s-l1200.jpg") no-repeat center center/cover;
+        url("s-l1200.jpg");
+        
+    background-size:cover;        /* image s'adapte */
+    background-position:center;   /* centre toujours */
+    background-repeat:no-repeat;
 }
 
-/* Effet fondu en bas */
+/* Dégradé bas style Netflix */
 .hero::after{
     content:"";
     position:absolute;
     bottom:0;
     left:0;
     width:100%;
-    height:200px;
+    height:20vh;
     background:linear-gradient(to top, #141414, transparent);
 }
 
-/* TEXTE HERO */
+/* TEXTE */
 .hero h1{
-    font-size:clamp(28px, 5vw, 60px);
-    max-width:600px;
-    z-index:2;
+    font-size:clamp(26px, 5vw, 70px);
+    max-width:700px;
 }
 
 .hero p{
     margin-top:20px;
-    font-size:clamp(14px, 2vw, 20px);
+    font-size:clamp(14px, 2vw, 22px);
     max-width:500px;
-    z-index:2;
 }
 
 /* BOUTON */
-button{
-    padding:12px 25px;
-    margin-top:25px;
+.play{
+    margin-top:30px;
+    padding:14px 30px;
+    font-size:clamp(14px, 2vw, 18px);
     border:none;
     border-radius:5px;
     font-weight:bold;
     cursor:pointer;
-    font-size:16px;
-}
-
-.play{
     background:white;
     color:black;
     transition:0.3s;
-    box-shadow:0 5px 15px rgba(0,0,0,0.4);
-    z-index:2;
 }
 
 .play:hover{
@@ -96,24 +95,16 @@ button{
 
 /* SECTION FILMS */
 .movies{
-    padding:40px 5%;
+    padding:50px 5%;
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
     gap:20px;
-
-    opacity:0;
-    transform:translateY(40px);
-    transition:1s ease;
 }
 
-.movies.show{
-    opacity:1;
-    transform:translateY(0);
-}
-
-/* CARTE FILM */
+/* CARTE */
 .movie{
-    height:260px;
+    height:clamp(200px, 30vw, 300px);
+    background:#333;
     border-radius:8px;
     display:flex;
     align-items:center;
@@ -122,7 +113,6 @@ button{
     color:white;
     font-weight:bold;
     transition:0.3s;
-    background:#333;
 }
 
 .movie:hover{
@@ -130,10 +120,22 @@ button{
     background:#555;
 }
 
-/* RESPONSIVE */
-@media(max-width:600px){
+/* MOBILE OPTIMISATION */
+@media(max-width:768px){
     .hero{
-        padding-top:150px;
+        text-align:center;
+        align-items:center;
+    }
+
+    .hero p{
+        max-width:90%;
+    }
+}
+
+/* GRAND ECRAN (TV) */
+@media(min-width:1600px){
+    .hero{
+        padding-left:10%;
     }
 }
 </style>
@@ -146,30 +148,15 @@ button{
 <section class="hero">
     <h1>Film Exclusif</h1>
     <p>Découvrez le film le plus regardé du moment.</p>
-
-    <a href="film1.html">
-        <button class="play">▶ Lecture</button>
-    </a>
+    <button class="play">▶ Lecture</button>
 </section>
 
 <section class="movies">
-    <a href="film1.html" class="movie">Film 1</a>
-    <a href="film2.html" class="movie">Film 2</a>
-    <a href="film3.html" class="movie">Film 3</a>
-    <a href="film4.html" class="movie">Film 4</a>
+    <a href="#" class="movie">Film 1</a>
+    <a href="#" class="movie">Film 2</a>
+    <a href="#" class="movie">Film 3</a>
+    <a href="#" class="movie">Film 4</a>
 </section>
-
-<script>
-window.addEventListener("scroll", function(){
-    const movies = document.querySelector(".movies");
-    const position = movies.getBoundingClientRect().top;
-    const screenHeight = window.innerHeight;
-
-    if(position < screenHeight - 100){
-        movies.classList.add("show");
-    }
-});
-</script>
 
 </body>
 </html>
