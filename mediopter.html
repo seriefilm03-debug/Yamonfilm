@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMONFILM - Arrow</title>
+<title>YAMONFILM - Medicopter 117</title>
 
 <style>
-html{
-scroll-behavior:smooth;
-}
-
+html{scroll-behavior:smooth;}
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -17,11 +14,10 @@ background:#0b0f14;
 color:white;
 }
 
-/* HEADER */
 header{
 position:fixed;
-width:100%;
 top:0;
+width:100%;
 padding:15px 40px;
 display:flex;
 justify-content:space-between;
@@ -30,7 +26,6 @@ background:rgba(0,0,0,0.6);
 backdrop-filter:blur(10px);
 z-index:1000;
 }
-
 .logo{
 font-size:22px;
 font-weight:bold;
@@ -40,41 +35,30 @@ color:#e50914;
 /* HERO */
 .hero{
 height:85vh;
-background:url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78") center/cover no-repeat;
-position:relative;
+background-size:cover;
+background-position:center;
 display:flex;
 align-items:flex-end;
 padding:80px 60px;
+position:relative;
 }
-
 .hero::before{
 content:"";
 position:absolute;
 inset:0;
-background:linear-gradient(to top, #0b0f14 15%, transparent 70%);
+background:linear-gradient(to top,#0b0f14 15%,transparent 70%);
 }
-
 .hero-content{
 position:relative;
 max-width:700px;
 }
-
 .hero h1{
 font-size:60px;
 margin:0 0 10px 0;
 }
+.meta{opacity:0.8;margin-bottom:15px;}
+.description{line-height:1.6;margin-bottom:25px;}
 
-.meta{
-opacity:0.8;
-margin-bottom:15px;
-}
-
-.description{
-line-height:1.6;
-margin-bottom:25px;
-}
-
-/* BOUTON PRINCIPAL */
 .btn-main{
 background:#e50914;
 color:white;
@@ -86,22 +70,14 @@ font-size:16px;
 cursor:pointer;
 transition:0.3s;
 }
-
 .btn-main:hover{
 background:#ff1f1f;
 transform:scale(1.05);
 }
 
 /* SAISON */
-.season-section{
-padding:40px 60px 20px 60px;
-}
-
-.season-dropdown{
-position:relative;
-display:inline-block;
-}
-
+.season-section{padding:40px 60px 20px;}
+.season-dropdown{position:relative;display:inline-block;}
 .season-menu{
 display:none;
 position:absolute;
@@ -112,29 +88,20 @@ overflow:hidden;
 min-width:180px;
 box-shadow:0 10px 20px rgba(0,0,0,0.5);
 }
-
 .season-menu div{
 padding:12px 15px;
 cursor:pointer;
 transition:0.2s;
 }
+.season-menu div:hover{background:#e50914;}
+.season-menu.show{display:block;}
 
-.season-menu div:hover{
-background:#e50914;
-}
-
-.season-menu.show{
-display:block;
-}
-
-/* EPISODES GRID */
 .episodes{
 display:grid;
-grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
 gap:25px;
-padding:20px 60px 60px 60px;
+padding:20px 60px 60px;
 }
-
 .card{
 background:#141a22;
 border-radius:12px;
@@ -142,21 +109,8 @@ overflow:hidden;
 transition:0.3s;
 cursor:pointer;
 }
-
-.card:hover{
-transform:scale(1.05);
-}
-
-.card img{
-width:100%;
-height:160px;
-object-fit:cover;
-}
-
-.card-content{
-padding:15px;
-}
-
+.card:hover{transform:scale(1.05);}
+.card-content{padding:15px;}
 .badge{
 display:inline-block;
 background:#1db954;
@@ -164,20 +118,6 @@ padding:4px 8px;
 border-radius:5px;
 font-size:12px;
 margin-bottom:8px;
-}
-
-.progress{
-height:5px;
-background:#333;
-border-radius:5px;
-margin-top:10px;
-overflow:hidden;
-}
-
-.progress div{
-height:100%;
-width:60%;
-background:#e50914;
 }
 </style>
 </head>
@@ -188,82 +128,109 @@ background:#e50914;
 <div>🔍 🔔 ☰</div>
 </header>
 
-<!-- HERO -->
-<section class="hero">
+<section class="hero" id="hero">
 <div class="hero-content">
-<h1>Arrow</h1>
-<div class="meta">⭐ 6.8/10 • Crime • Action • 2012 • 9 saisons</div>
-<p class="description">
-Les nouvelles aventures de Green Arrow / Oliver Queen, combattant ultra efficace issu de l'univers DC Comics.
-</p>
+<h1 id="title">Medicopter 117</h1>
+<div class="meta" id="meta"></div>
+<p class="description" id="plot"></p>
 <button class="btn-main">▶ Regarder maintenant</button>
 </div>
 </section>
 
-<!-- SAISON -->
 <div class="season-section">
 <div class="season-dropdown">
 <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-<div class="season-menu" id="seasonMenu">
-<div data-season="1">Saison 1</div>
-<div data-season="2">Saison 2</div>
-<div data-season="3">Saison 3</div>
-</div>
+<div class="season-menu" id="seasonMenu"></div>
 </div>
 </div>
 
-<!-- EPISODES -->
 <div class="episodes" id="episodes"></div>
 
 <script>
-const episodesData = {
-1: ["Retour en force","L'adieu","Le Sauveur"],
-2: ["Vengeance","Alliance","Trahison"],
-3: ["Corto Maltese","Le Magicien","Le Retour"]
-};
+const apiKey = "ded42c99";
+const imdbID = "tt0165049"; // Medicopter 117
+
+const hero = document.getElementById("hero");
+const title = document.getElementById("title");
+const meta = document.getElementById("meta");
+const plot = document.getElementById("plot");
 
 const seasonBtn = document.getElementById("seasonBtn");
 const seasonMenu = document.getElementById("seasonMenu");
 const episodesContainer = document.getElementById("episodes");
 
-seasonBtn.onclick = () => {
-seasonMenu.classList.toggle("show");
-};
+// Infos principales
+async function loadSeries(){
+const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&apikey=${apiKey}`);
+const data = await res.json();
 
-document.querySelectorAll(".season-menu div").forEach(item=>{
-item.onclick = () => {
-const season = item.getAttribute("data-season");
-seasonBtn.innerHTML = item.innerHTML + " ▼";
+title.textContent = data.Title;
+meta.textContent = `⭐ ${data.imdbRating} • ${data.Year} • ${data.Genre} • ${data.totalSeasons} saisons`;
+plot.textContent = data.Plot;
+
+hero.style.backgroundImage = `url(${data.Poster})`;
+
+loadSeasons(data.totalSeasons);
+}
+
+// Saisons
+function loadSeasons(totalSeasons){
+seasonMenu.innerHTML="";
+
+for(let i=1;i<=totalSeasons;i++){
+const div=document.createElement("div");
+div.textContent="Saison "+i;
+div.dataset.season=i;
+
+div.onclick=()=>{
+seasonBtn.innerHTML="Saison "+i+" ▼";
 seasonMenu.classList.remove("show");
-showEpisodes(season);
+loadEpisodes(i);
 };
-});
 
-function showEpisodes(season){
+seasonMenu.appendChild(div);
+}
+
+loadEpisodes(1);
+}
+
+// Episodes
+async function loadEpisodes(season){
 episodesContainer.innerHTML="";
 
-episodesData[season].forEach(title=>{
+const res = await fetch(`https://www.omdbapi.com/?i=${imdbID}&Season=${season}&apikey=${apiKey}`);
+const data = await res.json();
+
+if(!data.Episodes){
+episodesContainer.innerHTML="<p>Aucun épisode trouvé.</p>";
+return;
+}
+
+data.Episodes.forEach(ep=>{
 const card=document.createElement("div");
 card.className="card";
 
 card.innerHTML=`
-<img src="https://images.unsplash.com/photo-1517602302552-471fe67acf66" />
 <div class="card-content">
-<span class="badge">✓ Déjà vu</span>
-<h4>${title}</h4>
-<div class="progress"><div></div></div>
+<span class="badge">IMDb ⭐ ${ep.imdbRating || "N/A"}</span>
+<h4>${ep.Episode}. ${ep.Title}</h4>
+<small>${ep.Released}</small>
 </div>
 `;
 
-card.onclick = () => {
-window.scrollTo({top:0, behavior:"smooth"});
+card.onclick=()=>{
+window.scrollTo({top:0,behavior:"smooth"});
 };
 
 episodesContainer.appendChild(card);
 });
 }
 
-showEpisodes(1);
+seasonBtn.onclick=()=>{
+seasonMenu.classList.toggle("show");
+};
+
+loadSeries();
 </script>
 
 </body>
