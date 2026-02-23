@@ -6,162 +6,179 @@
 <title>YAMONFILM - Arrow</title>
 
 <style>
+html{
+scroll-behavior:smooth;
+}
+
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#0b0f14;
-    color:white;
+margin:0;
+font-family:Arial, sans-serif;
+background:#0b0f14;
+color:white;
 }
 
 /* HEADER */
 header{
-    position:fixed;
-    width:100%;
-    top:0;
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(10px);
-    z-index:1000;
+position:fixed;
+width:100%;
+top:0;
+padding:15px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+z-index:1000;
 }
 
 .logo{
-    font-size:22px;
-    font-weight:bold;
-    color:#ff3c3c;
+font-size:22px;
+font-weight:bold;
+color:#e50914;
 }
 
 /* HERO */
 .hero{
-    height:85vh;
-    background:url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78") center/cover no-repeat;
-    position:relative;
-    display:flex;
-    align-items:flex-end;
-    padding:80px 50px;
+height:85vh;
+background:url("https://images.unsplash.com/photo-1502134249126-9f3755a50d78") center/cover no-repeat;
+position:relative;
+display:flex;
+align-items:flex-end;
+padding:80px 60px;
 }
 
 .hero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(to top, #0b0f14 15%, transparent 70%);
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(to top, #0b0f14 15%, transparent 70%);
 }
 
 .hero-content{
-    position:relative;
-    max-width:700px;
+position:relative;
+max-width:700px;
 }
 
 .hero h1{
-    font-size:55px;
-    margin:0 0 10px 0;
+font-size:60px;
+margin:0 0 10px 0;
 }
 
 .meta{
-    opacity:0.8;
-    margin-bottom:15px;
+opacity:0.8;
+margin-bottom:15px;
 }
 
 .description{
-    line-height:1.6;
-    margin-bottom:20px;
+line-height:1.6;
+margin-bottom:25px;
 }
 
+/* BOUTON PRINCIPAL */
 .btn-main{
-    background:#e50914;
-    color:white;
-    border:none;
-    padding:14px 30px;
-    border-radius:8px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
+background:#e50914;
+color:white;
+border:none;
+padding:15px 35px;
+border-radius:10px;
+font-weight:bold;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
 }
 
 .btn-main:hover{
-    background:#ff1f1f;
-}
-
-/* TABS */
-.tabs{
-    display:flex;
-    gap:20px;
-    padding:20px 50px;
-    border-bottom:1px solid #222;
-}
-
-.tabs div{
-    cursor:pointer;
-    opacity:0.6;
-}
-
-.tabs div.active{
-    opacity:1;
-    border-bottom:3px solid #e50914;
-    padding-bottom:5px;
+background:#ff1f1f;
+transform:scale(1.05);
 }
 
 /* SAISON */
-.season-select{
-    padding:20px 50px;
+.season-section{
+padding:40px 60px 20px 60px;
+}
+
+.season-dropdown{
+position:relative;
+display:inline-block;
+}
+
+.season-menu{
+display:none;
+position:absolute;
+background:#141a22;
+margin-top:10px;
+border-radius:10px;
+overflow:hidden;
+min-width:180px;
+box-shadow:0 10px 20px rgba(0,0,0,0.5);
+}
+
+.season-menu div{
+padding:12px 15px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.season-menu div:hover{
+background:#e50914;
+}
+
+.season-menu.show{
+display:block;
 }
 
 /* EPISODES GRID */
 .episodes{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
-    gap:20px;
-    padding:0 50px 50px 50px;
+display:grid;
+grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+gap:25px;
+padding:20px 60px 60px 60px;
 }
 
 .card{
-    background:#141a22;
-    border-radius:12px;
-    overflow:hidden;
-    transition:0.3s;
-    cursor:pointer;
+background:#141a22;
+border-radius:12px;
+overflow:hidden;
+transition:0.3s;
+cursor:pointer;
 }
 
 .card:hover{
-    transform:scale(1.03);
+transform:scale(1.05);
 }
 
 .card img{
-    width:100%;
-    height:160px;
-    object-fit:cover;
+width:100%;
+height:160px;
+object-fit:cover;
 }
 
 .card-content{
-    padding:15px;
+padding:15px;
 }
 
 .badge{
-    display:inline-block;
-    background:#1db954;
-    padding:4px 8px;
-    border-radius:5px;
-    font-size:12px;
-    margin-bottom:8px;
+display:inline-block;
+background:#1db954;
+padding:4px 8px;
+border-radius:5px;
+font-size:12px;
+margin-bottom:8px;
 }
 
 .progress{
-    height:5px;
-    background:#333;
-    border-radius:5px;
-    margin-top:10px;
-    overflow:hidden;
+height:5px;
+background:#333;
+border-radius:5px;
+margin-top:10px;
+overflow:hidden;
 }
 
 .progress div{
-    height:100%;
-    width:60%;
-    background:#e50914;
+height:100%;
+width:60%;
+background:#e50914;
 }
-
 </style>
 </head>
 <body>
@@ -171,33 +188,31 @@ header{
 <div>🔍 🔔 ☰</div>
 </header>
 
+<!-- HERO -->
 <section class="hero">
 <div class="hero-content">
 <h1>Arrow</h1>
 <div class="meta">⭐ 6.8/10 • Crime • Action • 2012 • 9 saisons</div>
 <p class="description">
-Les nouvelles aventures de Green Arrow / Oliver Queen, combattant ultra efficace issu de l'univers DC Comics...
+Les nouvelles aventures de Green Arrow / Oliver Queen, combattant ultra efficace issu de l'univers DC Comics.
 </p>
-<button class="btn-main">▶ Reprendre (S3:E4)</button>
+<button class="btn-main">▶ Regarder maintenant</button>
 </div>
 </section>
 
-<div class="tabs">
-<div class="active">Épisodes</div>
-<div>Vidéos & Bande-annonce</div>
-<div>Casting & Production</div>
-<div>Commentaires</div>
+<!-- SAISON -->
+<div class="season-section">
+<div class="season-dropdown">
+<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+<div class="season-menu" id="seasonMenu">
+<div data-season="1">Saison 1</div>
+<div data-season="2">Saison 2</div>
+<div data-season="3">Saison 3</div>
+</div>
+</div>
 </div>
 
-<div class="season-select">
-<label>Saison :</label>
-<select id="season">
-<option value="1">Saison 1</option>
-<option value="2">Saison 2</option>
-<option value="3">Saison 3</option>
-</select>
-</div>
-
+<!-- EPISODES -->
 <div class="episodes" id="episodes"></div>
 
 <script>
@@ -207,9 +222,25 @@ const episodesData = {
 3: ["Corto Maltese","Le Magicien","Le Retour"]
 };
 
+const seasonBtn = document.getElementById("seasonBtn");
+const seasonMenu = document.getElementById("seasonMenu");
+const episodesContainer = document.getElementById("episodes");
+
+seasonBtn.onclick = () => {
+seasonMenu.classList.toggle("show");
+};
+
+document.querySelectorAll(".season-menu div").forEach(item=>{
+item.onclick = () => {
+const season = item.getAttribute("data-season");
+seasonBtn.innerHTML = item.innerHTML + " ▼";
+seasonMenu.classList.remove("show");
+showEpisodes(season);
+};
+});
+
 function showEpisodes(season){
-const container = document.getElementById("episodes");
-container.innerHTML="";
+episodesContainer.innerHTML="";
 
 episodesData[season].forEach(title=>{
 const card=document.createElement("div");
@@ -224,13 +255,15 @@ card.innerHTML=`
 </div>
 `;
 
-container.appendChild(card);
+card.onclick = () => {
+window.scrollTo({top:0, behavior:"smooth"});
+};
+
+episodesContainer.appendChild(card);
 });
 }
 
-const select=document.getElementById("season");
-showEpisodes(select.value);
-select.addEventListener("change",()=>showEpisodes(select.value));
+showEpisodes(1);
 </script>
 
 </body>
