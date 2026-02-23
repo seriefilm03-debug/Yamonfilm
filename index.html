@@ -6,8 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
+*{
     margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
     font-family:Arial, sans-serif;
     background:#141414;
     color:white;
@@ -15,58 +20,76 @@ body{
 
 /* NAVBAR */
 .navbar{
-    background:black;
-    padding:20px;
-    font-size:28px;
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 5%;
+    font-size:clamp(20px, 3vw, 28px);
     font-weight:bold;
     color:#e50914;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    z-index:1000;
 }
 
 /* HERO */
 .hero{
-    height:90vh;
-    padding:80px 40px;
+    min-height:100vh;
+    padding:120px 5%;
     display:flex;
-    align-items:center;
+    flex-direction:column;
+    justify-content:center;
     background:
-        linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)),
-        url("https://share.google/HvVzrBjvnuwvQZAG5");
-    background-size:cover;
-    background-position:center;
+        linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
+        url("https://images.unsplash.com/photo-1505685296765-3a2736de412f") no-repeat center center/cover;
 }
 
-
-
+/* TEXTE HERO */
 .hero h1{
-    font-size:40px;
+    font-size:clamp(28px, 5vw, 60px);
+    max-width:600px;
 }
 
-button{
-    padding:10px 20px;
+.hero p{
     margin-top:20px;
+    font-size:clamp(14px, 2vw, 20px);
+    max-width:500px;
+}
+
+/* BOUTON */
+button{
+    padding:12px 25px;
+    margin-top:25px;
     border:none;
     border-radius:5px;
     font-weight:bold;
     cursor:pointer;
+    font-size:16px;
 }
 
 .play{
     background:white;
     color:black;
+    transition:0.3s;
 }
 
-/* FILMS */
+.play:hover{
+    background:#e50914;
+    color:white;
+}
+
+/* SECTION FILMS */
 .movies{
-    display:flex;
+    padding:40px 5%;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
     gap:20px;
-    padding:40px;
 }
 
+/* CARTE FILM */
 .movie{
-    width:180px;
-    height:250px;
     background:#333;
-    border-radius:5px;
+    height:260px;
+    border-radius:8px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -77,8 +100,15 @@ button{
 }
 
 .movie:hover{
-    transform:scale(1.08);
+    transform:scale(1.05);
     background:#555;
+}
+
+/* RESPONSIVE PETIT ECRAN */
+@media(max-width:600px){
+    .hero{
+        padding-top:150px;
+    }
 }
 </style>
 </head>
@@ -99,6 +129,8 @@ button{
 <section class="movies">
     <a href="film1.html" class="movie">Film 1</a>
     <a href="film2.html" class="movie">Film 2</a>
+    <a href="film3.html" class="movie">Film 3</a>
+    <a href="film4.html" class="movie">Film 4</a>
 </section>
 
 </body>
