@@ -33,6 +33,7 @@ body{
 
 /* HERO */
 .hero{
+    position:relative;
     min-height:100vh;
     padding:120px 5%;
     display:flex;
@@ -40,19 +41,32 @@ body{
     justify-content:center;
     background:
         linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
-        url("https://images.unsplash.com/photo-1505685296765-3a2736de412f") no-repeat center center/cover;
+        url("s-l1200.jpg") no-repeat center center/cover;
+}
+
+/* Effet fondu en bas */
+.hero::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:200px;
+    background:linear-gradient(to top, #141414, transparent);
 }
 
 /* TEXTE HERO */
 .hero h1{
     font-size:clamp(28px, 5vw, 60px);
     max-width:600px;
+    z-index:2;
 }
 
 .hero p{
     margin-top:20px;
     font-size:clamp(14px, 2vw, 20px);
     max-width:500px;
+    z-index:2;
 }
 
 /* BOUTON */
@@ -70,11 +84,14 @@ button{
     background:white;
     color:black;
     transition:0.3s;
+    box-shadow:0 5px 15px rgba(0,0,0,0.4);
+    z-index:2;
 }
 
 .play:hover{
     background:#e50914;
     color:white;
+    transform:scale(1.05);
 }
 
 /* SECTION FILMS */
@@ -83,11 +100,19 @@ button{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
     gap:20px;
+
+    opacity:0;
+    transform:translateY(40px);
+    transition:1s ease;
+}
+
+.movies.show{
+    opacity:1;
+    transform:translateY(0);
 }
 
 /* CARTE FILM */
 .movie{
-    background:#333;
     height:260px;
     border-radius:8px;
     display:flex;
@@ -97,6 +122,7 @@ button{
     color:white;
     font-weight:bold;
     transition:0.3s;
+    background:#333;
 }
 
 .movie:hover{
@@ -104,7 +130,7 @@ button{
     background:#555;
 }
 
-/* RESPONSIVE PETIT ECRAN */
+/* RESPONSIVE */
 @media(max-width:600px){
     .hero{
         padding-top:150px;
@@ -132,6 +158,18 @@ button{
     <a href="film3.html" class="movie">Film 3</a>
     <a href="film4.html" class="movie">Film 4</a>
 </section>
+
+<script>
+window.addEventListener("scroll", function(){
+    const movies = document.querySelector(".movies");
+    const position = movies.getBoundingClientRect().top;
+    const screenHeight = window.innerHeight;
+
+    if(position < screenHeight - 100){
+        movies.classList.add("show");
+    }
+});
+</script>
 
 </body>
 </html>
