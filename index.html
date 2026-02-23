@@ -41,12 +41,12 @@ body{
     justify-content:center;
     align-items:flex-start;
     padding:0 5%;
-
+    
     background:
         linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
         url("s-l1200.jpg");
-    background-size: 100% auto;        /* ajuste la largeur, réduit le zoom */
-    background-position: top center;   /* montre le haut de l'image */
+    background-size: cover;            /* Remplit tout l'écran */
+    background-position: center;       /* Centre l'image */
     background-repeat: no-repeat;
 }
 
@@ -126,9 +126,11 @@ body{
 /* MOBILE */
 @media(max-width:768px){
     .hero{
-        text-align:center;
         align-items:center;
-        background-size: cover;       /* pour petit écran, full cover */
+        text-align:center;
+        background-size: cover;       /* Plein écran mobile */
+        background-position: center;  /* Centre l'image */
+        height:100vh;                 /* Assure 100% hauteur */
     }
 
     .hero h1, .hero p{
