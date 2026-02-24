@@ -32,6 +32,7 @@ z-index:1000;
 font-size:22px;
 font-weight:bold;
 color:#e50914;
+text-decoration:none;
 }
 
 /* HERO */
@@ -81,6 +82,7 @@ font-size:18px;
 font-weight:bold;
 cursor:pointer;
 transition:.3s;
+margin-top:15px;
 }
 
 .btn-main:hover{
@@ -177,7 +179,7 @@ border-radius:5px;
 <body>
 
 <header>
-<div class="logo">YAMONFILM</div>
+<a href="index.html" class="logo">YAMONFILM</a>
 </header>
 
 <section class="hero" id="hero">
@@ -185,7 +187,11 @@ border-radius:5px;
 <h1 id="title">Chargement...</h1>
 <p class="meta" id="meta"></p>
 <p id="overview"></p>
-<button class="btn-main">Regarder la serie complete  maintenant</button>
+
+<button class="btn-main" onclick="goToFullSeries()">
+Regarder la série complète maintenant
+</button>
+
 </div>
 </section>
 
@@ -210,6 +216,11 @@ const overview=document.getElementById("overview");
 const seasonMenu=document.getElementById("seasonMenu");
 const seasonBtn=document.getElementById("seasonBtn");
 const episodesContainer=document.getElementById("episodes");
+
+/* Redirection bouton principal */
+function goToFullSeries(){
+window.location.href="serie-complete.html?id="+seriesId;
+}
 
 /* Charger infos série */
 async function loadSeries(){
@@ -266,9 +277,13 @@ card.innerHTML=`
 /* Lien UNIQUEMENT Saison 1 Episode 1 */
 if(season==1 && ep.episode_number==1){
 card.style.border="2px solid #e50914";
-card.onclick=()=>{window.location.href="https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";}
+card.onclick=()=>{
+window.location.href="https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
+};
 }else{
-card.onclick=()=>{window.scrollTo({top:0,behavior:"smooth"});}
+card.onclick=()=>{
+window.scrollTo({top:0,behavior:"smooth"});
+};
 }
 
 episodesContainer.appendChild(card);
