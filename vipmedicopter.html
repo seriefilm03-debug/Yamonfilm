@@ -12,6 +12,39 @@ body{
 font-family:Arial, sans-serif;
 background:#0f0f0f;
 color:white;
+display:none; /* Caché par défaut */
+}
+
+/* ECRAN CODE */
+#lockScreen{
+position:fixed;
+inset:0;
+background:#0f0f0f;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+#lockScreen h2{
+margin-bottom:20px;
+}
+
+#lockScreen input{
+padding:12px 20px;
+border-radius:6px;
+border:none;
+margin-bottom:15px;
+}
+
+#lockScreen button{
+padding:12px 25px;
+border:none;
+background:#e50914;
+color:white;
+border-radius:6px;
+cursor:pointer;
 }
 
 /* HEADER */
@@ -159,26 +192,20 @@ border-radius:5px;
 }
 
 /* RESPONSIVE */
-@media(max-width:1024px){
-.hero{padding:60px}
-.episodes{padding:20px 40px}
-}
-
 @media(max-width:768px){
-.hero{height:70vh;padding:40px}
+.hero{padding:40px;height:70vh}
 .hero h1{font-size:32px}
-.season-section{padding:30px}
-.episodes{padding:20px}
-}
-
-@media(max-width:480px){
-.hero{height:60vh}
-.hero h1{font-size:26px}
-.btn-main{padding:12px 20px;font-size:14px}
 }
 </style>
 </head>
 <body>
+
+<!-- 🔒 Ecran verrou -->
+<div id="lockScreen">
+<h2>Entrez le code d'accès</h2>
+<input type="password" id="accessCode" placeholder="Code">
+<button onclick="checkCode()">Accéder</button>
+</div>
 
 <header>
 <a href="index.html" class="logo">YAMONFILM</a>
@@ -190,8 +217,7 @@ border-radius:5px;
 <p class="meta" id="meta"></p>
 <p id="overview"></p>
 
-<!-- 🔥 Lien vers autre page -->
-<a href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g" class="btn-main">
+<a href="serie-complete.html?id=40996" class="btn-main">
 Regarder la série maintenant
 </a>
 
@@ -212,6 +238,18 @@ const apiKey="182c7173698e34803715eacab5c693a7";
 const seriesId=40996;
 const imgBase="https://image.tmdb.org/t/p/original";
 
+/* 🔒 Vérification Code */
+function checkCode(){
+const code=document.getElementById("accessCode").value;
+if(code==="200105"){
+document.getElementById("lockScreen").style.display="none";
+document.body.style.display="block";
+}else{
+alert("Code incorrect");
+}
+}
+
+/* TMDB */
 const hero=document.getElementById("hero");
 const title=document.getElementById("title");
 const meta=document.getElementById("meta");
@@ -220,7 +258,6 @@ const seasonMenu=document.getElementById("seasonMenu");
 const seasonBtn=document.getElementById("seasonBtn");
 const episodesContainer=document.getElementById("episodes");
 
-/* Charger infos série */
 async function loadSeries(){
 const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
 const data=await res.json();
@@ -233,7 +270,6 @@ hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
 loadSeasons(data.number_of_seasons);
 }
 
-/* Charger saisons */
 function loadSeasons(total){
 seasonMenu.innerHTML="";
 for(let i=1;i<=total;i++){
@@ -249,7 +285,6 @@ seasonMenu.appendChild(div);
 loadEpisodes(1);
 }
 
-/* Charger épisodes */
 async function loadEpisodes(season){
 episodesContainer.innerHTML="";
 const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
@@ -272,7 +307,6 @@ card.innerHTML=`
 </div>
 `;
 
-/* Lien UNIQUEMENT Saison 1 Episode 1 */
 if(season==1 && ep.episode_number==1){
 card.style.border="2px solid #e50914";
 card.onclick=()=>{
