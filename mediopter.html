@@ -73,6 +73,14 @@ color:#ccc;
 margin-bottom:15px;
 }
 
+/* BOUTONS */
+.btn-group{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-top:15px;
+}
+
 .btn-main{
 display:inline-block;
 background:#e50914;
@@ -84,7 +92,6 @@ font-size:18px;
 font-weight:bold;
 cursor:pointer;
 transition:.3s;
-margin-top:15px;
 }
 
 .btn-main:hover{
@@ -190,10 +197,15 @@ border-radius:5px;
 <p class="meta" id="meta"></p>
 <p id="overview"></p>
 
-<!-- 🔥 Lien vers autre page -->
-<a href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g" class="btn-main">
+<div class="btn-group">
+<a href="serie-complete.html?id=40996" class="btn-main">
 Regarder la série maintenant
 </a>
+
+<a href="acces.html" class="btn-main">
+J’ai déjà payé
+</a>
+</div>
 
 </div>
 </section>
@@ -272,7 +284,6 @@ card.innerHTML=`
 </div>
 `;
 
-/* Lien UNIQUEMENT Saison 1 Episode 1 */
 if(season==1 && ep.episode_number==1){
 card.style.border="2px solid #e50914";
 card.onclick=()=>{
