@@ -13,7 +13,7 @@ body{
   font-family: Arial, sans-serif;
   background:#0f0f0f;
   color:white;
-  display:block; /* toujours visible */
+  display:block;
 }
 
 /* ===== MENU DE CODE / ÉCRAN DE VERROU ===== */
@@ -69,7 +69,7 @@ body{
 
 /* ===== CONTENU PRINCIPAL ===== */
 .main-content{
-  display:none; /* caché par défaut */
+  display:none;
 }
 
 /* ===== HEADER ===== */
@@ -268,6 +268,21 @@ const apiKey="182c7173698e34803715eacab5c693a7";
 const seriesId=40996;
 const imgBase="https://image.tmdb.org/t/p/original";
 
+// 🔗 Liens pour chaque épisode (à compléter)
+const episodeLinks = {
+  1: { // Saison 1
+    1: "https://lien-episode-1.com",
+    2: "https://lien-episode-2.com",
+    3: "https://lien-episode-3.com"
+    // ajoute tous les épisodes
+  },
+  2: { // Saison 2
+    1: "https://lien-s2-ep1.com",
+    2: "https://lien-s2-ep2.com"
+    // etc.
+  }
+};
+
 /* 🔒 Vérification Code */
 function checkCode(){
   const code = document.getElementById("accessCode").value;
@@ -337,14 +352,15 @@ async function loadEpisodes(season){
       </div>
     `;
 
-    if(season==1 && ep.episode_number==1){
-      card.style.border="2px solid #e50914";
-      card.onclick = () => {
-        window.location.href="https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
-      };
-    } else {
-      card.onclick = () => { window.scrollTo({top:0,behavior:"smooth"}); };
-    }
+    // Chaque épisode clique sur son propre lien
+    card.onclick = () => {
+      const link = episodeLinks[season] && episodeLinks[season][ep.episode_number];
+      if(link){
+        window.location.href = link;
+      } else {
+        alert("Lien non défini pour cet épisode");
+      }
+    };
 
     episodesContainer.appendChild(card);
   });
