@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medicopter 117 - YAMONFILM</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:Arial, sans-serif;
+background:#0f0f0f;
+color:white;
+}
+
+/* HEADER */
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:15px 40px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+display:flex;
+justify-content:space-between;
+align-items:center;
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#e50914;
+text-decoration:none;
+}
+
+/* HERO */
+.hero{
+margin-top:70px;
+height:80vh;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:80px;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+height:60%;
+background:linear-gradient(to top,#0f0f0f,transparent);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+max-width:600px;
+}
+
+.hero h1{
+font-size:55px;
+margin-bottom:15px;
+}
+
+.meta{
+color:#ccc;
+margin-bottom:15px;
+}
+
+.btn-main{
+display:inline-block;
+background:#e50914;
+color:white;
+text-decoration:none;
+padding:15px 35px;
+border-radius:8px;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+margin-top:15px;
+}
+
+.btn-main:hover{
+background:#ff2e2e;
+}
+
+/* SAISON */
+.season-section{
+padding:40px 80px 20px;
+}
+
+.season-dropdown{
+position:relative;
+display:inline-block;
+}
+
+.season-menu{
+position:absolute;
+background:#1c1c1c;
+border-radius:8px;
+margin-top:10px;
+display:none;
+overflow:hidden;
+}
+
+.season-menu div{
+padding:12px 20px;
+cursor:pointer;
+}
+
+.season-menu div:hover{
+background:#e50914;
+}
+
+.show{display:block}
+
+/* EPISODES */
+.episodes{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:20px;
+padding:20px 80px 80px;
+}
+
+.card{
+background:#1c1c1c;
+border-radius:12px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+.card img{
+width:100%;
+height:150px;
+object-fit:cover;
+}
+
+.card-content{
+padding:15px;
+}
+
+.badge{
+font-size:12px;
+background:#e50914;
+padding:4px 8px;
+border-radius:5px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+.hero{padding:60px}
+.episodes{padding:20px 40px}
+}
+
+@media(max-width:768px){
+.hero{height:70vh;padding:40px}
+.hero h1{font-size:32px}
+.season-section{padding:30px}
+.episodes{padding:20px}
+}
+
+@media(max-width:480px){
+.hero{height:60vh}
+.hero h1{font-size:26px}
+.btn-main{padding:12px 20px;font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html" class="logo">YAMONFILM</a>
+</header>
+
+<section class="hero" id="hero">
+<div class="hero-content">
+<h1 id="title">Chargement...</h1>
+<p class="meta" id="meta"></p>
+<p id="overview"></p>
+
+<!-- 🔥 Lien vers autre page -->
+<a href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g" class="btn-main">
+Regarder la série maintenant
+</a>
+
+</div>
+</section>
+
+<div class="season-section">
+<div class="season-dropdown">
+<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+<div class="season-menu" id="seasonMenu"></div>
+</div>
+</div>
+
+<div class="episodes" id="episodes"></div>
+
+<script>
+const apiKey="182c7173698e34803715eacab5c693a7";
+const seriesId=40996;
+const imgBase="https://image.tmdb.org/t/p/original";
+
+const hero=document.getElementById("hero");
+const title=document.getElementById("title");
+const meta=document.getElementById("meta");
+const overview=document.getElementById("overview");
+const seasonMenu=document.getElementById("seasonMenu");
+const seasonBtn=document.getElementById("seasonBtn");
+const episodesContainer=document.getElementById("episodes");
+
+/* Charger infos série */
+async function loadSeries(){
+const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
+
+title.textContent=data.name;
+meta.textContent=`⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
+overview.textContent=data.overview;
+hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
+
+loadSeasons(data.number_of_seasons);
+}
+
+/* Charger saisons */
+function loadSeasons(total){
+seasonMenu.innerHTML="";
+for(let i=1;i<=total;i++){
+const div=document.createElement("div");
+div.textContent="Saison "+i;
+div.onclick=()=>{
+seasonBtn.innerHTML="Saison "+i+" ▼";
+seasonMenu.classList.remove("show");
+loadEpisodes(i);
+};
+seasonMenu.appendChild(div);
+}
+loadEpisodes(1);
+}
+
+/* Charger épisodes */
+async function loadEpisodes(season){
+episodesContainer.innerHTML="";
+const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
+
+data.episodes.forEach(ep=>{
+let imageUrl=ep.still_path?imgBase+ep.still_path:
+data.poster_path?imgBase+data.poster_path:
+"https://via.placeholder.com/500x281?text=Episode";
+
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<img src="${imageUrl}">
+<div class="card-content">
+<span class="badge">⭐ ${ep.vote_average||"N/A"}</span>
+<h4>${ep.episode_number}. ${ep.name}</h4>
+<small>${ep.air_date||""}</small>
+</div>
+`;
+
+/* Lien UNIQUEMENT Saison 1 Episode 1 */
+if(season==1 && ep.episode_number==1){
+card.style.border="2px solid #e50914";
+card.onclick=()=>{
+window.location.href="https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
+};
+}else{
+card.onclick=()=>{
+window.scrollTo({top:0,behavior:"smooth"});
+};
+}
+
+episodesContainer.appendChild(card);
+});
+}
+
+seasonBtn.onclick=()=>{seasonMenu.classList.toggle("show");}
+
+loadSeries();
+</script>
+
+</body>
+</html>
