@@ -74,8 +74,10 @@ margin-bottom:15px;
 }
 
 .btn-main{
+display:inline-block;
 background:#e50914;
-border:none;
+color:white;
+text-decoration:none;
 padding:15px 35px;
 border-radius:8px;
 font-size:18px;
@@ -188,9 +190,10 @@ border-radius:5px;
 <p class="meta" id="meta"></p>
 <p id="overview"></p>
 
-<button class="btn-main" onclick="goToFullSeries()">
-Regarder la série complète maintenant
-</button>
+<!-- 🔥 Lien vers autre page -->
+<a href="serie-complete.html?id=40996" class="btn-main">
+Regarder la série maintenant
+</a>
 
 </div>
 </section>
@@ -216,11 +219,6 @@ const overview=document.getElementById("overview");
 const seasonMenu=document.getElementById("seasonMenu");
 const seasonBtn=document.getElementById("seasonBtn");
 const episodesContainer=document.getElementById("episodes");
-
-/* Redirection bouton principal */
-function goToFullSeries(){
-window.location.href="serie-complete.html?id="+seriesId;
-}
 
 /* Charger infos série */
 async function loadSeries(){
