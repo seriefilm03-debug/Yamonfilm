@@ -3,185 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMONFILM</title>
+<title>Medicopter 117 - YAMONFILM</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-    font-family:Arial, sans-serif;
-    background:#141414;
-    color:white;
+font-family:Arial, sans-serif;
+background:#0f0f0f;
+color:white;
 }
 
-/* NAVBAR */
-.navbar{
-    position:fixed;
-    top:0;
-    width:100%;
-    padding:20px 5%;
-    font-size:clamp(18px, 3vw, 30px);
-    font-weight:bold;
-    color:#e50914;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    z-index:1000;
+/* HEADER */
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:15px 40px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+display:flex;
+justify-content:space-between;
+align-items:center;
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#e50914;
 }
 
 /* HERO */
 .hero{
-    position:relative;
-    width:100%;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-    padding:0 5%;
-    
-    background:
-        linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
-        url("s-l1200.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+margin-top:70px;
+height:80vh;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:80px;
+position:relative;
 }
 
-/* Dégradé bas style Netflix */
 .hero::after{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:20vh;
-    background:linear-gradient(to top, #141414, transparent);
+content:"";
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+height:60%;
+background:linear-gradient(to top,#0f0f0f,transparent);
 }
 
-/* TEXTE */
+.hero-content{
+position:relative;
+z-index:2;
+max-width:600px;
+}
+
 .hero h1{
-    font-size:clamp(26px, 5vw, 70px);
-    max-width:700px;
-    z-index:2;
+font-size:55px;
+margin-bottom:15px;
 }
 
-.hero p{
-    margin-top:20px;
-    font-size:clamp(14px, 2vw, 22px);
-    max-width:500px;
-    z-index:2;
+.meta{
+color:#ccc;
+margin-bottom:15px;
 }
 
-/* BOUTON */
-.play{
-    margin-top:30px;
-    padding:14px 30px;
-    font-size:clamp(14px, 2vw, 18px);
-    border:none;
-    border-radius:5px;
-    font-weight:bold;
-    cursor:pointer;
-    background:white;
-    color:black;
-    transition:0.3s;
-    z-index:2;
+.btn-main{
+background:#e50914;
+border:none;
+padding:15px 35px;
+border-radius:8px;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
 }
 
-.play:hover{
-    background:#e50914;
-    color:white;
-    transform:scale(1.05);
+.btn-main:hover{
+background:#ff2e2e;
 }
 
-/* SECTION FILMS */
-.movies{
-    padding:50px 5%;
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
-    gap:20px;
+/* SAISON */
+.season-section{
+padding:40px 80px 20px;
 }
 
-/* CARTE FILM */
-.movie{
-    height:clamp(200px, 30vw, 300px);
-    border-radius:8px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    text-decoration:none;
-    color:white;
-    font-weight:bold;
-    transition:0.3s;
-    position:relative;
-    overflow:hidden;
-    background-size:cover;
-    background-position:center;
+.season-dropdown{
+position:relative;
+display:inline-block;
 }
 
-.movie span{
-    position:absolute;
-    bottom:10px;
-    left:10px;
-    z-index:2;
-    font-size:clamp(14px,1.5vw,18px);
+.season-menu{
+position:absolute;
+background:#1c1c1c;
+border-radius:8px;
+margin-top:10px;
+display:none;
+overflow:hidden;
 }
 
-.movie::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.3);
+.season-menu div{
+padding:12px 20px;
+cursor:pointer;
 }
 
-.movie:hover{
-    transform:scale(1.05);
+.season-menu div:hover{
+background:#e50914;
 }
 
-/* MOBILE */
+.show{display:block}
+
+/* EPISODES */
+.episodes{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:20px;
+padding:20px 80px 80px;
+}
+
+.card{
+background:#1c1c1c;
+border-radius:12px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+.card img{
+width:100%;
+height:150px;
+object-fit:cover;
+}
+
+.card-content{
+padding:15px;
+}
+
+.badge{
+font-size:12px;
+background:#e50914;
+padding:4px 8px;
+border-radius:5px;
+}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+.hero{padding:60px}
+.episodes{padding:20px 40px}
+}
+
 @media(max-width:768px){
-    .hero{
-        align-items:center;
-        text-align:center;
-        background-size: cover;
-        background-position: center;
-        height:100vh;
-    }
+.hero{height:70vh;padding:40px}
+.hero h1{font-size:32px}
+.season-section{padding:30px}
+.episodes{padding:20px}
+}
 
-    .hero h1, .hero p{
-        max-width:90%;
-    }
-
-    .play{
-        padding:12px 25px;
-        font-size:16px;
-    }
+@media(max-width:480px){
+.hero{height:60vh}
+.hero h1{font-size:26px}
+.btn-main{padding:12px 20px;font-size:14px}
 }
 </style>
 </head>
-
 <body>
 
-<div class="navbar">YAMONFILM</div>
+<header>
+<div class="logo">YAMONFILM</div>
+</header>
 
-<!-- HERO avec lien -->
-<section class="hero">
-    <h1>Medicopter 117</h1>
-    <p>Découvrez la série la plus regardée du moment.</p>
-    <a href="lecture.html">
-        <button class="play">▶ Lecture</button>
-    </a>
+<section class="hero" id="hero">
+<div class="hero-content">
+<h1 id="title">Chargement...</h1>
+<p class="meta" id="meta"></p>
+<p id="overview"></p>
+<button class="btn-main">Regarder maintenant</button>
+</div>
 </section>
 
-<!-- SECTION FILMS -->
-<section class="movies">
-    <a href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')"><span>Medicopter 117</span></a>
-    <a href="film2.html" class="movie" style="background-image:url('film2.jpg')"><span>Film 2</span></a>
-    <a href="film3.html" class="movie" style="background-image:url('film3.jpg')"><span>Film 3</span></a>
-    <a href="film4.html" class="movie" style="background-image:url('film4.jpg')"><span>Film 4</span></a>
-</section>
+<div class="season-section">
+<div class="season-dropdown">
+<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+<div class="season-menu" id="seasonMenu"></div>
+</div>
+</div>
+
+<div class="episodes" id="episodes"></div>
+
+<script>
+const apiKey="182c7173698e34803715eacab5c693a7";
+const seriesId=40996;
+const imgBase="https://image.tmdb.org/t/p/original";
+
+const hero=document.getElementById("hero");
+const title=document.getElementById("title");
+const meta=document.getElementById("meta");
+const overview=document.getElementById("overview");
+const seasonMenu=document.getElementById("seasonMenu");
+const seasonBtn=document.getElementById("seasonBtn");
+const episodesContainer=document.getElementById("episodes");
+
+/* Charger infos série */
+async function loadSeries(){
+const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
+
+title.textContent=data.name;
+meta.textContent=`⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
+overview.textContent=data.overview;
+hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
+
+loadSeasons(data.number_of_seasons);
+}
+
+/* Charger saisons */
+function loadSeasons(total){
+seasonMenu.innerHTML="";
+for(let i=1;i<=total;i++){
+const div=document.createElement("div");
+div.textContent="Saison "+i;
+div.onclick=()=>{
+seasonBtn.innerHTML="Saison "+i+" ▼";
+seasonMenu.classList.remove("show");
+loadEpisodes(i);
+};
+seasonMenu.appendChild(div);
+}
+loadEpisodes(1);
+}
+
+/* Charger épisodes */
+async function loadEpisodes(season){
+episodesContainer.innerHTML="";
+const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
+
+data.episodes.forEach(ep=>{
+let imageUrl=ep.still_path?imgBase+ep.still_path:
+data.poster_path?imgBase+data.poster_path:
+"https://via.placeholder.com/500x281?text=Episode";
+
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<img src="${imageUrl}">
+<div class="card-content">
+<span class="badge">⭐ ${ep.vote_average||"N/A"}</span>
+<h4>${ep.episode_number}. ${ep.name}</h4>
+<small>${ep.air_date||""}</small>
+</div>
+`;
+
+/* Lien UNIQUEMENT Saison 1 Episode 1 */
+if(season==1 && ep.episode_number==1){
+card.style.border="2px solid #e50914";
+card.onclick=()=>{window.location.href="episode1.html";}
+}else{
+card.onclick=()=>{window.scrollTo({top:0,behavior:"smooth"});}
+}
+
+episodesContainer.appendChild(card);
+});
+}
+
+seasonBtn.onclick=()=>{seasonMenu.classList.toggle("show");}
+
+loadSeries();
+</script>
 
 </body>
 </html>
