@@ -13,7 +13,7 @@ body{
   font-family: Arial, sans-serif;
   background:#0f0f0f;
   color:white;
-  display:none; /* caché par défaut */
+  display:block; /* toujours visible */
 }
 
 /* ===== MENU DE CODE / ÉCRAN DE VERROU ===== */
@@ -65,6 +65,11 @@ body{
 
 .lock-container button:hover{
   background:#ff2e2e;
+}
+
+/* ===== CONTENU PRINCIPAL ===== */
+.main-content{
+  display:none; /* caché par défaut */
 }
 
 /* ===== HEADER ===== */
@@ -231,6 +236,8 @@ header{
   </div>
 </div>
 
+<!-- CONTENU PRINCIPAL -->
+<div class="main-content">
 <header>
   <a href="index.html" class="logo">YAMONFILM</a>
 </header>
@@ -254,6 +261,7 @@ header{
 </div>
 
 <div class="episodes" id="episodes"></div>
+</div>
 
 <script>
 const apiKey="182c7173698e34803715eacab5c693a7";
@@ -265,7 +273,7 @@ function checkCode(){
   const code = document.getElementById("accessCode").value;
   if(code === "200105"){
     document.getElementById("lockScreen").style.display = "none";
-    document.body.style.display = "block";
+    document.querySelector(".main-content").style.display = "block";
   } else {
     alert("Code incorrect");
   }
