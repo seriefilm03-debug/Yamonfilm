@@ -3,185 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMONFILM</title>
+<title>YAMONFILM - Streaming Auto</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+/* --- TON STYLE D'ORIGINE CONSERVÉ --- */
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{ font-family:Arial, sans-serif; background:#141414; color:white; overflow-x: hidden; }
 
-body{
-    font-family:Arial, sans-serif;
-    background:#141414;
-    color:white;
-}
-
-/* NAVBAR */
 .navbar{
-    position:fixed;
-    top:0;
-    width:100%;
-    padding:20px 5%;
-    font-size:clamp(18px, 3vw, 30px);
-    font-weight:bold;
-    color:#e50914;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    z-index:1000;
+    position:fixed; top:0; width:100%; padding:20px 5%;
+    font-size:clamp(18px, 3vw, 30px); font-weight:bold; color:#e50914;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); z-index:1000;
 }
 
-/* HERO */
 .hero{
-    position:relative;
-    width:100%;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-    padding:0 5%;
-    
-    background:
-        linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
-        url("s-l1200.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    position:relative; width:100%; height:80vh; display:flex;
+    flex-direction:column; justify-content:center; align-items:flex-start;
+    padding:0 5%; background: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)), url("s-l1200.jpg");
+    background-size: cover; background-position: center;
 }
 
-/* Dégradé bas style Netflix */
 .hero::after{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:20vh;
+    content:""; position:absolute; bottom:0; left:0; width:100%; height:20vh;
     background:linear-gradient(to top, #141414, transparent);
 }
 
-/* TEXTE */
-.hero h1{
-    font-size:clamp(26px, 5vw, 70px);
-    max-width:700px;
-    z-index:2;
+.hero h1{ font-size:clamp(26px, 5vw, 70px); max-width:700px; z-index:2; }
+.hero p{ margin-top:20px; font-size:clamp(14px, 2vw, 22px); max-width:500px; z-index:2; }
+
+/* --- NOUVELLE BARRE DE RECHERCHE --- */
+.search-container {
+    padding: 30px 5%;
+    text-align: center;
+    background: #141414;
 }
 
-.hero p{
-    margin-top:20px;
-    font-size:clamp(14px, 2vw, 22px);
-    max-width:500px;
-    z-index:2;
+.search-container input {
+    padding: 12px 20px;
+    width: 300px;
+    border-radius: 25px;
+    border: 1px solid #333;
+    background: #222;
+    color: white;
+    font-size: 16px;
+    outline: none;
 }
 
-/* BOUTON */
-.play{
-    margin-top:30px;
-    padding:14px 30px;
-    font-size:clamp(14px, 2vw, 18px);
-    border:none;
-    border-radius:5px;
-    font-weight:bold;
-    cursor:pointer;
-    background:white;
-    color:black;
-    transition:0.3s;
-    z-index:2;
+.search-container button {
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: none;
+    background: #e50914;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
-.play:hover{
-    background:#e50914;
-    color:white;
-    transform:scale(1.05);
-}
-
-/* SECTION FILMS */
+/* --- SECTION FILMS DYNAMIQUE --- */
 .movies{
-    padding:50px 5%;
+    padding:20px 5%;
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
-    gap:20px;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:25px;
 }
 
-/* CARTE FILM */
-.movie{
-    height:clamp(200px, 30vw, 300px);
-    border-radius:8px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    text-decoration:none;
-    color:white;
-    font-weight:bold;
-    transition:0.3s;
-    position:relative;
-    overflow:hidden;
-    background-size:cover;
-    background-position:center;
+.movie-card {
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #222;
+    position: relative;
 }
 
-.movie span{
-    position:absolute;
-    bottom:10px;
-    left:10px;
-    z-index:2;
-    font-size:clamp(14px,1.5vw,18px);
+.movie-card:hover { transform: scale(1.08); z-index: 10; }
+
+.movie-card img { width: 100%; height: 270px; object-fit: cover; }
+
+.movie-card .title {
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
 }
 
-.movie::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.3);
+/* --- LECTEUR (MODAL) --- */
+#player-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
-.movie:hover{
-    transform:scale(1.05);
+#player-modal iframe {
+    width: 90%;
+    max-width: 900px;
+    height: 500px;
+    border: 2px solid #333;
 }
 
-/* MOBILE */
+.close-btn {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: #e50914;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
 @media(max-width:768px){
-    .hero{
-        align-items:center;
-        text-align:center;
-        background-size: cover;
-        background-position: center;
-        height:100vh;
-    }
-
-    .hero h1, .hero p{
-        max-width:90%;
-    }
-
-    .play{
-        padding:12px 25px;
-        font-size:16px;
-    }
+    .hero{ align-items:center; text-align:center; }
+    .search-container input { width: 70%; }
 }
 </style>
 </head>
-
 <body>
 
 <div class="navbar">YAMONFILM</div>
 
-<!-- HERO avec lien -->
 <section class="hero">
     <h1>Medicopter 117</h1>
-    <p>Découvrez la série la plus regardée du moment.</p>
-    <a href="mediopter.html">
-        <button class="play">▶ Lecture</button>
-    </a>
+    <p>Recherchez n'importe quel film ou série ci-dessous.</p>
 </section>
 
-<!-- SECTION FILMS -->
-<section class="movies">
-    <a href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')"><span>Medicopter 117</span></a>
-    <a href="le clown.html" class="movie" style="background-image:url('film2.jpg')"><span>Film 2</span></a>
-    <a href="film3.html" class="movie" style="background-image:url('film3.jpg')"><span>Film 3</span></a>
-    <a href="film4.html" class="movie" style="background-image:url('film4.jpg')"><span>Film 4</span></a>
-</section>
+<div class="search-container">
+    <input type="text" id="search-input" placeholder="Titre en anglais (ex: Batman)...">
+    <button onclick="searchMovies()">Rechercher</button>
+</div>
+
+<section class="movies" id="movie-results">
+    </section>
+
+<div id="player-modal">
+    <div class="close-btn" onclick="closePlayer()">FERMER LE LECTEUR X</div>
+    <iframe id="main-player" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
+</div>
+
+<script>
+const API_KEY = 'ded42c99';
+
+async function searchMovies() {
+    const query = document.getElementById('search-input').value;
+    if(!query) return;
+
+    const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const resultsDiv = document.getElementById('movie-results');
+    resultsDiv.innerHTML = '';
+
+    if(data.Search) {
+        data.Search.forEach(movie => {
+            if(movie.Poster !== "N/A") {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <img src="${movie.Poster}" alt="${movie.Title}">
+                    <div class="title">${movie.Title}</div>
+                `;
+                card.onclick = () => openPlayer(movie.imdbID);
+                resultsDiv.appendChild(card);
+            }
+        });
+    } else {
+        resultsDiv.innerHTML = "<p>Aucun film trouvé. Essayez un nom en anglais !</p>";
+    }
+}
+
+function openPlayer(id) {
+    const modal = document.getElementById('player-modal');
+    const iframe = document.getElementById('main-player');
+    // On utilise Vidsrc pour la recherche automatique de lien
+    iframe.src = `https://vidsrc.me/embed/movie/${id}`;
+    modal.style.display = 'flex';
+}
+
+function closePlayer() {
+    const modal = document.getElementById('player-modal');
+    const iframe = document.getElementById('main-player');
+    modal.style.display = 'none';
+    iframe.src = ''; // Arrête la vidéo
+}
+
+// Recherche avec la touche Entrée
+document.getElementById('search-input').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') searchMovies();
+});
+</script>
 
 </body>
 </html>
