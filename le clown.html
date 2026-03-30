@@ -20,7 +20,7 @@ position:fixed;
 top:0;
 width:100%;
 padding:15px 40px;
-background:rgba(0,0,0,0.6);
+background:rgba(0,0,0,0.8);
 backdrop-filter:blur(10px);
 display:flex;
 justify-content:space-between;
@@ -35,9 +35,35 @@ color:#e50914;
 text-decoration:none;
 }
 
+/* LECTEUR VIDEO (MODAL) */
+#video-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+#video-overlay iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+.close-video {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    z-index: 3001;
+    text-shadow: 0 0 10px black;
+}
+
 /* HERO */
 .hero{
-margin-top:70px;
+margin-top:0;
 height:80vh;
 background-size:cover;
 background-position:center;
@@ -73,12 +99,9 @@ color:#ccc;
 margin-bottom:15px;
 }
 
-/* BOUTONS */
-.btn-group{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-top:15px;
+/* SAISON */
+.season-section{
+padding:40px 80px 20px;
 }
 
 .btn-main{
@@ -86,22 +109,12 @@ display:inline-block;
 background:#e50914;
 color:white;
 text-decoration:none;
-padding:15px 35px;
+padding:12px 25px;
 border-radius:8px;
-font-size:18px;
+font-size:16px;
 font-weight:bold;
 cursor:pointer;
-transition:.3s;
 border:none;
-}
-
-.btn-main:hover{
-background:#ff2e2e;
-}
-
-/* SAISON */
-.season-section{
-padding:40px 80px 20px;
 }
 
 .season-dropdown{
@@ -115,7 +128,10 @@ background:#1c1c1c;
 border-radius:8px;
 margin-top:10px;
 display:none;
-overflow:hidden;
+overflow-y:auto;
+max-height: 300px;
+width: 150px;
+z-index: 100;
 }
 
 .season-menu div{
@@ -143,10 +159,12 @@ border-radius:12px;
 overflow:hidden;
 cursor:pointer;
 transition:.3s;
+border: 1px solid transparent;
 }
 
 .card:hover{
 transform:scale(1.05);
+border-color: #e50914;
 }
 
 .card img{
@@ -166,78 +184,9 @@ padding:4px 8px;
 border-radius:5px;
 }
 
-/* POPUP */
-.popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.7);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:2000;
-opacity:0;
-pointer-events:none;
-transition:.3s;
-}
-
-.popup.show{
-opacity:1;
-pointer-events:auto;
-}
-
-.popup-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:12px;
-text-align:center;
-max-width:400px;
-border:1px solid #e50914;
-animation:fadeIn .3s ease;
-}
-
-.popup-box p{
-margin-bottom:20px;
-}
-
-.popup-box button{
-background:#e50914;
-border:none;
-color:white;
-padding:10px 20px;
-border-radius:6px;
-cursor:pointer;
-font-weight:bold;
-}
-
-.popup-box button:hover{
-background:#ff2e2e;
-}
-
-@keyframes fadeIn{
-from{transform:scale(0.9);opacity:0;}
-to{transform:scale(1);opacity:1;}
-}
-
-/* RESPONSIVE */
-@media(max-width:1024px){
-.hero{padding:60px}
-.episodes{padding:20px 40px}
-}
-
 @media(max-width:768px){
-.hero{height:70vh;padding:40px}
-.hero h1{font-size:32px}
-.season-section{padding:30px}
-.episodes{padding:20px}
-}
-
-@media(max-width:480px){
-.hero{height:60vh}
-.hero h1{font-size:26px}
-.btn-main{padding:12px 20px;font-size:14px}
+.hero{padding:40px}
+.episodes, .season-section{padding:20px}
 }
 </style>
 </head>
@@ -247,47 +196,32 @@ to{transform:scale(1);opacity:1;}
 <a href="index.html" class="logo">YAMONFILM</a>
 </header>
 
+<div id="video-overlay">
+    <span class="close-video" onclick="closeVideo()">&times;</span>
+    <iframe id="video-iframe" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
+</div>
+
 <section class="hero" id="hero">
 <div class="hero-content">
 <h1 id="title">Chargement...</h1>
 <p class="meta" id="meta"></p>
 <p id="overview"></p>
-
-<div class="btn-group">
-<a href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g" class="btn-main">
-Regarder la série maintenant
-</a>
-
-<a href="vipclown.html" class="btn-main">
-J’ai déjà payé
-</a>
-</div>
 </div>
 </section>
 
 <div class="season-section">
-<div class="season-dropdown">
-<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-<div class="season-menu" id="seasonMenu"></div>
-</div>
+    <h3>Saisons</h3>
+    <div class="season-dropdown">
+        <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+        <div class="season-menu" id="seasonMenu"></div>
+    </div>
 </div>
 
 <div class="episodes" id="episodes"></div>
 
-<!-- POPUP -->
-<div id="popupMessage" class="popup">
-<div class="popup-box">
-<p>
-Pour voir tous les épisodes, veuillez cliquer sur
-<strong>"Regarder la série maintenant"</strong>.
-</p>
-<button onclick="closePopup()">Fermer</button>
-</div>
-</div>
-
 <script>
 const apiKey="182c7173698e34803715eacab5c693a7";
-const seriesId=16678;
+const seriesId=16678; // ID du Clown
 const imgBase="https://image.tmdb.org/t/p/original";
 
 const hero=document.getElementById("hero");
@@ -297,15 +231,22 @@ const overview=document.getElementById("overview");
 const seasonMenu=document.getElementById("seasonMenu");
 const seasonBtn=document.getElementById("seasonBtn");
 const episodesContainer=document.getElementById("episodes");
+const videoOverlay=document.getElementById("video-overlay");
+const videoIframe=document.getElementById("video-iframe");
 
-/* POPUP FUNCTIONS */
-function showPopup(){
-document.getElementById("popupMessage").classList.add("show");
-window.scrollTo({top:0,behavior:"smooth"});
+/* FONCTIONS LECTEUR */
+function openVideo(s, e) {
+    // On génère le lien automatique vidsrc (S=Saison, E=Episode)
+    const url = `https://vidsrc.me/embed/tv?tmdb=${seriesId}&season=${s}&episode=${e}`;
+    videoIframe.src = url;
+    videoOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden"; // Stop scroll
 }
 
-function closePopup(){
-document.getElementById("popupMessage").classList.remove("show");
+function closeVideo() {
+    videoOverlay.style.display = "none";
+    videoIframe.src = "";
+    document.body.style.overflow = "auto";
 }
 
 /* Charger infos série */
@@ -321,57 +262,47 @@ hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
 loadSeasons(data.number_of_seasons);
 }
 
-/* Charger saisons */
+/* Charger menu saisons */
 function loadSeasons(total){
 seasonMenu.innerHTML="";
 for(let i=1;i<=total;i++){
-const div=document.createElement("div");
-div.textContent="Saison "+i;
-div.onclick=()=>{
-seasonBtn.innerHTML="Saison "+i+" ▼";
-seasonMenu.classList.remove("show");
-loadEpisodes(i);
-};
-seasonMenu.appendChild(div);
+    const div=document.createElement("div");
+    div.textContent="Saison "+i;
+    div.onclick=()=>{
+        seasonBtn.innerHTML="Saison "+i+" ▼";
+        seasonMenu.classList.remove("show");
+        loadEpisodes(i);
+    };
+    seasonMenu.appendChild(div);
 }
 loadEpisodes(1);
 }
 
-/* Charger épisodes */
-async function loadEpisodes(season){
-episodesContainer.innerHTML="";
-const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+/* Charger épisodes dynamiques */
+async function loadEpisodes(seasonNumber){
+episodesContainer.innerHTML="<p>Chargement des épisodes...</p>";
+const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${seasonNumber}?api_key=${apiKey}&language=fr-FR`);
 const data=await res.json();
 
+episodesContainer.innerHTML="";
+
 data.episodes.forEach(ep=>{
-let imageUrl=ep.still_path?imgBase+ep.still_path:
-data.poster_path?imgBase+data.poster_path:
-"https://via.placeholder.com/500x281?text=Episode";
+    let imageUrl=ep.still_path?imgBase+ep.still_path: "https://via.placeholder.com/500x281?text=Episode";
 
-const card=document.createElement("div");
-card.className="card";
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+        <img src="${imageUrl}">
+        <div class="card-content">
+            <span class="badge">S${seasonNumber} - E${ep.episode_number}</span>
+            <h4>${ep.name}</h4>
+        </div>
+    `;
 
-card.innerHTML=`
-<img src="${imageUrl}">
-<div class="card-content">
-<span class="badge">⭐ ${ep.vote_average||"N/A"}</span>
-<h4>${ep.episode_number}. ${ep.name}</h4>
-<small>${ep.air_date||""}</small>
-</div>
-`;
+    // AU CLIC : On ouvre le lecteur automatique
+    card.onclick=()=> openVideo(seasonNumber, ep.episode_number);
 
-if(season==1 && ep.episode_number==1){
-card.style.border="2px solid #e50914";
-card.onclick=()=>{
-window.location.href="https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
-};
-}else{
-card.onclick=()=>{
-showPopup();
-};
-}
-
-episodesContainer.appendChild(card);
+    episodesContainer.appendChild(card);
 });
 }
 
