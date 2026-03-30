@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Lecteur Automatique</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #111; border-radius: 10px; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        h1 { color: #e50914; }
+        p { color: #ccc; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Visionnage Automatique</h1>
+        <p>Le lecteur ci-dessous recherche automatiquement les sources sur le web.</p>
+
+        <div class="video-container">
+            <iframe src="https://vidsrc.to/embed/movie/tt0111161" allowfullscreen></iframe>
+        </div>
+
+        <p style="margin-top: 20px; font-size: 0.8em;">Note : Si le lecteur affiche une pub, ferme-la une fois pour lancer la vidéo.</p>
+    </div>
+
+</body>
+</html>
