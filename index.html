@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMONFILM - Streaming Auto</title>
+<title>YAMONFILM</title>
 
 <style>
-/* --- TON STYLE D'ORIGINE CONSERVÉ --- */
+/* --- TON STYLE CONSERVÉ --- */
 *{ margin:0; padding:0; box-sizing:border-box; }
-body{ font-family:Arial, sans-serif; background:#141414; color:white; overflow-x: hidden; }
+body{ font-family:Arial, sans-serif; background:#141414; color:white; }
 
 .navbar{
     position:fixed; top:0; width:100%; padding:20px 5%;
@@ -31,171 +31,124 @@ body{ font-family:Arial, sans-serif; background:#141414; color:white; overflow-x
 .hero h1{ font-size:clamp(26px, 5vw, 70px); max-width:700px; z-index:2; }
 .hero p{ margin-top:20px; font-size:clamp(14px, 2vw, 22px); max-width:500px; z-index:2; }
 
-/* --- NOUVELLE BARRE DE RECHERCHE --- */
-.search-container {
-    padding: 30px 5%;
-    text-align: center;
-    background: #141414;
+/* --- BARRE DE RECHERCHE DISCRÈTE --- */
+.search-bar {
+    padding: 20px 5%;
+    display: flex;
+    gap: 10px;
+}
+input#search-input {
+    flex: 1; padding: 12px; border-radius: 5px; border: 1px solid #333;
+    background: #222; color: white; outline: none;
+}
+button.search-btn {
+    padding: 12px 25px; background: #e50914; color: white;
+    border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
 }
 
-.search-container input {
-    padding: 12px 20px;
-    width: 300px;
-    border-radius: 25px;
-    border: 1px solid #333;
-    background: #222;
-    color: white;
-    font-size: 16px;
-    outline: none;
-}
-
-.search-container button {
-    padding: 12px 25px;
-    border-radius: 25px;
-    border: none;
-    background: #e50914;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-/* --- SECTION FILMS DYNAMIQUE --- */
+/* --- SECTION FILMS (DYNAMIQUE) --- */
 .movies{
-    padding:20px 5%;
+    padding:30px 5%;
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
-    gap:25px;
+    grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+    gap:20px;
 }
 
-.movie-card {
+.movie {
+    height: 250px; border-radius: 8px; display: flex; align-items: flex-end;
+    justify-content: center; text-decoration: none; color: white;
+    font-weight: bold; transition: 0.3s; position: relative;
+    overflow: hidden; background-size: cover; background-position: center;
     cursor: pointer;
-    transition: 0.3s;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #222;
-    position: relative;
 }
 
-.movie-card:hover { transform: scale(1.08); z-index: 10; }
+.movie span { position: absolute; bottom: 10px; left: 10px; z-index: 2; font-size: 14px; text-shadow: 2px 2px 4px black; }
+.movie::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.movie:hover { transform: scale(1.05); }
 
-.movie-card img { width: 100%; height: 270px; object-fit: cover; }
-
-.movie-card .title {
-    padding: 10px;
-    font-size: 14px;
-    text-align: center;
-    font-weight: bold;
-}
-
-/* --- LECTEUR (MODAL) --- */
+/* --- LECTEUR OVERLAY --- */
 #player-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    display: none; position: fixed; inset: 0; background: black;
+    z-index: 2000; justify-content: center; align-items: center;
 }
-
-#player-modal iframe {
-    width: 90%;
-    max-width: 900px;
-    height: 500px;
-    border: 2px solid #333;
-}
-
-.close-btn {
-    margin-bottom: 20px;
-    padding: 10px 20px;
-    background: #e50914;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 5px;
-}
-
-@media(max-width:768px){
-    .hero{ align-items:center; text-align:center; }
-    .search-container input { width: 70%; }
-}
+.close-player { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 2001; }
+iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
+
 <body>
 
 <div class="navbar">YAMONFILM</div>
 
 <section class="hero">
     <h1>Medicopter 117</h1>
-    <p>Recherchez n'importe quel film ou série ci-dessous.</p>
+    <p>Recherchez et regardez vos films instantanément.</p>
 </section>
 
-<div class="search-container">
-    <input type="text" id="search-input" placeholder="Titre en anglais (ex: Batman)...">
-    <button onclick="searchMovies()">Rechercher</button>
+<div class="search-bar">
+    <input type="text" id="search-input" placeholder="Tapez un film (ex: Batman, Spiderman)...">
+    <button class="search-btn" onclick="searchMovies()">RECHERCHER</button>
 </div>
 
-<section class="movies" id="movie-results">
+<section class="movies" id="movie-list">
     </section>
 
 <div id="player-modal">
-    <div class="close-btn" onclick="closePlayer()">FERMER LE LECTEUR X</div>
-    <iframe id="main-player" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
+    <span class="close-player" onclick="closePlayer()">&times; FERMER</span>
+    <iframe id="video-frame" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
 </div>
 
 <script>
-const API_KEY = 'ded42c99';
+const MY_KEY = 'ded42c99'; // Ta clé API OMDb
 
 async function searchMovies() {
     const query = document.getElementById('search-input').value;
     if(!query) return;
 
-    const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const resultsDiv = document.getElementById('movie-results');
-    resultsDiv.innerHTML = '';
+    const resp = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${MY_KEY}`);
+    const data = await resp.json();
+    const list = document.getElementById('movie-list');
+    list.innerHTML = '';
 
     if(data.Search) {
-        data.Search.forEach(movie => {
-            if(movie.Poster !== "N/A") {
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.innerHTML = `
-                    <img src="${movie.Poster}" alt="${movie.Title}">
-                    <div class="title">${movie.Title}</div>
-                `;
-                card.onclick = () => openPlayer(movie.imdbID);
-                resultsDiv.appendChild(card);
+        data.Search.forEach(m => {
+            if(m.Poster !== "N/A") {
+                const item = document.createElement('div');
+                item.className = 'movie';
+                item.style.backgroundImage = `url('${m.Poster}')`;
+                item.innerHTML = `<span>${m.Title}</span>`;
+                item.onclick = () => openPlayer(m.imdbID);
+                list.appendChild(item);
             }
         });
-    } else {
-        resultsDiv.innerHTML = "<p>Aucun film trouvé. Essayez un nom en anglais !</p>";
     }
 }
 
-function openPlayer(id) {
+function openPlayer(imdbID) {
     const modal = document.getElementById('player-modal');
-    const iframe = document.getElementById('main-player');
-    // On utilise Vidsrc pour la recherche automatique de lien
-    iframe.src = `https://vidsrc.me/embed/movie/${id}`;
+    const frame = document.getElementById('video-frame');
+    // On utilise Vidsrc.me pour éviter un max de pubs
+    frame.src = `https://vidsrc.me/embed/movie/${imdbID}`;
     modal.style.display = 'flex';
 }
 
 function closePlayer() {
     const modal = document.getElementById('player-modal');
-    const iframe = document.getElementById('main-player');
+    const frame = document.getElementById('video-frame');
     modal.style.display = 'none';
-    iframe.src = ''; // Arrête la vidéo
+    frame.src = ''; 
 }
 
-// Recherche avec la touche Entrée
+// Touche Entrée pour chercher
 document.getElementById('search-input').addEventListener('keypress', (e) => {
     if(e.key === 'Enter') searchMovies();
 });
+
+// Charger des films au démarrage (Optionnel)
+window.onload = () => {
+    document.getElementById('search-input').value = 'Action';
+    searchMovies();
+};
 </script>
 
 </body>
