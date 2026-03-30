@@ -6,211 +6,114 @@
 <title>Le Clown - YAMONFILM</title>
 
 <style>
+/* STYLE GLOBAL */
 *{box-sizing:border-box;margin:0;padding:0}
-
-body{
-font-family:Arial, sans-serif;
-background:#0f0f0f;
-color:white;
-}
+body{ font-family:Arial, sans-serif; background:#0f0f0f; color:white; overflow-x: hidden; }
 
 /* HEADER */
 header{
-position:fixed;
-top:0;
-width:100%;
-padding:15px 40px;
-background:rgba(0,0,0,0.8);
-backdrop-filter:blur(10px);
-display:flex;
-justify-content:space-between;
-align-items:center;
-z-index:1000;
+    position:fixed; top:0; width:100%; padding:15px 40px;
+    background:rgba(0,0,0,0.8); backdrop-filter:blur(10px);
+    display:flex; justify-content:space-between; align-items:center; z-index:1000;
 }
-
-.logo{
-font-size:22px;
-font-weight:bold;
-color:#e50914;
-text-decoration:none;
-}
+.logo{ font-size:22px; font-weight:bold; color:#e50914; text-decoration:none; }
 
 /* LECTEUR VIDEO (MODAL) */
 #video-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: black;
-    z-index: 3000;
-    justify-content: center;
-    align-items: center;
+    display: none; position: fixed; inset: 0; background: black;
+    z-index: 3000; flex-direction: column; justify-content: center; align-items: center;
 }
-#video-overlay iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
+#video-overlay iframe { width: 100%; height: 85%; border: none; }
+
+/* BARRE DE SERVEURS */
+.server-bar {
+    width: 100%; background: #1c1c1c; padding: 15px;
+    display: flex; justify-content: center; gap: 15px; border-top: 2px solid #e50914;
 }
+.btn-server {
+    background: #333; color: white; border: none; padding: 10px 15px;
+    border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
+}
+.btn-server:hover, .btn-server.active { background: #e50914; }
+
 .close-video {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 40px;
-    color: white;
-    cursor: pointer;
-    z-index: 3001;
-    text-shadow: 0 0 10px black;
+    position: absolute; top: 15px; right: 25px; font-size: 35px;
+    color: white; cursor: pointer; z-index: 3001;
 }
 
-/* HERO */
+/* HERO SECTION */
 .hero{
-margin-top:0;
-height:80vh;
-background-size:cover;
-background-position:center;
-display:flex;
-align-items:flex-end;
-padding:80px;
-position:relative;
+    height:70vh; background-size:cover; background-position:center;
+    display:flex; align-items:flex-end; padding:60px 5%; position:relative;
 }
-
 .hero::after{
-content:"";
-position:absolute;
-bottom:0;
-left:0;
-width:100%;
-height:60%;
-background:linear-gradient(to top,#0f0f0f,transparent);
+    content:""; position:absolute; bottom:0; left:0; width:100%; height:60%;
+    background:linear-gradient(to top,#0f0f0f,transparent);
 }
+.hero-content{ position:relative; z-index:2; max-width:700px; }
+.hero h1{ font-size:clamp(30px, 5vw, 60px); margin-bottom:10px; }
 
-.hero-content{
-position:relative;
-z-index:2;
-max-width:600px;
-}
-
-.hero h1{
-font-size:55px;
-margin-bottom:15px;
-}
-
-.meta{
-color:#ccc;
-margin-bottom:15px;
-}
-
-/* SAISON */
-.season-section{
-padding:40px 80px 20px;
-}
-
+/* SAISONS */
+.season-section{ padding:30px 5% 10px; }
 .btn-main{
-display:inline-block;
-background:#e50914;
-color:white;
-text-decoration:none;
-padding:12px 25px;
-border-radius:8px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-border:none;
+    display:inline-block; background:#e50914; color:white;
+    padding:12px 25px; border-radius:8px; font-weight:bold;
+    cursor:pointer; border:none;
 }
 
-.season-dropdown{
-position:relative;
-display:inline-block;
-}
-
+.season-dropdown{ position:relative; display:inline-block; }
 .season-menu{
-position:absolute;
-background:#1c1c1c;
-border-radius:8px;
-margin-top:10px;
-display:none;
-overflow-y:auto;
-max-height: 300px;
-width: 150px;
-z-index: 100;
+    position:absolute; background:#1c1c1c; border-radius:8px;
+    margin-top:10px; display:none; overflow-y:auto;
+    max-height: 250px; width: 160px; z-index: 100; border: 1px solid #333;
 }
-
-.season-menu div{
-padding:12px 20px;
-cursor:pointer;
-}
-
-.season-menu div:hover{
-background:#e50914;
-}
-
+.season-menu div{ padding:12px 20px; cursor:pointer; }
+.season-menu div:hover{ background:#e50914; }
 .show{display:block}
 
-/* EPISODES */
+/* GRILLE EPISODES */
 .episodes{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;
-padding:20px 80px 80px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px; padding:20px 5% 80px;
 }
-
 .card{
-background:#1c1c1c;
-border-radius:12px;
-overflow:hidden;
-cursor:pointer;
-transition:.3s;
-border: 1px solid transparent;
+    background:#1c1c1c; border-radius:12px; overflow:hidden;
+    cursor:pointer; transition:.3s; border: 1px solid transparent;
 }
+.card:hover{ transform:scale(1.05); border-color: #e50914; }
+.card img{ width:100%; height:150px; object-fit:cover; }
+.card-content{ padding:15px; }
+.badge{ font-size:12px; background:#e50914; padding:4px 8px; border-radius:5px; }
 
-.card:hover{
-transform:scale(1.05);
-border-color: #e50914;
-}
-
-.card img{
-width:100%;
-height:150px;
-object-fit:cover;
-}
-
-.card-content{
-padding:15px;
-}
-
-.badge{
-font-size:12px;
-background:#e50914;
-padding:4px 8px;
-border-radius:5px;
-}
-
-@media(max-width:768px){
-.hero{padding:40px}
-.episodes, .season-section{padding:20px}
-}
 </style>
 </head>
 <body>
 
 <header>
-<a href="index.html" class="logo">YAMONFILM</a>
+    <a href="index.html" class="logo">YAMONFILM</a>
 </header>
 
 <div id="video-overlay">
     <span class="close-video" onclick="closeVideo()">&times;</span>
+    
     <iframe id="video-iframe" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
+
+    <div class="server-bar">
+        <button class="btn-server active" onclick="changeServer(0)">Serveur 1</button>
+        <button class="btn-server" onclick="changeServer(1)">Serveur 2</button>
+        <button class="btn-server" onclick="changeServer(2)">Serveur 3</button>
+    </div>
 </div>
 
 <section class="hero" id="hero">
-<div class="hero-content">
-<h1 id="title">Chargement...</h1>
-<p class="meta" id="meta"></p>
-<p id="overview"></p>
-</div>
+    <div class="hero-content">
+        <h1 id="title">Chargement...</h1>
+        <p class="meta" id="meta"></p>
+        <p id="overview"></p>
+    </div>
 </section>
 
 <div class="season-section">
-    <h3>Saisons</h3>
     <div class="season-dropdown">
         <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
         <div class="season-menu" id="seasonMenu"></div>
@@ -221,26 +124,39 @@ border-radius:5px;
 
 <script>
 const apiKey="182c7173698e34803715eacab5c693a7";
-const seriesId=16678; // ID du Clown
+const seriesId=16678; 
 const imgBase="https://image.tmdb.org/t/p/original";
 
-const hero=document.getElementById("hero");
-const title=document.getElementById("title");
-const meta=document.getElementById("meta");
-const overview=document.getElementById("overview");
-const seasonMenu=document.getElementById("seasonMenu");
-const seasonBtn=document.getElementById("seasonBtn");
-const episodesContainer=document.getElementById("episodes");
+let currentS = 1;
+let currentE = 1;
+
 const videoOverlay=document.getElementById("video-overlay");
 const videoIframe=document.getElementById("video-iframe");
+const serverBtns=document.querySelectorAll(".btn-server");
 
-/* FONCTIONS LECTEUR */
+// FONCTION POUR OUVRIR LE LECTEUR
 function openVideo(s, e) {
-    // On génère le lien automatique vidsrc (S=Saison, E=Episode)
-    const url = `https://vidsrc.me/embed/tv?tmdb=${seriesId}&season=${s}&episode=${e}`;
-    videoIframe.src = url;
+    currentS = s;
+    currentE = e;
+    changeServer(0); // Charge le serveur 1 par défaut
     videoOverlay.style.display = "flex";
-    document.body.style.overflow = "hidden"; // Stop scroll
+    document.body.style.overflow = "hidden";
+}
+
+// FONCTION POUR CHANGER DE LECTEUR
+function changeServer(index) {
+    const sources = [
+        `https://vidsrc.me/embed/tv?tmdb=${seriesId}&season=${currentS}&episode=${currentE}`,
+        `https://vidsrc.pro/embed/tv/${seriesId}/${currentS}/${currentE}`,
+        `https://multiembed.mov/?video_id=${seriesId}&tmdb=1&s=${currentS}&e=${currentE}`
+    ];
+
+    // Mise à jour de l'iframe
+    videoIframe.src = sources[index];
+
+    // Mise à jour visuelle des boutons
+    serverBtns.forEach(btn => btn.classList.remove("active"));
+    serverBtns[index].classList.add("active");
 }
 
 function closeVideo() {
@@ -249,65 +165,49 @@ function closeVideo() {
     document.body.style.overflow = "auto";
 }
 
-/* Charger infos série */
+// --- LOGIQUE TMDB (Saisons/Episodes) ---
 async function loadSeries(){
-const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
-const data=await res.json();
-
-title.textContent=data.name;
-meta.textContent=`⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
-overview.textContent=data.overview;
-hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
-
-loadSeasons(data.number_of_seasons);
+    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
+    const data=await res.json();
+    document.getElementById("title").textContent=data.name;
+    document.getElementById("meta").textContent=`⭐ ${data.vote_average.toFixed(1)} • ${data.number_of_seasons} saisons`;
+    document.getElementById("overview").textContent=data.overview;
+    document.getElementById("hero").style.backgroundImage=`linear-gradient(to right, rgba(0,0,0,0.8), transparent), url(${imgBase}${data.backdrop_path})`;
+    loadSeasonsMenu(data.number_of_seasons);
 }
 
-/* Charger menu saisons */
-function loadSeasons(total){
-seasonMenu.innerHTML="";
-for(let i=1;i<=total;i++){
-    const div=document.createElement("div");
-    div.textContent="Saison "+i;
-    div.onclick=()=>{
-        seasonBtn.innerHTML="Saison "+i+" ▼";
-        seasonMenu.classList.remove("show");
-        loadEpisodes(i);
-    };
-    seasonMenu.appendChild(div);
-}
-loadEpisodes(1);
+function loadSeasonsMenu(total){
+    const menu = document.getElementById("seasonMenu");
+    menu.innerHTML="";
+    for(let i=1;i<=total;i++){
+        const div=document.createElement("div");
+        div.textContent="Saison "+i;
+        div.onclick=()=>{
+            document.getElementById("seasonBtn").innerHTML="Saison "+i+" ▼";
+            menu.classList.remove("show");
+            loadEpisodes(i);
+        };
+        menu.appendChild(div);
+    }
+    loadEpisodes(1);
 }
 
-/* Charger épisodes dynamiques */
 async function loadEpisodes(seasonNumber){
-episodesContainer.innerHTML="<p>Chargement des épisodes...</p>";
-const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${seasonNumber}?api_key=${apiKey}&language=fr-FR`);
-const data=await res.json();
-
-episodesContainer.innerHTML="";
-
-data.episodes.forEach(ep=>{
-    let imageUrl=ep.still_path?imgBase+ep.still_path: "https://via.placeholder.com/500x281?text=Episode";
-
-    const card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`
-        <img src="${imageUrl}">
-        <div class="card-content">
-            <span class="badge">S${seasonNumber} - E${ep.episode_number}</span>
-            <h4>${ep.name}</h4>
-        </div>
-    `;
-
-    // AU CLIC : On ouvre le lecteur automatique
-    card.onclick=()=> openVideo(seasonNumber, ep.episode_number);
-
-    episodesContainer.appendChild(card);
-});
+    const container = document.getElementById("episodes");
+    container.innerHTML="<p>Chargement...</p>";
+    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${seasonNumber}?api_key=${apiKey}&language=fr-FR`);
+    const data=await res.json();
+    container.innerHTML="";
+    data.episodes.forEach(ep=>{
+        const card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<img src="${ep.still_path ? imgBase+ep.still_path : 'https://via.placeholder.com/300x170'}"><div class="card-content"><span class="badge">E${ep.episode_number}</span><h4>${ep.name}</h4></div>`;
+        card.onclick=()=> openVideo(seasonNumber, ep.episode_number);
+        container.appendChild(card);
+    });
 }
 
-seasonBtn.onclick=()=>{seasonMenu.classList.toggle("show");}
-
+document.getElementById("seasonBtn").onclick=()=>document.getElementById("seasonMenu").classList.toggle("show");
 loadSeries();
 </script>
 
