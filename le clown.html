@@ -23,23 +23,25 @@ header{
     display: none; position: fixed; inset: 0; background: black;
     z-index: 3000; flex-direction: column; justify-content: center; align-items: center;
 }
-#video-overlay iframe { width: 100%; height: 85%; border: none; }
+#video-overlay iframe { width: 100%; height: 85%; border: none; background: #000; }
 
-/* BARRE DE SERVEURS */
+/* BARRE DE SERVEURS STYLE XALAFLIX */
 .server-bar {
     width: 100%; background: #1c1c1c; padding: 15px;
-    display: flex; justify-content: center; gap: 15px; border-top: 2px solid #e50914;
+    display: flex; justify-content: center; gap: 10px; border-top: 2px solid #e50914;
+    flex-wrap: wrap;
 }
 .btn-server {
-    background: #333; color: white; border: none; padding: 10px 15px;
+    background: #333; color: white; border: 1px solid #444; padding: 10px 20px;
     border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
 }
-.btn-server:hover, .btn-server.active { background: #e50914; }
+.btn-server:hover, .btn-server.active { background: #e50914; border-color: #e50914; transform: translateY(-2px); }
 
 .close-video {
     position: absolute; top: 15px; right: 25px; font-size: 35px;
-    color: white; cursor: pointer; z-index: 3001;
+    color: white; cursor: pointer; z-index: 3001; transition: 0.3s;
 }
+.close-video:hover { color: #e50914; }
 
 /* HERO SECTION */
 .hero{
@@ -51,15 +53,16 @@ header{
     background:linear-gradient(to top,#0f0f0f,transparent);
 }
 .hero-content{ position:relative; z-index:2; max-width:700px; }
-.hero h1{ font-size:clamp(30px, 5vw, 60px); margin-bottom:10px; }
+.hero h1{ font-size:clamp(30px, 5vw, 60px); margin-bottom:10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
 
 /* SAISONS */
-.season-section{ padding:30px 5% 10px; }
+.season-section{ padding:30px 5% 10px; display: flex; align-items: center; gap: 20px; }
 .btn-main{
     display:inline-block; background:#e50914; color:white;
     padding:12px 25px; border-radius:8px; font-weight:bold;
-    cursor:pointer; border:none;
+    cursor:pointer; border:none; transition: 0.3s;
 }
+.btn-main:hover { background: #b20710; }
 
 .season-dropdown{ position:relative; display:inline-block; }
 .season-menu{
@@ -78,9 +81,9 @@ header{
 }
 .card{
     background:#1c1c1c; border-radius:12px; overflow:hidden;
-    cursor:pointer; transition:.3s; border: 1px solid transparent;
+    cursor:pointer; transition:.4s; border: 1px solid #333;
 }
-.card:hover{ transform:scale(1.05); border-color: #e50914; }
+.card:hover{ transform:scale(1.05); border-color: #e50914; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 .card img{ width:100%; height:150px; object-fit:cover; }
 .card-content{ padding:15px; }
 .badge{ font-size:12px; background:#e50914; padding:4px 8px; border-radius:5px; }
@@ -99,21 +102,22 @@ header{
     <iframe id="video-iframe" src="" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"></iframe>
 
     <div class="server-bar">
-        <button class="btn-server active" onclick="changeServer(0)">Serveur 1</button>
-        <button class="btn-server" onclick="changeServer(1)">Serveur 2</button>
-        <button class="btn-server" onclick="changeServer(2)">Serveur 3</button>
+        <button class="btn-server active" onclick="changeServer(0)">Xalaflix (Principal)</button>
+        <button class="btn-server" onclick="changeServer(1)">Serveur Multi</button>
+        <button class="btn-server" onclick="changeServer(2)">Serveur Secours</button>
     </div>
 </div>
 
 <section class="hero" id="hero">
     <div class="hero-content">
         <h1 id="title">Chargement...</h1>
-        <p class="meta" id="meta"></p>
-        <p id="overview"></p>
+        <p class="meta" id="meta" style="color: #e50914; font-weight: bold; margin-bottom: 10px;"></p>
+        <p id="overview" style="color: #ccc; line-height: 1.4;"></p>
     </div>
 </section>
 
 <div class="season-section">
+    <h3>Choisir :</h3>
     <div class="season-dropdown">
         <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
         <div class="season-menu" id="seasonMenu"></div>
@@ -134,27 +138,25 @@ const videoOverlay=document.getElementById("video-overlay");
 const videoIframe=document.getElementById("video-iframe");
 const serverBtns=document.querySelectorAll(".btn-server");
 
-// FONCTION POUR OUVRIR LE LECTEUR
 function openVideo(s, e) {
     currentS = s;
     currentE = e;
-    changeServer(0); // Charge le serveur 1 par défaut
+    changeServer(0); // Charge Xalaflix par défaut
     videoOverlay.style.display = "flex";
     document.body.style.overflow = "hidden";
 }
 
-// FONCTION POUR CHANGER DE LECTEUR
 function changeServer(index) {
     const sources = [
-        `https://vidsrc.me/embed/tv?tmdb=${seriesId}&season=${currentS}&episode=${currentE}`,
+        // Serveur 1 : Xalaflix / Embed.su (Très stable en FR)
+        `https://embed.su/embed/tv/${seriesId}/${currentS}/${currentE}`,
+        // Serveur 2 : Vidsrc.pro
         `https://vidsrc.pro/embed/tv/${seriesId}/${currentS}/${currentE}`,
+        // Serveur 3 : MultiEmbed
         `https://multiembed.mov/?video_id=${seriesId}&tmdb=1&s=${currentS}&e=${currentE}`
     ];
 
-    // Mise à jour de l'iframe
     videoIframe.src = sources[index];
-
-    // Mise à jour visuelle des boutons
     serverBtns.forEach(btn => btn.classList.remove("active"));
     serverBtns[index].classList.add("active");
 }
@@ -165,14 +167,14 @@ function closeVideo() {
     document.body.style.overflow = "auto";
 }
 
-// --- LOGIQUE TMDB (Saisons/Episodes) ---
+// --- SYNC TMDB ---
 async function loadSeries(){
     const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
     const data=await res.json();
     document.getElementById("title").textContent=data.name;
-    document.getElementById("meta").textContent=`⭐ ${data.vote_average.toFixed(1)} • ${data.number_of_seasons} saisons`;
-    document.getElementById("overview").textContent=data.overview;
-    document.getElementById("hero").style.backgroundImage=`linear-gradient(to right, rgba(0,0,0,0.8), transparent), url(${imgBase}${data.backdrop_path})`;
+    document.getElementById("meta").textContent=`⭐ ${data.vote_average.toFixed(1)} / 10 • ${data.number_of_seasons} Saisons`;
+    document.getElementById("overview").textContent=data.overview || "Résumé non disponible.";
+    document.getElementById("hero").style.backgroundImage=`linear-gradient(to right, rgba(0,0,0,0.85), transparent), url(${imgBase}${data.backdrop_path})`;
     loadSeasonsMenu(data.number_of_seasons);
 }
 
@@ -194,14 +196,20 @@ function loadSeasonsMenu(total){
 
 async function loadEpisodes(seasonNumber){
     const container = document.getElementById("episodes");
-    container.innerHTML="<p>Chargement...</p>";
+    container.innerHTML="<p style='padding:20px;'>Recherche des épisodes...</p>";
     const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${seasonNumber}?api_key=${apiKey}&language=fr-FR`);
     const data=await res.json();
     container.innerHTML="";
     data.episodes.forEach(ep=>{
         const card=document.createElement("div");
         card.className="card";
-        card.innerHTML=`<img src="${ep.still_path ? imgBase+ep.still_path : 'https://via.placeholder.com/300x170'}"><div class="card-content"><span class="badge">E${ep.episode_number}</span><h4>${ep.name}</h4></div>`;
+        card.innerHTML=`
+            <img src="${ep.still_path ? imgBase+ep.still_path : 'https://via.placeholder.com/300x170?text=YAMONFILM'}">
+            <div class="card-content">
+                <span class="badge">E${ep.episode_number}</span>
+                <h4 style="margin-top:10px;">${ep.name}</h4>
+            </div>
+        `;
         card.onclick=()=> openVideo(seasonNumber, ep.episode_number);
         container.appendChild(card);
     });
