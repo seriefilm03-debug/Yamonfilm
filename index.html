@@ -1,20 +1,194 @@
-<!-- CODE À AJOUTER DANS index.html -->
+<<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#141414;
+    color:white;
+}
+
+/* NAVBAR */
+.navbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 5%;
+    font-size:clamp(18px, 3vw, 30px);
+    font-weight:bold;
+    color:#e50914;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    z-index:1000;
+}
+
+/* HERO */
+.hero{
+    position:relative;
+    width:100%;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    padding:0 5%;
+    
+    background:
+        linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
+        url("s-l1200.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:20vh;
+    background:linear-gradient(to top, #141414, transparent);
+}
+
+.hero h1{
+    font-size:clamp(26px, 5vw, 70px);
+    max-width:700px;
+    z-index:2;
+}
+
+.hero p{
+    margin-top:20px;
+    font-size:clamp(14px, 2vw, 22px);
+    max-width:500px;
+    z-index:2;
+}
+
+.play{
+    margin-top:30px;
+    padding:14px 30px;
+    font-size:clamp(14px, 2vw, 18px);
+    border:none;
+    border-radius:5px;
+    font-weight:bold;
+    cursor:pointer;
+    background:white;
+    color:black;
+    transition:0.3s;
+    z-index:2;
+}
+
+.play:hover{
+    background:#e50914;
+    color:white;
+    transform:scale(1.05);
+}
+
+/* CODE BOX */
+.codebox{
+    margin-top:100px;
+    padding:20px 5%;
+}
+
+.codebox input{
+    padding:10px;
+    border:none;
+    border-radius:5px;
+}
+
+.codebox button{
+    padding:10px;
+    background:#e50914;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* SECTION FILMS */
+.movies{
+    padding:50px 5%;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:20px;
+}
+
+.movie{
+    height:clamp(200px, 30vw, 300px);
+    border-radius:8px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+    transition:0.3s;
+    position:relative;
+    overflow:hidden;
+    background-size:cover;
+    background-position:center;
+}
+
+.movie span{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    z-index:2;
+}
+
+.movie::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.3);
+}
+
+.movie:hover{
+    transform:scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">YAMONFILM</div>
+
+<!-- BOX CODE -->
 <div class="codebox">
   <input type="text" id="code" placeholder="Entrer le code">
   <button onclick="unlock()">Valider</button>
   <p id="msg"></p>
 </div>
 
-<!-- Lien normal Medicopter (toujours visible) -->
-<a id="medicopterLink" href="mediopter.html">
-  <button class="play">▶ Medicopter 117</button>
-</a>
+<!-- HERO -->
+<section class="hero">
+    <h1>Medicopter 117</h1>
+    <p>Découvrez la série la plus regardée du moment.</p>
 
-<!-- Lien VIP Medicopter (caché par défaut) -->
-<a id="vipMedicopter" href="vipmedicopter.html" style="display:none;">
-  <button class="play">🔥 Medicopter VIP</button>
-</a>
+    <!-- lien normal -->
+    <a id="medicopterLink" href="mediopter.html">
+        <button class="play">▶ Lecture</button>
+    </a>
 
+    <!-- lien VIP -->
+    <a id="vipMedicopter" href="vipmedicopter.html" style="display:none;">
+        <button class="play">🔥 VIP</button>
+    </a>
+</section>
+
+<!-- SECTION FILMS -->
+<section class="movies">
+    <a id="medicopterCard" href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')"><span>Medicopter 117</span></a>
+
+    <a id="vipMedicopterCard" href="vipmedicopter.html" class="movie" style="background-image:url('s-l1200.jpg'); display:none;"><span>🔥 Medicopter VIP</span></a>
+</section>
+
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -32,9 +206,8 @@ const db = getFirestore(app);
 
 const CODE = "MEDICOPTER";
 
-// Débloquer le code
 window.unlock = async () => {
-  const input = document.getElementById("code").value.trim();
+  const input = document.getElementById("code").value;
   const user = auth.currentUser;
 
   if(!user){
@@ -42,9 +215,7 @@ window.unlock = async () => {
     return;
   }
 
-  // Si code correct
   if(input === CODE){
-    // Sauvegarder dans Firestore
     await setDoc(doc(db, "users", user.uid), {
       medicopterVIP: true
     }, { merge: true });
@@ -56,24 +227,29 @@ window.unlock = async () => {
   }
 };
 
-// Vérifier accès utilisateur et afficher VIP si débloqué
 async function checkAccess(user){
   const docRef = doc(db, "users", user.uid);
   const docSnap = await getDoc(docRef);
 
   if(docSnap.exists()){
     const data = docSnap.data();
+
     if(data.medicopterVIP){
-      document.getElementById("vipMedicopter").style.display = "block"; // montre VIP
-      document.getElementById("msg").innerText = "Accès VIP déjà débloqué !"; // plus besoin de code
+      document.getElementById("vipMedicopter").style.display = "block";
+      document.getElementById("medicopterLink").style.display = "none";
+
+      document.getElementById("vipMedicopterCard").style.display = "block";
+      document.getElementById("medicopterCard").style.display = "none";
     }
   }
 }
 
-// Charger état utilisateur au chargement
 onAuthStateChanged(auth, (user) => {
   if(user){
     checkAccess(user);
   }
 });
 </script>
+
+</body>
+</html>
