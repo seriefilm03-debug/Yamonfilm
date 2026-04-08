@@ -2,21 +2,58 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion</title>
+<title>Connexion - YAMONFILM</title>
 
 <style>
 body{
-  background:#141414;color:white;
-  display:flex;justify-content:center;align-items:center;
-  height:100vh;font-family:Arial;
+  margin:0;
+  font-family:Arial;
+  background:#141414;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
 }
+
 .box{
-  background:#222;padding:30px;border-radius:10px;
-  display:flex;flex-direction:column;gap:15px;width:300px;
+  background:rgba(0,0,0,0.85);
+  padding:40px;
+  border-radius:10px;
+  width:300px;
 }
-input{padding:10px;border:none;border-radius:5px;}
-button{padding:10px;background:#e50914;color:white;border:none;border-radius:5px;cursor:pointer;}
+
+h2{
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:5px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  background:#e50914;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.8;
+}
+
+#error{
+  color:red;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -24,35 +61,56 @@ button{padding:10px;background:#e50914;color:white;border:none;border-radius:5px
 
 <div class="box">
   <h2>Connexion</h2>
-  <input type="email" id="email">
-  <input type="password" id="password">
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Mot de passe">
+
   <button onclick="login()">Se connecter</button>
-  <p id="msg"></p>
+  <button onclick="register()">S'inscrire</button>
+
+  <p id="error"></p>
 </div>
 
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const app = initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
   authDomain: "yamonfilm-fead8.firebaseapp.com",
   projectId: "yamonfilm-fead8"
-});
+};
 
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.login = ()=>{
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+// INSCRIPTION
+window.register = () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(error => {
+      document.getElementById("error").innerText = error.message;
+    });
+};
+
+// CONNEXION
+window.login = () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   signInWithEmailAndPassword(auth, email, password)
-  .then(()=>{
-    window.location.href="index.html";
-  })
-  .catch(err=>{
-    document.getElementById("msg").innerText = err.message;
-  });
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(error => {
+      document.getElementById("error").innerText = error.message;
+    });
 };
 </script>
 
