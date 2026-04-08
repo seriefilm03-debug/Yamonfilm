@@ -18,83 +18,63 @@ body{background:#141414;color:white;overflow-x:hidden;}
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:0 25px;
+  padding:0 15px;
   background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
   z-index:1000;
 }
 
-.logo{
-  color:#e50914;
-  font-size:24px;
-  font-weight:bold;
-}
+.logo{color:#e50914;font-size:22px;font-weight:bold;}
+.menu-btn{font-size:26px;cursor:pointer;}
 
-.menu-btn{
-  font-size:26px;
-  cursor:pointer;
-}
-
-/* OVERLAY FLOU */
+/* OVERLAY */
 .overlay{
   position:fixed;
   inset:0;
-  backdrop-filter:blur(8px);
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);
   opacity:0;
   pointer-events:none;
   transition:0.3s;
   z-index:1500;
 }
+.overlay.show{opacity:1;pointer-events:auto;}
 
-.overlay.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-/* MENU DROITE */
+/* MENU */
 .side-menu{
   position:fixed;
   top:0;
-  right:-300px;
-  width:270px;
+  right:-100%;
+  width:280px;
+  max-width:85%;
   height:100%;
   background:#111;
-  padding:25px;
+  padding:20px;
   display:flex;
   flex-direction:column;
   gap:20px;
   transition:0.3s;
   z-index:2000;
-  box-shadow:-10px 0 30px rgba(0,0,0,0.7);
 }
-
-.side-menu.open{
-  right:0;
-}
+.side-menu.open{right:0;}
 
 .side-menu a, .side-menu button{
   color:white;
   text-decoration:none;
-  background:none;
   border:none;
-  font-size:17px;
+  background:none;
+  font-size:16px;
   cursor:pointer;
-  text-align:left;
-  transition:0.2s;
+  padding:10px 0;
 }
+.side-menu a:hover{color:#e50914;}
 
-.side-menu a:hover, .side-menu button:hover{
-  color:#e50914;
-}
-
-/* CODE BOX */
+/* CODE */
 .codebox{
   margin-top:20px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-
 .codebox input{
   padding:10px;
   border:none;
@@ -102,17 +82,13 @@ body{background:#141414;color:white;overflow-x:hidden;}
   background:#222;
   color:white;
 }
-
 .codebox button{
   padding:10px;
   background:#e50914;
   border:none;
   border-radius:5px;
   color:white;
-  cursor:pointer;
 }
-
-#msg{font-size:12px;}
 
 /* HERO */
 .hero{
@@ -128,60 +104,45 @@ body{background:#141414;color:white;overflow-x:hidden;}
   margin-top:60px;
 }
 
-.hero h1{font-size:clamp(30px,5vw,70px);}
-.hero p{margin-top:20px;}
+.hero h1{font-size:clamp(28px,6vw,60px);}
+.hero p{margin-top:15px;font-size:clamp(14px,3vw,18px);}
 
 .play{
   margin-top:20px;
-  padding:14px 30px;
+  padding:12px 25px;
   border:none;
   border-radius:5px;
   background:white;
-  cursor:pointer;
   font-weight:bold;
-  transition:0.3s;
+  cursor:pointer;
 }
-
-.play:hover{
-  background:#e50914;
-  color:white;
-  transform:scale(1.05);
-}
+.play:hover{background:#e50914;color:white;}
 
 /* FILMS */
 .movies{
-  padding:40px 5%;
+  padding:20px 5%;
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:15px;
 }
-
 .movie{
-  height:220px;
+  height:180px;
   background-size:cover;
-  border-radius:10px;
+  border-radius:8px;
   display:flex;
   align-items:flex-end;
   padding:10px;
-  position:relative;
-  overflow:hidden;
-  transition:0.3s;
 }
 
-.movie::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.3);
-}
-
-.movie:hover{
-  transform:scale(1.05);
-}
-
-/* RESPONSIVE */
+/* MOBILE FIX */
 @media(max-width:600px){
-  .side-menu{width:100%;}
+  .side-menu{
+    width:100%;
+    max-width:100%;
+  }
+  .navbar{padding:0 10px;}
+  .hero{height:90vh;}
+  .movies{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
@@ -194,7 +155,7 @@ body{background:#141414;color:white;overflow-x:hidden;}
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
-<!-- OVERLAY FLOU -->
+<!-- OVERLAY -->
 <div class="overlay" id="overlay"></div>
 
 <!-- MENU -->
@@ -204,7 +165,7 @@ body{background:#141414;color:white;overflow-x:hidden;}
   <button id="logoutBtn">Déconnexion</button>
 
   <div class="codebox">
-    <input type="text" id="code" placeholder="Entrer un code">
+    <input type="text" id="code" placeholder="Entrer code">
     <button onclick="unlock()">Valider</button>
     <p id="msg"></p>
   </div>
@@ -223,7 +184,7 @@ body{background:#141414;color:white;overflow-x:hidden;}
 <!-- FILMS -->
 <section class="movies">
   <a id="serieCompleteCard" href="vipmedicopter.html" class="movie" style="background-image:url('s-l1200.jpg'); display:none;">
-    <span>🔥 Série Complète</span>
+    <span>Série Complète</span>
   </a>
 </section>
 
@@ -233,14 +194,13 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, doc, updateDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+  apiKey: "AIzaSy...",
   authDomain: "yamonfilm-fead8.firebaseapp.com",
   projectId: "yamonfilm-fead8"
 });
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const CODE = "MEDICOPTER";
 
 const menu = document.getElementById("menu");
 const overlay = document.getElementById("overlay");
@@ -252,7 +212,8 @@ window.toggleMenu = ()=>{
 };
 
 // FERMETURE
-overlay.addEventListener("click", closeMenu);
+overlay.onclick = closeMenu;
+
 document.addEventListener("click",(e)=>{
   const btn = document.querySelector(".menu-btn");
   if(!menu.contains(e.target) && !btn.contains(e.target)){
@@ -276,14 +237,14 @@ window.unlock = async ()=>{
   const input = document.getElementById("code").value;
   const user = auth.currentUser;
 
-  if(input === CODE){
+  if(input === "MEDICOPTER"){
     await updateDoc(doc(db,"users",user.uid), {
       seriesUnlocked: arrayUnion("MEDICOPTER")
     });
-    document.getElementById("msg").innerText="Code validé 🔥";
+    document.getElementById("msg").innerText="OK 🔥";
     checkAccess(user);
   } else {
-    document.getElementById("msg").innerText="Code invalide ❌";
+    document.getElementById("msg").innerText="Erreur ❌";
   }
 };
 
@@ -291,7 +252,7 @@ async function checkAccess(user){
   const snap = await getDoc(doc(db,"users",user.uid));
   if(snap.exists()){
     const data = snap.data();
-    if(data.seriesUnlocked && data.seriesUnlocked.includes("MEDICOPTER")){
+    if(data.seriesUnlocked?.includes("MEDICOPTER")){
       document.getElementById("serieCompleteLink").style.display="block";
       document.getElementById("serieCompleteCard").style.display="block";
     }
