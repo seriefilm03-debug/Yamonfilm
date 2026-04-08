@@ -12,19 +12,54 @@ body{
     font-family:Arial, sans-serif;
     background:#141414;
     color:white;
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:200px;
+    background:#141414;
+    padding:20px;
+    height:100vh;
+    position:fixed;
+    top:0;
+    left:0;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    box-shadow:2px 0 10px rgba(0,0,0,0.5);
+    z-index:10000;
+}
+
+.sidebar a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    padding:10px;
+    border-radius:5px;
+    transition:0.2s;
+}
+
+.sidebar a:hover{
+    background:#e50914;
+}
+
+/* MAIN CONTENT */
+.main{
+    margin-left:200px;
+    width:calc(100% - 200px);
 }
 
 /* NAVBAR */
 .navbar{
-    position:fixed;
-    top:0;
     width:100%;
     padding:20px 5%;
     font-size:clamp(18px, 3vw, 30px);
     font-weight:bold;
     color:#e50914;
     background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    z-index:1000;
+    position:fixed;
+    z-index:999;
 }
 
 /* HERO */
@@ -37,13 +72,12 @@ body{
     justify-content:center;
     align-items:flex-start;
     padding:0 5%;
-    
+    margin-top:60px;
     background:
         linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
         url("s-l1200.jpg");
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
 }
 
 .hero::after{
@@ -89,7 +123,7 @@ body{
     transform:scale(1.05);
 }
 
-/* CODE BOX repositionné et stylé */
+/* CODE BOX */
 .codebox{
     position:fixed;
     top:20px;
@@ -189,43 +223,50 @@ body{
 
 <body>
 
-<div class="navbar">YAMONFILM</div>
-
-<!-- BOX CODE -->
-<div class="codebox">
-  <input type="text" id="code" placeholder="Entrer le code">
-  <button onclick="unlock()">Valider</button>
-  <p id="msg"></p>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-header">YAMONFILM</div>
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
+    <a href="#" id="logoutBtn">Déconnexion</a>
 </div>
 
-<!-- HERO -->
-<section class="hero">
-    <h1>Medicopter 117</h1>
-    <p>Découvrez la série la plus regardée du moment.</p>
+<!-- MAIN CONTENT -->
+<div class="main">
+    <div class="navbar">YAMONFILM</div>
 
-    <!-- lien normal -->
-    <a id="medicopterLink" href="mediopter.html">
-        <button class="play">▶ Lecture</button>
-    </a>
+    <!-- BOX CODE -->
+    <div class="codebox">
+      <input type="text" id="code" placeholder="Entrer le code">
+      <button onclick="unlock()">Valider</button>
+      <p id="msg"></p>
+    </div>
 
-    <!-- lien VIP -->
-    <a id="vipMedicopter" href="vipmedicopter.html" style="display:none;">
-        <button class="play">🔥 VIP</button>
-    </a>
-</section>
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Medicopter 117</h1>
+        <p>Découvrez la série la plus regardée du moment.</p>
 
-<!-- SECTION FILMS -->
-<section class="movies">
-    <a id="medicopterCard" href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')"><span>Medicopter 117</span></a>
+        <!-- Série complète (invisible avant code) -->
+        <a id="serieCompleteLink" href="vipmedicopter.html" style="display:none;">
+            <button class="play">🔥 Série Complète</button>
+        </a>
+    </section>
 
-    <a id="vipMedicopterCard" href="vipmedicopter.html" class="movie" style="background-image:url('s-l1200.jpg'); display:none;"><span>🔥 Medicopter VIP</span></a>
-</section>
+    <!-- SECTION FILMS -->
+    <section class="movies">
+        <!-- Carte série complète -->
+        <a id="serieCompleteCard" href="vipmedicopter.html" class="movie" style="background-image:url('s-l1200.jpg'); display:none;">
+            <span>🔥 Série Complète</span>
+        </a>
+    </section>
+</div>
 
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -239,48 +280,49 @@ const db = getFirestore(app);
 
 const CODE = "MEDICOPTER";
 
+// Vérifie si connecté, sinon redirige
+onAuthStateChanged(auth, (user)=>{
+    if(!user){
+        alert("Connecte-toi pour accéder au site !");
+        window.location.href = "login.html";
+    } else {
+        checkAccess(user);
+    }
+});
+
 window.unlock = async () => {
-  const input = document.getElementById("code").value.trim();
-  const user = auth.currentUser;
+    const input = document.getElementById("code").value.trim();
+    const user = auth.currentUser;
+    if(!user){ alert("Connecte-toi !"); return; }
 
-  if(!user){
-    alert("Connecte-toi !");
-    return;
-  }
-
-  if(input === CODE){
-    await setDoc(doc(db, "users", user.uid), {
-      medicopterVIP: true
-    }, { merge: true });
-
-    document.getElementById("msg").innerText = "Code validé 🔥";
-    checkAccess(user);
-  } else {
-    document.getElementById("msg").innerText = "Code invalide ❌";
-  }
+    if(input === CODE){
+        await updateDoc(doc(db,"users",user.uid), {
+            seriesUnlocked: arrayUnion("MEDICOPTER")
+        });
+        document.getElementById("msg").innerText="Code validé 🔥";
+        checkAccess(user);
+    } else {
+        document.getElementById("msg").innerText="Code invalide ❌";
+    }
 };
 
 async function checkAccess(user){
-  const docRef = doc(db, "users", user.uid);
-  const docSnap = await getDoc(docRef);
-
-  if(docSnap.exists()){
-    const data = docSnap.data();
-    if(data.medicopterVIP){
-      // Affiche le VIP sans cacher le normal
-      document.getElementById("vipMedicopter").style.display = "block";
-      document.getElementById("vipMedicopterCard").style.display = "block";
-      document.getElementById("msg").innerText = "Accès VIP déjà débloqué !";
+    const docRef = doc(db,"users",user.uid);
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists()){
+        const data = docSnap.data();
+        if(data.seriesUnlocked && data.seriesUnlocked.includes("MEDICOPTER")){
+            document.getElementById("serieCompleteLink").style.display="block";
+            document.getElementById("serieCompleteCard").style.display="block";
+            document.getElementById("msg").innerText="Série débloquée !";
+        }
     }
-  }
 }
 
-onAuthStateChanged(auth, (user) => {
-  if(user){
-    checkAccess(user);
-  }
+// Déconnexion
+document.getElementById("logoutBtn").addEventListener("click",()=>{
+    signOut(auth).then(()=>{ window.location.href="login.html"; });
 });
 </script>
-
 </body>
 </html>
