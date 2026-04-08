@@ -15,7 +15,6 @@ body{
   height:100vh;
   font-family:Arial;
 }
-
 .box{
   background:#222;
   padding:30px;
@@ -25,23 +24,8 @@ body{
   flex-direction:column;
   gap:15px;
 }
-
-input{
-  padding:10px;
-  border:none;
-  border-radius:5px;
-}
-
-button{
-  padding:10px;
-  background:#e50914;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-a{color:#e50914;}
+input{padding:10px;border:none;border-radius:5px;}
+button{padding:10px;background:#e50914;color:white;border:none;border-radius:5px;cursor:pointer;}
 </style>
 </head>
 
@@ -53,41 +37,33 @@ a{color:#e50914;}
   <input type="password" id="password" placeholder="Mot de passe">
   <button onclick="login()">Se connecter</button>
   <p id="msg"></p>
-  <a href="signup.html">Créer un compte</a>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const app = initializeApp({
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
   authDomain: "yamonfilm-fead8.firebaseapp.com",
   projectId: "yamonfilm-fead8"
 });
 
 const auth = getAuth(app);
 
-// Connexion
 window.login = ()=>{
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   signInWithEmailAndPassword(auth, email, password)
   .then(()=>{
     window.location.href="index.html";
   })
   .catch(err=>{
+    console.log(err.code);
     document.getElementById("msg").innerText = err.message;
   });
 };
-
-// Si déjà connecté → direct accueil
-onAuthStateChanged(auth,(user)=>{
-  if(user){
-    window.location.href="index.html";
-  }
-});
 </script>
 
 </body>
