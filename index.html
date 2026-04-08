@@ -8,11 +8,10 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{background:#141414;color:white;}
 
-/* NAVBAR FIXE EN HAUT */
+/* NAVBAR */
 .navbar{
   position:fixed;
-  top:0;
-  left:0;
+  top:0; left:0;
   width:100%;
   height:60px;
   display:flex;
@@ -23,102 +22,66 @@ body{background:#141414;color:white;}
   z-index:1000;
   transition:background 0.3s;
 }
-.navbar.scrolled{
-  background:rgba(20,20,20,0.95);
-}
-.navbar .logo{
-  font-size:24px;
-  font-weight:bold;
-  color:#e50914;
-  cursor:pointer;
-}
-.navbar .menu{
-  display:flex;
-  gap:20px;
-}
-.navbar .menu a{
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-  transition:0.2s;
-}
-.navbar .menu a:hover{color:#e50914;}
-.navbar .menu button{
-  padding:6px 12px;
-  border:none;
-  border-radius:4px;
-  background:#e50914;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
+.navbar.scrolled{background:rgba(20,20,20,0.95);}
+.navbar .logo{font-size:24px;font-weight:bold;color:#e50914;cursor:pointer;}
+.navbar .menu{display:flex;gap:15px;}
+.navbar .menu a, .navbar .menu button{color:white;text-decoration:none;font-weight:bold;transition:0.2s;}
+.navbar .menu a:hover, .navbar .menu button:hover{color:#e50914;}
+.navbar .menu button{padding:6px 10px;border:none;border-radius:4px;background:#e50914;color:white;cursor:pointer;}
+
+/* MOBILE TOGGLE */
+#menuToggle{display:none;position:fixed;top:15px;left:15px;z-index:1100;background:#e50914;color:white;border:none;padding:10px;border-radius:5px;cursor:pointer;}
 
 /* HERO */
 .hero{
-  position:relative;
-  width:100%;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:0 5%;
-  background:linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)), url("s-l1200.jpg");
-  background-size:cover;
-  background-position:center;
-  margin-top:60px;
+  position:relative;width:100%;height:90vh;display:flex;flex-direction:column;justify-content:center;padding:0 5%;background:linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)), url("s-l1200.jpg");background-size:cover;background-position:center;margin-top:60px;
 }
-.hero h1{font-size:clamp(26px,5vw,70px);z-index:2;}
-.hero p{margin-top:20px;font-size:clamp(14px,2vw,22px);max-width:500px;z-index:2;}
-.play{margin-top:20px;padding:14px 30px;font-size:clamp(14px,2vw,18px);border:none;border-radius:5px;font-weight:bold;cursor:pointer;background:white;color:black;transition:0.3s;z-index:2;}
+.hero h1{font-size:clamp(22px,6vw,50px);z-index:2;}
+.hero p{margin-top:15px;font-size:clamp(12px,3vw,18px);max-width:500px;z-index:2;}
+.play{margin-top:15px;padding:12px 25px;font-size:clamp(12px,2.5vw,16px);border:none;border-radius:5px;font-weight:bold;cursor:pointer;background:white;color:black;transition:0.3s;z-index:2;}
 .play:hover{background:#e50914;color:white;transform:scale(1.05);}
 
 /* CODE BOX */
 .codebox{
-  position:fixed;
-  top:70px;
-  right:20px;
-  background:rgba(0,0,0,0.7);
-  padding:15px 20px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  z-index:1001;
-  box-shadow:0 0 15px rgba(0,0,0,0.5);
-  font-size:16px;
+  position:fixed;top:70px;right:20px;background:rgba(0,0,0,0.7);padding:10px 15px;border-radius:8px;display:flex;align-items:center;gap:8px;z-index:1001;box-shadow:0 0 10px rgba(0,0,0,0.5);font-size:14px;
 }
-.codebox input{padding:8px 12px;border:none;border-radius:5px;background:#222;color:white;outline:none;width:150px;font-size:14px;}
+.codebox input{padding:6px 8px;border:none;border-radius:5px;background:#222;color:white;outline:none;width:120px;font-size:13px;}
 .codebox input::placeholder{color:#aaa;}
-.codebox button{padding:8px 15px;background:#e50914;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;font-size:14px;transition:0.2s;}
+.codebox button{padding:6px 10px;background:#e50914;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;font-size:13px;transition:0.2s;}
 .codebox button:hover{background:#f40612;}
-.codebox p{margin:0;color:#fff;font-size:14px;margin-left:10px;}
+.codebox p{margin:0;color:#fff;font-size:12px;margin-left:5px;}
 
 /* SECTION FILMS */
-.movies{padding:30px 5%;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;}
-.movie{height:clamp(200px,30vw,300px);border-radius:8px;display:flex;align-items:flex-end;justify-content:center;text-decoration:none;color:white;font-weight:bold;transition:0.3s;position:relative;overflow:hidden;background-size:cover;background-position:center;}
-.movie span{position:absolute;bottom:10px;left:10px;z-index:2;}
+.movies{padding:20px 5%;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;}
+.movie{height:clamp(150px,25vw,250px);border-radius:8px;display:flex;align-items:flex-end;justify-content:center;text-decoration:none;color:white;font-weight:bold;transition:0.3s;position:relative;overflow:hidden;background-size:cover;background-position:center;}
+.movie span{position:absolute;bottom:10px;left:10px;z-index:2;font-size:12px;}
 .movie::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0.3);}
 .movie:hover{transform:scale(1.05);}
 
 /* RESPONSIVE */
 @media(max-width:768px){
-  .navbar{flex-direction:column;align-items:flex-start;padding:10px 20px;}
-  .navbar .menu{flex-direction:column;gap:10px;width:100%;}
-  .codebox{top:130px;}
+  .navbar{flex-direction:row;justify-content:space-between;padding:10px 15px;}
+  .navbar .menu{display:none;position:absolute;top:60px;right:0;background:#141414;flex-direction:column;width:150px;padding:10px;border-radius:0 0 5px 5px;}
+  .navbar .menu.show{display:flex;}
+  #menuToggle{display:block;}
+  .codebox{top:130px;right:10px;width:calc(100% - 40px);}
+  .codebox input{width:60%; font-size:12px;}
+  .codebox button{font-size:12px;}
 }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- MENU -->
 <div class="navbar" id="navbar">
   <div class="logo">YAMONFILM</div>
-  <div class="menu">
+  <div class="menu" id="menu">
     <a href="account.html">Mon compte</a>
     <a href="series.html">Mes séries</a>
     <button id="logoutBtn">Déconnexion</button>
   </div>
 </div>
+<button id="menuToggle">☰</button>
 
 <!-- CODE BOX -->
 <div class="codebox">
@@ -160,7 +123,12 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const CODE = "MEDICOPTER";
 
-// Menu effet scroll
+// Toggle menu mobile
+const menuToggle = document.getElementById('menuToggle');
+const menu = document.getElementById('menu');
+menuToggle.addEventListener('click', ()=>{ menu.classList.toggle('show'); });
+
+// Menu scroll effect
 window.addEventListener('scroll', ()=>{
   const navbar = document.getElementById('navbar');
   if(window.scrollY > 50){ navbar.classList.add('scrolled'); }
@@ -168,11 +136,9 @@ window.addEventListener('scroll', ()=>{
 });
 
 // Vérifie connexion
-onAuthStateChanged(auth, (user)=>{
-  if(!user){
-    alert("Connecte-toi pour accéder !");
-    window.location.href="login.html";
-  } else { checkAccess(user); }
+onAuthStateChanged(auth,(user)=>{
+  if(!user){ alert("Connecte-toi !"); window.location.href="login.html"; }
+  else{ checkAccess(user); }
 });
 
 // Déblocage code
