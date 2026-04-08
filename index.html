@@ -6,17 +6,8 @@
 <title>YAMONFILM</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:Arial, sans-serif;
-    background:#141414;
-    color:white;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#141414;color:white;}
 
 /* NAVBAR */
 .navbar{
@@ -29,7 +20,32 @@ body{
     color:#e50914;
     background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
     z-index:1000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
+
+/* AUTH FORM */
+#auth{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+#auth input{
+    padding:5px 10px;
+    border-radius:5px;
+    border:none;
+}
+#auth button{
+    padding:8px 15px;
+    background:#e50914;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+#auth button:hover{opacity:0.8;}
 
 /* HERO */
 .hero{
@@ -41,16 +57,11 @@ body{
     justify-content:center;
     align-items:flex-start;
     padding:0 5%;
-    
-    background:
-        linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)),
-        url("s-l1200.jpg");
+    background:linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3)), url("s-l1200.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
-
-/* Dégradé bas style Netflix */
 .hero::after{
     content:"";
     position:absolute;
@@ -60,41 +71,10 @@ body{
     height:20vh;
     background:linear-gradient(to top, #141414, transparent);
 }
-
-/* TEXTE */
-.hero h1{
-    font-size:clamp(26px, 5vw, 70px);
-    max-width:700px;
-    z-index:2;
-}
-
-.hero p{
-    margin-top:20px;
-    font-size:clamp(14px, 2vw, 22px);
-    max-width:500px;
-    z-index:2;
-}
-
-/* BOUTON */
-.play{
-    margin-top:30px;
-    padding:14px 30px;
-    font-size:clamp(14px, 2vw, 18px);
-    border:none;
-    border-radius:5px;
-    font-weight:bold;
-    cursor:pointer;
-    background:white;
-    color:black;
-    transition:0.3s;
-    z-index:2;
-}
-
-.play:hover{
-    background:#e50914;
-    color:white;
-    transform:scale(1.05);
-}
+.hero h1{font-size:clamp(26px, 5vw, 70px);max-width:700px;z-index:2;}
+.hero p{margin-top:20px;font-size:clamp(14px, 2vw, 22px);max-width:500px;z-index:2;}
+.play{margin-top:30px;padding:14px 30px;font-size:clamp(14px, 2vw, 18px);border:none;border-radius:5px;font-weight:bold;cursor:pointer;background:white;color:black;transition:0.3s;z-index:2;}
+.play:hover{background:#e50914;color:white;transform:scale(1.05);}
 
 /* SECTION FILMS */
 .movies{
@@ -103,8 +83,6 @@ body{
     grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
     gap:20px;
 }
-
-/* CARTE FILM */
 .movie{
     height:clamp(200px, 30vw, 300px);
     border-radius:8px;
@@ -120,7 +98,6 @@ body{
     background-size:cover;
     background-position:center;
 }
-
 .movie span{
     position:absolute;
     bottom:10px;
@@ -128,60 +105,93 @@ body{
     z-index:2;
     font-size:clamp(14px,1.5vw,18px);
 }
-
 .movie::after{
     content:"";
     position:absolute;
     inset:0;
     background:rgba(0,0,0,0.3);
 }
-
-.movie:hover{
-    transform:scale(1.05);
-}
+.movie:hover{transform:scale(1.05);}
 
 /* MOBILE */
 @media(max-width:768px){
-    .hero{
-        align-items:center;
-        text-align:center;
-        background-size: cover;
-        background-position: center;
-        height:100vh;
-    }
-
-    .hero h1, .hero p{
-        max-width:90%;
-    }
-
-    .play{
-        padding:12px 25px;
-        font-size:16px;
-    }
+    .hero{align-items:center;text-align:center;height:100vh;}
+    .hero h1, .hero p{max-width:90%;}
+    .play{padding:12px 25px;font-size:16px;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="navbar">YAMONFILM</div>
+<div class="navbar">
+  <div>YAMONFILM</div>
+  <!-- AUTH FORM -->
+  <div id="auth">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <button onclick="register(document.getElementById('email').value, document.getElementById('password').value)">S'inscrire</button>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Mot de passe">
+    <button onclick="login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)">Se connecter</button>
+    <button onclick="signOut(auth)">Déconnexion</button>
+  </div>
+</div>
 
-<!-- HERO avec lien -->
+<!-- HERO -->
 <section class="hero">
     <h1>Medicopter 117</h1>
     <p>Découvrez la série la plus regardée du moment.</p>
-    <a href="mediopter.html">
-        <button class="play">▶ Lecture</button>
-    </a>
+    <a href="mediopter.html"><button class="play">▶ Lecture</button></a>
 </section>
 
 <!-- SECTION FILMS -->
-<section class="movies">
+<section id="videos" class="movies" style="display:none;">
     <a href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')"><span>Medicopter 117</span></a>
     <a href="le clown.html" class="movie" style="background-image:url('film2.jpg')"><span>Film 2</span></a>
     <a href="film3.html" class="movie" style="background-image:url('film3.jpg')"><span>Film 3</span></a>
     <a href="film4.html" class="movie" style="background-image:url('film4.jpg')"><span>Film 4</span></a>
 </section>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+    authDomain: "yamonfilm-fead8.firebaseapp.com",
+    projectId: "yamonfilm-fead8",
+    storageBucket: "yamonfilm-fead8.firebasestorage.app",
+    messagingSenderId: "105979385486",
+    appId: "1:105979385486:web:ac808e7e70fc0ad7335bdf",
+    measurementId: "G-JFY1FQ8PK7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Inscription
+  window.register = (email, password) => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => alert("Compte créé !"))
+      .catch(error => alert(error.message));
+  }
+
+  // Connexion
+  window.login = (email, password) => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => alert("Connecté !"))
+      .catch(error => alert(error.message));
+  }
+
+  // Afficher contenu privé si connecté
+  onAuthStateChanged(auth, user => {
+    const videos = document.getElementById("videos");
+    if(user && videos) videos.style.display = "grid";
+    else if(videos) videos.style.display = "none";
+  });
+</script>
 
 </body>
 </html>
