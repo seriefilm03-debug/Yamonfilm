@@ -116,12 +116,10 @@ body{background:#141414;color:white;overflow-x:hidden;}
   padding:10px;
 }
 
-/* MOBILE */
 @media(max-width:600px){
   .side-menu{width:100%;max-width:100%;}
 }
 
-/* 🔥 VIP HIDDEN AU DÉPART */
 .hidden{display:none;}
 </style>
 </head>
@@ -148,7 +146,7 @@ body{background:#141414;color:white;overflow-x:hidden;}
 <!-- HERO -->
 <section class="hero">
 
-  <!-- 🔥 NORMAL -->
+  <!-- NORMAL -->
   <div id="normalSection">
     <h1>Medicopter 117</h1>
     <p>Découvrez la série la plus regardée</p>
@@ -158,10 +156,10 @@ body{background:#141414;color:white;overflow-x:hidden;}
     </a>
   </div>
 
-  <!-- 🔥 VIP -->
+  <!-- VIP -->
   <div id="vipSection" class="hidden">
     <h1>Medicopter VIP 🔥</h1>
-    <p>Accès complet débloqué</p>
+    <p>Accès débloqué</p>
 
     <a href="vipmedicopter.html">
       <button class="play">▶ Voir VIP</button>
@@ -172,14 +170,12 @@ body{background:#141414;color:white;overflow-x:hidden;}
 
 <section class="movies">
 
-  <!-- NORMAL CARD -->
   <a id="normalCard" href="medicopter.html" class="movie" style="background-image:url('s-l1200.jpg')">
     <span>Medicopter</span>
   </a>
 
-  <!-- VIP CARD -->
   <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image:url('s-l1200.jpg')">
-    <span>Série Complète VIP</span>
+    <span>Série VIP</span>
   </a>
 
 </section>
@@ -187,7 +183,8 @@ body{background:#141414;color:white;overflow-x:hidden;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, updateDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, getDoc, arrayUnion, setDoc }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -222,21 +219,35 @@ onAuthStateChanged(auth,(user)=>{
   }
 });
 
-window.unlock = async ()=>{
+window.unlock = async () => {
   const user = auth.currentUser;
-  const input = document.getElementById("code").value;
+  const input = document.getElementById("code").value.trim();
 
-  if(input === "MEDICOPTER"){
-    await updateDoc(doc(db,"users",user.uid), {
+  if (!user) {
+    document.getElementById("msg").innerText = "Non connecté ❌";
+    return;
+  }
+
+  if (input !== "MEDICOPTER") {
+    document.getElementById("msg").innerText = "Code incorrect ❌";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+
+  try {
+    await updateDoc(userRef, {
       seriesUnlocked: arrayUnion("MEDICOPTER")
     });
-
-    document.getElementById("msg").innerText="Débloqué 🔥";
-
-    applyVIP();
-  } else {
-    document.getElementById("msg").innerText="Code invalide ❌";
+  } catch (e) {
+    await setDoc(userRef, {
+      seriesUnlocked: ["MEDICOPTER"]
+    }, { merge: true });
   }
+
+  document.getElementById("msg").innerText = "Débloqué 🔥";
+
+  applyVIP();
 };
 
 async function checkAccess(user){
@@ -248,11 +259,9 @@ async function checkAccess(user){
 }
 
 function applyVIP(){
-  // 🔥 ON CACHE NORMAL
   document.getElementById("normalSection").classList.add("hidden");
   document.getElementById("normalCard").classList.add("hidden");
 
-  // 🔥 ON AFFICHE VIP
   document.getElementById("vipSection").classList.remove("hidden");
   document.getElementById("vipCard").classList.remove("hidden");
 }
@@ -261,6 +270,9 @@ document.getElementById("logoutBtn").onclick = ()=>{
   signOut(auth).then(()=> window.location.href="login.html");
 };
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
