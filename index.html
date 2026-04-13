@@ -1,3 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  background:#141414;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* NAV */
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 20px;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  z-index:1000;
+}
+
+.logo{
+  color:#e50914;
+  font-size:clamp(18px,2vw,28px);
+  font-weight:bold;
+}
+
+.menu-btn{
+  font-size:28px;
+  cursor:pointer;
+}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
+}
+
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* MENU */
+.side-menu{
+  position:fixed;
+  top:0;
+  right:-100%;
+  width:320px;
+  max-width:90%;
+  height:100%;
+  background:#111;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  transition:0.3s;
+  z-index:2000;
+}
+
+.side-menu.open{
+  right:0;
+}
+
+.side-menu a,
+.side-menu button{
+  color:white;
+  text-decoration:none;
+  background:none;
+  border:none;
+  font-size:16px;
+  padding:10px 0;
+  cursor:pointer;
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:80px 5% 40px;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.3)),
+    url("s-l1200.jpg") center/cover no-repeat;
+}
+
+.hero h1{
+  font-size:clamp(28px,5vw,72px);
+}
+
+.hero p{
+  margin-top:15px;
+  font-size:clamp(14px,2vw,20px);
+  opacity:0.9;
+}
+
+/* BUTTON */
+.play{
+  margin-top:20px;
+  padding:12px 25px;
+  border:none;
+  border-radius:6px;
+  background:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.play:hover{
+  background:#e50914;
+  color:white;
+}
+
+/* MOVIES */
+.movies{
+  padding:25px 5%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:15px;
+}
+
+.movie{
+  height:190px;
+  background-size:cover;
+  background-position:center;
+  border-radius:10px;
+  display:flex;
+  align-items:flex-end;
+  padding:10px;
+}
+
+/* RESPONSIVE */
+@media (max-width:600px){
+  .side-menu{width:100%;}
+  .hero{text-align:center; align-items:center;}
+  .movie{height:160px;}
+}
+
+@media (min-width:1600px){
+  .movie{height:260px;}
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="navbar">
+  <div class="logo">YAMONFILM</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="side-menu" id="menu">
+  <a href="account.html">Mon compte</a>
+  <a href="series.html">Mes séries</a>
+  <button id="logoutBtn">Déconnexion</button>
+
+  <input type="text" id="code" placeholder="Code">
+  <button onclick="unlock()">Valider</button>
+  <p id="msg"></p>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+
+  <div id="normalSection">
+    <h1>Medicopter 117</h1>
+    <p>Découvrez la série la plus regardée</p>
+
+    <a href="medicopter.html">
+      <button class="play">▶ Voir Medicopter</button>
+    </a>
+  </div>
+
+  <div id="vipSection" class="hidden">
+    <h1>Medicopter 🔥</h1>
+    <p>Accès débloqué</p>
+
+    <a href="vipmedicopter.html">
+      <button class="play">▶ Voir VIP</button>
+    </a>
+  </div>
+
+</section>
+
+<!-- MOVIES -->
+<section class="movies">
+
+  <a id="normalCard" href="medicopter.html" class="movie"
+     style="background-image:url('s-l1200.jpg')">
+    Medicopter
+  </a>
+
+  <a id="vipCard" href="vipmedicopter.html" class="movie hidden"
+     style="background-image:url('s-l1200.jpg')">
+    VIP
+  </a>
+
+</section>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -11,13 +236,13 @@ import {
 import {
   getFirestore,
   doc,
-  updateDoc,
   getDoc,
-  arrayUnion,
-  setDoc
+  updateDoc,
+  setDoc,
+  arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* FIREBASE INIT */
+/* FIREBASE */
 const app = initializeApp({
   apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
   authDomain: "yamonfilm-fead8.firebaseapp.com",
@@ -27,10 +252,10 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* 🔥 IMPORTANT FIX : session locale seulement */
+/* SESSION SAFE */
 setPersistence(auth, browserSessionPersistence);
 
-/* MENU */
+/* MENU SAFE */
 const menu = document.getElementById("menu");
 const overlay = document.getElementById("overlay");
 
@@ -39,70 +264,82 @@ window.toggleMenu = () => {
   overlay.classList.toggle("show");
 };
 
-overlay.onclick = () => {
-  menu.classList.remove("open");
-  overlay.classList.remove("show");
-};
+if (overlay) {
+  overlay.onclick = () => {
+    menu.classList.remove("open");
+    overlay.classList.remove("show");
+  };
+}
 
-/* AUTH STATE */
-onAuthStateChanged(auth, (user) => {
+/* AUTH SAFE */
+onAuthStateChanged(auth, async (user) => {
+  try {
+    if (!user) {
+      console.log("👤 Visiteur");
+      return;
+    }
 
-  if (!user) {
-    console.log("👤 Visiteur (non connecté)");
-    return;
+    console.log("✅ User:", user.uid);
+    await checkAccess(user);
+
+  } catch (e) {
+    console.error(e);
   }
-
-  console.log("✅ Connecté :", user.uid);
-  checkAccess(user);
 });
 
-/* UNLOCK VIP */
-window.unlock = async () => {
-  const user = auth.currentUser;
-  const input = document.getElementById("code").value.trim();
-
-  if (!user) {
-    document.getElementById("msg").innerText = "Non connecté ❌";
-    return;
-  }
-
-  if (input !== "MEDICOPTER") {
-    document.getElementById("msg").innerText = "Code incorrect ❌";
-    return;
-  }
-
-  const userRef = doc(db, "users", user.uid);
-
+/* CHECK VIP */
+async function checkAccess(user){
   try {
-    await updateDoc(userRef, {
-      seriesUnlocked: arrayUnion("MEDICOPTER")
-    });
-  } catch (e) {
-    await setDoc(userRef, {
-      seriesUnlocked: ["MEDICOPTER"]
-    }, { merge: true });
-  }
+    const snap = await getDoc(doc(db,"users",user.uid));
 
-  document.getElementById("msg").innerText = "Débloqué 🔥";
-  applyVIP();
-};
+    if(snap.exists() && snap.data().seriesUnlocked?.includes("MEDICOPTER")){
+      applyVIP();
+    }
 
-/* CHECK ACCESS */
-async function checkAccess(user) {
-  const snap = await getDoc(doc(db, "users", user.uid));
-
-  if (snap.exists() && snap.data().seriesUnlocked?.includes("MEDICOPTER")) {
-    applyVIP();
+  } catch(e){
+    console.error(e);
   }
 }
 
-/* VIP MODE */
-function applyVIP() {
-  document.getElementById("normalSection").classList.add("hidden");
-  document.getElementById("normalCard").classList.add("hidden");
+/* UNLOCK */
+window.unlock = async () => {
+  const user = auth.currentUser;
+  const input = document.getElementById("code");
+  const msg = document.getElementById("msg");
 
-  document.getElementById("vipSection").classList.remove("hidden");
-  document.getElementById("vipCard").classList.remove("hidden");
+  if(!user){
+    msg.innerText = "Non connecté ❌";
+    return;
+  }
+
+  if(input.value.trim() !== "MEDICOPTER"){
+    msg.innerText = "Code incorrect ❌";
+    return;
+  }
+
+  const ref = doc(db,"users",user.uid);
+
+  try {
+    await updateDoc(ref,{
+      seriesUnlocked: arrayUnion("MEDICOPTER")
+    });
+  } catch {
+    await setDoc(ref,{
+      seriesUnlocked:["MEDICOPTER"]
+    },{merge:true});
+  }
+
+  msg.innerText = "Débloqué 🔥";
+  applyVIP();
+};
+
+/* VIP MODE */
+function applyVIP(){
+  document.getElementById("normalSection")?.classList.add("hidden");
+  document.getElementById("normalCard")?.classList.add("hidden");
+
+  document.getElementById("vipSection")?.classList.remove("hidden");
+  document.getElementById("vipCard")?.classList.remove("hidden");
 }
 
 /* LOGOUT */
@@ -112,3 +349,6 @@ document.getElementById("logoutBtn").onclick = () => {
   });
 };
 </script>
+
+</body>
+</html>
