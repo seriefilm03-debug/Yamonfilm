@@ -8,8 +8,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 
-
-
 /* ===== CONTENU PRINCIPAL ===== */
 .main-content{
   display:block;
@@ -171,7 +169,6 @@ header{
 
 <body>
 
-<!-- CONTENU PRINCIPAL -->
 <div class="main-content">
 <header>
   <a href="index.html" class="logo">YAMONFILM</a>
@@ -230,7 +227,6 @@ const episodeLinks = {
   }
 };
 
-/* ELEMENTS */
 const hero=document.getElementById("hero");
 const title=document.getElementById("title");
 const meta=document.getElementById("meta");
@@ -241,19 +237,27 @@ const episodesContainer=document.getElementById("episodes");
 
 /* SERIES */
 async function loadSeries(){
-  const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
-  const data=await res.json();
+  try{
+    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
+    const data=await res.json();
 
-  title.textContent=data.name;
-  meta.textContent=`⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
-  overview.textContent=data.overview;
+    title.textContent=data?.name || "Inconnu";
+    meta.textContent=`⭐ ${data?.vote_average || "N/A"} • ${data?.first_air_date || ""} • ${data?.number_of_seasons || 1} saisons`;
+    overview.textContent=data?.overview || "";
 
-  hero.style.backgroundImage=`url(${imgBase}${data.backdrop_path})`;
+    const backdrop = data?.backdrop_path 
+      ? `${imgBase}${data.backdrop_path}`
+      : "https://via.placeholder.com/1200x600?text=No+Image";
 
-  loadSeasons(data.number_of_seasons);
+    hero.style.backgroundImage=`url(${backdrop})`;
+
+    loadSeasons(data?.number_of_seasons || 1);
+
+  }catch(e){
+    title.textContent="Erreur de chargement";
+  }
 }
 
-/* SAISONS */
 function loadSeasons(total){
   seasonMenu.innerHTML="";
 
@@ -273,40 +277,46 @@ function loadSeasons(total){
   loadEpisodes(1);
 }
 
-/* EPISODES */
 async function loadEpisodes(season){
   episodesContainer.innerHTML="";
 
-  const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
-  const data=await res.json();
+  try{
+    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+    const data=await res.json();
 
-  data.episodes.forEach(ep=>{
+    if(!data.episodes) return;
 
-    const imageUrl=
-      ep.still_path?imgBase+ep.still_path:
-      data.poster_path?imgBase+data.poster_path:
-      "https://via.placeholder.com/500x281?text=Episode";
+    data.episodes.forEach(ep=>{
 
-    const card=document.createElement("div");
-    card.className="card";
+      const imageUrl=
+        ep?.still_path ? imgBase+ep.still_path :
+        data?.poster_path ? imgBase+data.poster_path :
+        "https://via.placeholder.com/500x281?text=Episode";
 
-    card.innerHTML=`
-      <img src="${imageUrl}">
-      <div class="card-content">
-        <span class="badge">⭐ ${ep.vote_average||"N/A"}</span>
-        <h4>${ep.episode_number}. ${ep.name}</h4>
-        <small>${ep.air_date||""}</small>
-      </div>
-    `;
+      const card=document.createElement("div");
+      card.className="card";
 
-    card.onclick=()=>{
-      const link=episodeLinks?.[season]?.[ep.episode_number];
-      if(link) window.location.href=link;
-      else alert("Lien non défini");
-    };
+      card.innerHTML=`
+        <img src="${imageUrl}">
+        <div class="card-content">
+          <span class="badge">⭐ ${ep?.vote_average || "N/A"}</span>
+          <h4>${ep?.episode_number || ""}. ${ep?.name || ""}</h4>
+          <small>${ep?.air_date || ""}</small>
+        </div>
+      `;
 
-    episodesContainer.appendChild(card);
-  });
+      card.onclick=()=>{
+        const link=episodeLinks?.[season]?.[ep?.episode_number];
+        if(link) window.location.href=link;
+        else alert("Lien non défini");
+      };
+
+      episodesContainer.appendChild(card);
+    });
+
+  }catch(e){
+    episodesContainer.innerHTML="<p>Erreur chargement épisodes</p>";
+  }
 }
 
 seasonBtn.onclick=()=>seasonMenu.classList.toggle("show");
