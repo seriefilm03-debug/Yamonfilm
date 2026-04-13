@@ -9,6 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#141414;color:white;overflow-x:hidden;}
 
+/* NAVBAR */
 .navbar{
   position:fixed;
   top:0;
@@ -19,10 +20,16 @@ body{background:#141414;color:white;overflow-x:hidden;}
   align-items:center;
   padding:0 15px;
   background:rgba(0,0,0,0.9);
+  z-index:1000;
 }
 
-.logo{color:#e50914;font-size:22px;font-weight:bold;}
+.logo{
+  color:#e50914;
+  font-size:22px;
+  font-weight:bold;
+}
 
+/* MENU SIMPLE */
 .side-menu{
   position:fixed;
   right:0;
@@ -36,20 +43,28 @@ body{background:#141414;color:white;overflow-x:hidden;}
   gap:10px;
 }
 
-input,button{
+input{
   padding:10px;
   border:none;
   border-radius:5px;
+  outline:none;
 }
 
 button{
+  padding:10px;
+  border:none;
+  border-radius:5px;
   background:#e50914;
   color:white;
   cursor:pointer;
+  font-weight:bold;
 }
 
-.hidden{display:none;}
+button:hover{
+  background:#ff2e2e;
+}
 
+/* HERO */
 .hero{
   margin-top:80px;
   padding:30px;
@@ -62,6 +77,17 @@ button{
   border:none;
   cursor:pointer;
   font-weight:bold;
+  border-radius:5px;
+}
+
+.play:hover{
+  background:#e50914;
+  color:white;
+}
+
+#msg{
+  margin-top:10px;
+  font-size:14px;
 }
 </style>
 </head>
@@ -79,20 +105,18 @@ button{
 </div>
 
 <section class="hero">
-
   <h1>Medicopter 117</h1>
   <p>Regarde la série maintenant</p>
 
   <a href="medicopter.html">
     <button class="play">▶ Voir Medicopter</button>
   </a>
-
 </section>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } 
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
@@ -106,40 +130,51 @@ const db = getFirestore(app);
 
 let userGlobal = null;
 
-onAuthStateChanged(auth,(user)=>{
-  userGlobal = user;
+/* 🔥 AUTH SAFE */
+onAuthStateChanged(auth, (user) => {
+  userGlobal = user || null;
 });
 
+/* 🔥 UNLOCK SAFE */
 window.unlock = async () => {
-  const input = document.getElementById("code").value.trim().toUpperCase();
 
-  if(!userGlobal){
-    document.getElementById("msg").innerText = "Pas connecté ❌";
+  const input = document.getElementById("code").value.trim().toUpperCase();
+  const msg = document.getElementById("msg");
+
+  if (!userGlobal) {
+    msg.innerText = "Non connecté ❌";
     return;
   }
 
   const codes = {
-    MEDICOPTER: "MEDICOPTER"
+    "MEDICOPTER": "MEDICOPTER"
   };
 
-  if(!codes[input]){
-    document.getElementById("msg").innerText = "Code incorrect ❌";
+  if (!codes[input]) {
+    msg.innerText = "Code incorrect ❌";
     return;
   }
 
-  const userRef = doc(db,"users",userGlobal.uid);
-
   try {
-    await updateDoc(userRef,{
-      seriesUnlocked: arrayUnion(codes[input])
-    });
-  } catch(e){
-    await setDoc(userRef,{
-      seriesUnlocked:[codes[input]]
-    },{merge:true});
-  }
+    const userRef = doc(db, "users", userGlobal.uid);
+    const snap = await getDoc(userRef);
 
-  document.getElementById("msg").innerText = "Débloqué 🔥";
+    if (snap.exists()) {
+      await updateDoc(userRef, {
+        seriesUnlocked: arrayUnion(codes[input])
+      });
+    } else {
+      await setDoc(userRef, {
+        seriesUnlocked: [codes[input]]
+      });
+    }
+
+    msg.innerText = "Débloqué 🔥";
+
+  } catch (error) {
+    console.error(error);
+    msg.innerText = "Erreur Firebase ❌";
+  }
 };
 </script>
 
