@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes séries - YAMONFILM</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+  background:#141414;
+  color:white;
+}
+
+/* HEADER */
+header{
+  position:fixed;
+  top:0;
+  width:100%;
+  height:60px;
+  background:rgba(0,0,0,0.9);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  z-index:1000;
+}
+
+.logo{
+  color:#e50914;
+  font-weight:bold;
+  font-size:20px;
+}
+
+/* CONTAINER */
+.container{
+  padding:90px 20px 40px;
+  max-width:1000px;
+  margin:auto;
+}
+
+/* INPUT CODE */
+.code-box{
+  display:flex;
+  gap:10px;
+  margin-bottom:30px;
+}
+
+input{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:5px;
+  outline:none;
+}
+
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:5px;
+  background:#e50914;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#ff2e2e;
+}
+
+/* SERIES GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+}
+
+/* CARD */
+.card{
+  background:#1c1c1c;
+  border-radius:10px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+}
+
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+
+.card p{
+  padding:10px;
+  font-size:14px;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  opacity:0.6;
+  margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">YAMONFILM</div>
+</header>
+
+<div class="container">
+
+  <!-- CODE INPUT -->
+  <div class="code-box">
+    <input type="text" id="code" placeholder="Entrer un code série (ex: MEDICOPTER)">
+    <button onclick="addSeries()">Valider</button>
+  </div>
+
+  <!-- LISTE SERIES -->
+  <div class="grid" id="grid"></div>
+
+  <p class="empty" id="empty">Aucune série débloquée</p>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+  authDomain: "yamonfilm-fead8.firebaseapp.com",
+  projectId: "yamonfilm-fead8"
+});
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+
+let currentUser = null;
+
+/* 🔥 LISTE DES SERIES DISPONIBLES */
+const seriesData = {
+  
+  VIPMEDICOPTER: {
+    title: "Medicopter VIP",
+    img: "s-l1200.jpg",
+    link: "vipmedicopter.html"
+  }
+};
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    window.location.href="login.html";
+    return;
+  }
+
+  currentUser = user;
+  loadSeries();
+});
+
+/* 🔥 CHARGER LES SERIES */
+async function loadSeries(){
+  grid.innerHTML = "";
+
+  const snap = await getDoc(doc(db,"users",currentUser.uid));
+
+  if(!snap.exists() || !snap.data().seriesUnlocked){
+    empty.style.display="block";
+    return;
+  }
+
+  const unlocked = snap.data().seriesUnlocked;
+
+  if(unlocked.length === 0){
+    empty.style.display="block";
+    return;
+  }
+
+  empty.style.display="none";
+
+  unlocked.forEach(code=>{
+    const s = seriesData[code];
+    if(!s) return;
+
+    const card = document.createElement("div");
+    card.className="card";
+
+    card.innerHTML=`
+      <img src="${s.img}">
+      <p>${s.title}</p>
+    `;
+
+    card.onclick=()=>{
+      window.location.href = s.link;
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+/* 🔥 AJOUTER UNE SERIE */
+window.addSeries = async ()=>{
+  const code = document.getElementById("code").value.trim().toUpperCase();
+
+  if(!currentUser) return;
+
+  if(!seriesData[code]){
+    alert("Code invalide ❌");
+    return;
+  }
+
+  const userRef = doc(db,"users",currentUser.uid);
+
+  try {
+    await updateDoc(userRef,{
+      seriesUnlocked: arrayUnion(code)
+    });
+  } catch(e){
+    await setDoc(userRef,{
+      seriesUnlocked:[code]
+    });
+  }
+
+  document.getElementById("code").value="";
+  loadSeries();
+};
+</script>
+
+</body>
+</html>
