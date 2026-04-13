@@ -115,7 +115,6 @@ body{
   opacity:0.9;
 }
 
-/* BUTTON */
 .play{
   margin-top:20px;
   padding:12px 25px;
@@ -132,7 +131,6 @@ body{
   color:white;
 }
 
-/* MOVIES */
 .movies{
   padding:25px 5%;
   display:grid;
@@ -150,15 +148,10 @@ body{
   padding:10px;
 }
 
-/* RESPONSIVE */
 @media (max-width:600px){
   .side-menu{width:100%;}
   .hero{text-align:center; align-items:center;}
   .movie{height:160px;}
-}
-
-@media (min-width:1600px){
-  .movie{height:260px;}
 }
 
 .hidden{display:none;}
@@ -167,7 +160,6 @@ body{
 
 <body>
 
-<!-- NAV -->
 <div class="navbar">
   <div class="logo">YAMONFILM</div>
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
@@ -185,7 +177,6 @@ body{
   <p id="msg"></p>
 </div>
 
-<!-- HERO -->
 <section class="hero">
 
   <div id="normalSection">
@@ -208,7 +199,6 @@ body{
 
 </section>
 
-<!-- MOVIES -->
 <section class="movies">
 
   <a id="normalCard" href="medicopter.html" class="movie"
@@ -228,9 +218,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getAuth,
   onAuthStateChanged,
-  signOut,
-  setPersistence,
-  browserSessionPersistence
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
@@ -252,10 +240,7 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* SESSION SAFE */
-setPersistence(auth, browserSessionPersistence);
-
-/* MENU SAFE */
+/* MENU */
 const menu = document.getElementById("menu");
 const overlay = document.getElementById("overlay");
 
@@ -264,51 +249,42 @@ window.toggleMenu = () => {
   overlay.classList.toggle("show");
 };
 
-if (overlay) {
-  overlay.onclick = () => {
-    menu.classList.remove("open");
-    overlay.classList.remove("show");
-  };
-}
+overlay.onclick = () => {
+  menu.classList.remove("open");
+  overlay.classList.remove("show");
+};
 
-/* AUTH SAFE */
+/* 🔥 AUTH OBLIGATOIRE */
 onAuthStateChanged(auth, async (user) => {
-  try {
-    if (!user) {
-      console.log("👤 Visiteur");
-      return;
-    }
 
-    console.log("✅ User:", user.uid);
-    await checkAccess(user);
-
-  } catch (e) {
-    console.error(e);
+  if (!user) {
+    // ❌ PAS CONNECTÉ → redirection obligatoire
+    window.location.href = "login.html";
+    return;
   }
+
+  // ✅ CONNECTÉ
+  console.log("User OK:", user.uid);
+  await checkAccess(user);
 });
 
-/* CHECK VIP */
+/* VIP CHECK */
 async function checkAccess(user){
-  try {
-    const snap = await getDoc(doc(db,"users",user.uid));
+  const snap = await getDoc(doc(db,"users",user.uid));
 
-    if(snap.exists() && snap.data().seriesUnlocked?.includes("MEDICOPTER")){
-      applyVIP();
-    }
-
-  } catch(e){
-    console.error(e);
+  if(snap.exists() && snap.data().seriesUnlocked?.includes("MEDICOPTER")){
+    applyVIP();
   }
 }
 
-/* UNLOCK */
+/* UNLOCK CODE */
 window.unlock = async () => {
   const user = auth.currentUser;
   const input = document.getElementById("code");
   const msg = document.getElementById("msg");
 
   if(!user){
-    msg.innerText = "Non connecté ❌";
+    window.location.href = "login.html";
     return;
   }
 
