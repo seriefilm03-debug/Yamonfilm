@@ -6,162 +6,59 @@
 <title>YAMONFILM</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
-}
-
-body{
-  background:#141414;
-  color:white;
-  overflow-x:hidden;
-}
+/* --- STYLE DE BASE --- */
+*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+body{ background:#141414; color:white; overflow-x:hidden; }
 
 /* NAV */
 .navbar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:60px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 20px;
-  background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  position:fixed; top:0; left:0; width:100%; height:60px;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
   z-index:1000;
 }
+.logo{ color:#e50914; font-size:clamp(18px,2vw,28px); font-weight:bold; text-decoration:none;}
+.menu-btn{ font-size:28px; cursor:pointer; }
 
-.logo{
-  color:#e50914;
-  font-size:clamp(18px,2vw,28px);
-  font-weight:bold;
-}
-
-.menu-btn{
-  font-size:28px;
-  cursor:pointer;
-}
-
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(6px);
-  opacity:0;
-  pointer-events:none;
-  transition:0.3s;
-}
-
-.overlay.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-/* MENU */
-.side-menu{
-  position:fixed;
-  top:0;
-  right:-100%;
-  width:320px;
-  max-width:90%;
-  height:100%;
-  background:#111;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-  transition:0.3s;
-  z-index:2000;
-}
-
-.side-menu.open{
-  right:0;
-}
-
-.side-menu a,
-.side-menu button{
-  color:white;
-  text-decoration:none;
-  background:none;
-  border:none;
-  font-size:16px;
-  padding:10px 0;
-  cursor:pointer;
-}
+/* OVERLAY & MENU */
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+.overlay.show{ opacity:1; pointer-events:auto; }
+.side-menu{ position:fixed; top:0; right:-100%; width:320px; max-width:90%; height:100%; background:#111; padding:20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
+.side-menu.open{ right:0; }
+.side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:16px; padding:10px 0; cursor:pointer; text-align:left;}
+.side-menu input { padding:10px; background:#222; border:1px solid #333; color:white; border-radius:5px; }
 
 /* HERO */
-.hero{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:80px 5% 40px;
-  background:
-    linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.3)),
-    url("s-l1200.jpg") center/cover no-repeat;
-}
+.hero{ min-height:80vh; display:flex; flex-direction:column; justify-content:center; padding:80px 5% 40px; background: linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.3)), url("s-l1200.jpg") center/cover no-repeat; }
+.hero h1{ font-size:clamp(28px,5vw,72px); }
+.hero p{ margin-top:15px; font-size:clamp(14px,2vw,20px); opacity:0.9; }
+.play{ margin-top:20px; padding:12px 25px; border:none; border-radius:6px; background:white; font-weight:bold; cursor:pointer; transition:0.2s; text-decoration:none; color:black; display:inline-block;}
+.play:hover{ background:#e50914; color:white; }
 
-.hero h1{
-  font-size:clamp(28px,5vw,72px);
-}
+/* SECTION REPRENDRE (NETFLIX STYLE) */
+.continue-section { padding: 30px 5% 10px; display: none; }
+.continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+.continue-grid::-webkit-scrollbar { display: none; }
+.continue-card { min-width: 240px; width: 240px; text-decoration: none; color: white; transition: 0.3s; }
+.continue-card:hover { transform: scale(1.05); }
+.img-container { position: relative; width: 100%; height: 135px; border-radius: 5px; overflow: hidden; background: #222; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; }
+.progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
+.play-hover { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+.img-container:hover .play-hover { opacity: 1; }
 
-.hero p{
-  margin-top:15px;
-  font-size:clamp(14px,2vw,20px);
-  opacity:0.9;
-}
-
-.play{
-  margin-top:20px;
-  padding:12px 25px;
-  border:none;
-  border-radius:6px;
-  background:white;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.play:hover{
-  background:#e50914;
-  color:white;
-}
-
-.movies{
-  padding:25px 5%;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:15px;
-}
-
-.movie{
-  height:190px;
-  background-size:cover;
-  background-position:center;
-  border-radius:10px;
-  display:flex;
-  align-items:flex-end;
-  padding:10px;
-}
-
-@media (max-width:600px){
-  .side-menu{width:100%;}
-  .hero{text-align:center; align-items:center;}
-  .movie{height:160px;}
-}
+/* GRILLE DES FILMS */
+.movies{ padding:25px 5%; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; }
+.movie{ height:220px; background-size:cover; background-position:center; border-radius:10px; display:flex; align-items:flex-end; padding:15px; text-decoration:none; color:white; font-weight:bold; border: 1px solid #333; transition: 0.3s;}
+.movie:hover { border-color: #e50914; transform: translateY(-5px); }
 
 .hidden{display:none;}
 </style>
 </head>
-
 <body>
 
 <div class="navbar">
-  <div class="logo">YAMONFILM</div>
+  <a href="index.html" class="logo">YAMONFILM</a>
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
@@ -171,110 +68,120 @@ body{
   <a href="account.html">Mon compte</a>
   <a href="series.html">Mes séries</a>
   <button id="logoutBtn">Déconnexion</button>
-
+  <hr style="border:0.1px solid #333; margin: 10px 0;">
   <input type="text" id="code" placeholder="Code">
-  <button onclick="unlock()">Valider</button>
-  <p id="msg"></p>
+  <button onclick="unlock()" style="background:#e50914; text-align:center; border-radius:5px;">Valider</button>
+  <p id="msg" style="text-align:center; font-size:12px;"></p>
 </div>
 
 <section class="hero">
-
   <div id="normalSection">
     <h1>Medicopter 117</h1>
     <p>Découvrez la série la plus regardée</p>
-
-    <a href="mediopter.html">
-      <button class="play">▶ Voir Medicopter</button>
-    </a>
+    <a href="medicopter.html" class="play">▶ Voir Medicopter</a>
   </div>
 
   <div id="vipSection" class="hidden">
     <h1>Medicopter 🔥</h1>
-    <p>Accès débloqué</p>
-
-    <a href="vipmedicopter.html">
-      <button class="play">▶ Voir VIP</button>
-    </a>
+    <p>Accès débloqué (Version VIP)</p>
+    <a href="vipmedicopter.html" class="play">▶ Voir VIP</a>
   </div>
-
 </section>
 
-<section class="movies">
+<section id="continue-watching" class="continue-section">
+    <h3 style="margin-bottom:15px;">Reprendre la lecture</h3>
+    <div id="continue-container" class="continue-grid">
+        </div>
+</section>
 
-  <a id="normalCard" href="medicopter.html" class="movie"
-     style="background-image:url('s-l1200.jpg')">
+<h3 style="padding: 20px 5% 0;">Toutes les séries</h3>
+<section class="movies">
+  <a id="normalCard" href="medicopter.html" class="movie" style="background-image:url('s-l1200.jpg')">
     Medicopter
   </a>
 
-  <a id="vipCard" href="vipmedicopter.html" class="movie hidden"
-     style="background-image:url('s-l1200.jpg')">
-    VIP
+  <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image:url('s-l1200.jpg')">
+    Medicopter VIP 🔥
   </a>
-
 </section>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  setDoc,
-  arrayUnion
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* FIREBASE */
-const app = initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
   authDomain: "yamonfilm-fead8.firebaseapp.com",
   projectId: "yamonfilm-fead8"
-});
+};
 
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 /* MENU */
-const menu = document.getElementById("menu");
-const overlay = document.getElementById("overlay");
-
 window.toggleMenu = () => {
-  menu.classList.toggle("open");
-  overlay.classList.toggle("show");
+  document.getElementById("menu").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
+};
+document.getElementById("overlay").onclick = () => {
+  document.getElementById("menu").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
 };
 
-overlay.onclick = () => {
-  menu.classList.remove("open");
-  overlay.classList.remove("show");
-};
-
-/* 🔥 AUTH OBLIGATOIRE */
+/* AUTH & PROGRESSION */
 onAuthStateChanged(auth, async (user) => {
-
   if (!user) {
-    // ❌ PAS CONNECTÉ → redirection obligatoire
     window.location.href = "login.html";
     return;
   }
 
-  // ✅ CONNECTÉ
-  console.log("User OK:", user.uid);
-  await checkAccess(user);
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (snap.exists()) {
+    const data = snap.data();
+    
+    // 1. Vérifier accès VIP
+    if (data.seriesUnlocked?.includes("MEDICOPTER")) {
+      applyVIP();
+    }
+
+    // 2. Afficher "Reprendre la lecture"
+    if (data.progress && data.progress.lastBySerie) {
+      displayContinue(data.progress.lastBySerie);
+    }
+  }
 });
 
-/* VIP CHECK */
-async function checkAccess(user){
-  const snap = await getDoc(doc(db,"users",user.uid));
+/* FONCTION REPRENDRE LA LECTURE */
+function displayContinue(lastBySerie) {
+    const container = document.getElementById("continue-container");
+    const section = document.getElementById("continue-watching");
+    container.innerHTML = "";
 
-  if(snap.exists() && snap.data().seriesUnlocked?.includes("MEDICOPTER")){
-    applyVIP();
-  }
+    // Convertir l'objet en tableau et trier par le plus récent (timestamp)
+    const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
+
+    if (items.length > 0) {
+        section.style.display = "block";
+        items.forEach(item => {
+            const card = document.createElement("a");
+            card.href = item.link; // Ex: medicopter.html
+            card.className = "continue-card";
+            card.innerHTML = `
+                <div class="img-container">
+                    <img src="https://image.tmdb.org/t/p/w300${item.img}">
+                    <div class="play-hover"><span style="font-size:30px;">▶</span></div>
+                    <div class="progress-bar"></div>
+                </div>
+                <div style="margin-top:8px;">
+                    <div style="font-weight:bold; font-size:14px;">${item.serieName}</div>
+                    <div style="font-size:12px; color:#aaa;">S${item.s} : E${item.e}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 }
 
 /* UNLOCK CODE */
@@ -283,46 +190,31 @@ window.unlock = async () => {
   const input = document.getElementById("code");
   const msg = document.getElementById("msg");
 
-  if(!user){
-    window.location.href = "login.html";
-    return;
-  }
-
-  if(input.value.trim() !== "MEDICOPTER"){
+  if (input.value.trim() !== "MEDICOPTER") {
     msg.innerText = "Code incorrect ❌";
     return;
   }
 
-  const ref = doc(db,"users",user.uid);
-
+  const ref = doc(db, "users", user.uid);
   try {
-    await updateDoc(ref,{
-      seriesUnlocked: arrayUnion("MEDICOPTER")
-    });
+    await updateDoc(ref, { seriesUnlocked: arrayUnion("MEDICOPTER") });
   } catch {
-    await setDoc(ref,{
-      seriesUnlocked:["MEDICOPTER"]
-    },{merge:true});
+    await setDoc(ref, { seriesUnlocked: ["MEDICOPTER"] }, { merge: true });
   }
-
   msg.innerText = "Débloqué 🔥";
   applyVIP();
 };
 
-/* VIP MODE */
-function applyVIP(){
+function applyVIP() {
   document.getElementById("normalSection")?.classList.add("hidden");
   document.getElementById("normalCard")?.classList.add("hidden");
-
   document.getElementById("vipSection")?.classList.remove("hidden");
   document.getElementById("vipCard")?.classList.remove("hidden");
 }
 
 /* LOGOUT */
 document.getElementById("logoutBtn").onclick = () => {
-  signOut(auth).then(() => {
-    window.location.href = "login.html";
-  });
+  signOut(auth).then(() => { window.location.href = "login.html"; });
 };
 </script>
 
