@@ -78,7 +78,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
         <p id="promoMsg" style="font-size: 11px; margin-top: 5px; text-align: center;"></p>
     </div>
 
-    <button id="logoutBtn" style="margin-top: auto;">Déconnexion</button>
+    <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
 </div>
 
 <section class="hero-container">
@@ -93,7 +93,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
         <div class="hero-content">
             <h1>Medicopter 117</h1>
             <p>Des vies en jeu, une équipe d'élite prête à tout.</p><br>
-            <a href="mediopter.html" class="play-btn">▶ Lecture</a>
+            <a id="heroMedicBtn" href="medicopter.html" class="play-btn">▶ Lecture</a>
         </div>
     </div>
 </section>
@@ -106,8 +106,8 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <h3 class="movies-label">Nos Séries</h3>
 <section class="movies">
     <a href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
-    <a id="normalCard" href="mediopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-    <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">Medicopter VIP 🔥</a>
+    <a id="normalCard" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
+    <a id="vipCard" href="medicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">Medicopter VIP 🔥</a>
 </section>
 
 <script type="module">
@@ -127,7 +127,7 @@ window.toggleMenu = () => {
 
 document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "login.html");
 
-// LOGIQUE D'ACTIVATION AJOUTÉE
+// LOGIQUE D'ACTIVATION
 document.getElementById("activateBtn").onclick = async () => {
     const code = document.getElementById("promoCode").value.trim().toUpperCase();
     const msg = document.getElementById("promoMsg");
@@ -135,18 +135,19 @@ document.getElementById("activateBtn").onclick = async () => {
     if (!code || !user) return;
 
     let serieToUnlock = "";
-    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER"; // Exemple de code
+    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER"; 
     else { msg.style.color = "red"; msg.innerText = "Code invalide."; return; }
 
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
-    let unlocked = snap.data().seriesUnlocked || [];
+    let userData = snap.exists() ? snap.data() : {};
+    let unlocked = userData.seriesUnlocked || [];
 
     if (!unlocked.includes(serieToUnlock)) {
         unlocked.push(serieToUnlock);
         await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
         msg.style.color = "lime"; msg.innerText = "Série débloquée !";
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => location.reload(), 1000);
     } else {
         msg.style.color = "orange"; msg.innerText = "Déjà débloqué.";
     }
@@ -166,9 +167,12 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
         const data = snap.data();
+        // Verifier si Medicopter est débloqué
         if (data.seriesUnlocked?.includes("MEDICOPTER")) {
             document.getElementById("normalCard").classList.add("hidden");
             document.getElementById("vipCard").classList.remove("hidden");
+            // Optionnel : Changer aussi le lien dans le carrousel si nécessaire
+            // document.getElementById("heroMedicBtn").href = "medicopter.html"; 
         }
         if (data.progress?.lastBySerie) {
             displayContinue(data.progress.lastBySerie);
