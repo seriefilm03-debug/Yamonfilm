@@ -26,10 +26,9 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .side-menu{ position:fixed; top:0; right:-100%; width:320px; max-width:90%; height:100%; background:#111; padding:20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
 .side-menu.open{ right:0; }
 .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:16px; padding:10px 0; cursor:pointer; text-align:left;}
-.side-menu input { padding:10px; background:#222; border:1px solid #333; color:white; border-radius:5px; }
 
 /* HERO */
-.hero{ min-height:80vh; display:flex; flex-direction:column; justify-content:center; padding:80px 5% 40px; background: linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.3)), url("s-l1200.jpg") center/cover no-repeat; }
+.hero{ min-height:80vh; display:flex; flex-direction:column; justify-content:center; padding:80px 5% 40px; background: linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.3)), url("https://image.tmdb.org/t/p/original/t363S5W8pG73k2qCAn29C06D9Wv.jpg") center/cover no-repeat; }
 .hero h1{ font-size:clamp(28px,5vw,72px); }
 .hero p{ margin-top:15px; font-size:clamp(14px,2vw,20px); opacity:0.9; }
 .play{ margin-top:20px; padding:12px 25px; border:none; border-radius:6px; background:white; font-weight:bold; cursor:pointer; transition:0.2s; text-decoration:none; color:black; display:inline-block;}
@@ -44,12 +43,10 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .img-container { position: relative; width: 100%; height: 135px; border-radius: 5px; overflow: hidden; background: #222; }
 .img-container img { width: 100%; height: 100%; object-fit: cover; }
 .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
-.play-hover { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
-.img-container:hover .play-hover { opacity: 1; }
 
-/* GRILLE DES FILMS */
+/* GRILLE DES SERIES */
 .movies{ padding:25px 5%; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; }
-.movie{ height:220px; background-size:cover; background-position:center; border-radius:10px; display:flex; align-items:flex-end; padding:15px; text-decoration:none; color:white; font-weight:bold; border: 1px solid #333; transition: 0.3s;}
+.movie{ height:250px; background-size:cover; background-position:center; border-radius:10px; display:flex; align-items:flex-end; padding:15px; text-decoration:none; color:white; font-weight:bold; border: 1px solid #333; transition: 0.3s;}
 .movie:hover { border-color: #e50914; transform: translateY(-5px); }
 
 .hidden{display:none;}
@@ -69,40 +66,38 @@ body{ background:#141414; color:white; overflow-x:hidden; }
   <a href="series.html">Mes séries</a>
   <button id="logoutBtn">Déconnexion</button>
   <hr style="border:0.1px solid #333; margin: 10px 0;">
-  <input type="text" id="code" placeholder="Code">
-  <button onclick="unlock()" style="background:#e50914; text-align:center; border-radius:5px;">Valider</button>
-  <p id="msg" style="text-align:center; font-size:12px;"></p>
+  <input type="text" id="code" placeholder="Code" style="padding:10px; background:#222; border:1px solid #333; color:white;">
+  <button onclick="unlock()" style="background:#e50914; text-align:center; border-radius:5px; margin-top:5px; color:white; padding:10px;">Valider</button>
+  <p id="msg" style="text-align:center; font-size:12px; margin-top:5px;"></p>
 </div>
 
 <section class="hero">
   <div id="normalSection">
-    <h1>Medicopter 117</h1>
-    <p>Découvrez la série la plus regardée</p>
-    <a href="medicopter.html" class="play">▶ Voir Medicopter</a>
-  </div>
-
-  <div id="vipSection" class="hidden">
-    <h1>Medicopter 🔥</h1>
-    <p>Accès débloqué (Version VIP)</p>
-    <a href="vipmedicopter.html" class="play">▶ Voir VIP</a>
+    <h1>Le Clown</h1>
+    <p>La justice a un nouveau visage.</p>
+    <a href="leclown.html" class="play">▶ Voir la série</a>
   </div>
 </section>
 
 <section id="continue-watching" class="continue-section">
     <h3 style="margin-bottom:15px;">Reprendre la lecture</h3>
-    <div id="continue-container" class="continue-grid">
-        </div>
+    <div id="continue-container" class="continue-grid"></div>
 </section>
 
 <h3 style="padding: 20px 5% 0;">Toutes les séries</h3>
 <section class="movies">
-  <a id="normalCard" href="mediopter.html" class="movie" style="background-image:url('s-l1200.jpg')">
-    Medicopter
+  
+  <a id="normalCard" href="medicopter.html" class="movie" style="background-image:url('s-l1200.jpg')">
+    Medicopter 117
   </a>
-
   <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image:url('s-l1200.jpg')">
     Medicopter VIP 🔥
   </a>
+
+  <a href="leclown.html" class="movie" style="background-image:url('https://image.tmdb.org/t/p/w500/i9nO1XgO768nIdF7Y7Fcl6A9XUn.jpg')">
+    Le Clown
+  </a>
+
 </section>
 
 <script type="module">
@@ -125,12 +120,8 @@ window.toggleMenu = () => {
   document.getElementById("menu").classList.toggle("open");
   document.getElementById("overlay").classList.toggle("show");
 };
-document.getElementById("overlay").onclick = () => {
-  document.getElementById("menu").classList.remove("open");
-  document.getElementById("overlay").classList.remove("show");
-};
 
-/* AUTH & PROGRESSION */
+/* AUTH */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
@@ -141,37 +132,39 @@ onAuthStateChanged(auth, async (user) => {
   if (snap.exists()) {
     const data = snap.data();
     
-    // 1. Vérifier accès VIP
+    // VIP Check
     if (data.seriesUnlocked?.includes("MEDICOPTER")) {
-      applyVIP();
+      document.getElementById("normalCard")?.classList.add("hidden");
+      document.getElementById("vipCard")?.classList.remove("hidden");
     }
 
-    // 2. Afficher "Reprendre la lecture"
+    // Afficher Reprendre
     if (data.progress && data.progress.lastBySerie) {
       displayContinue(data.progress.lastBySerie);
     }
   }
 });
 
-/* FONCTION REPRENDRE LA LECTURE */
 function displayContinue(lastBySerie) {
     const container = document.getElementById("continue-container");
     const section = document.getElementById("continue-watching");
     container.innerHTML = "";
 
-    // Convertir l'objet en tableau et trier par le plus récent (timestamp)
     const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
 
     if (items.length > 0) {
         section.style.display = "block";
         items.forEach(item => {
             const card = document.createElement("a");
-            card.href = item.link; // Ex: medicopter.html
+            card.href = item.link;
             card.className = "continue-card";
+            
+            // Image de secours si l'épisode n'en a pas
+            const imgUrl = item.img ? `https://image.tmdb.org/t/p/w300${item.img}` : 's-l1200.jpg';
+
             card.innerHTML = `
                 <div class="img-container">
-                    <img src="https://image.tmdb.org/t/p/w300${item.img}">
-                    <div class="play-hover"><span style="font-size:30px;">▶</span></div>
+                    <img src="${imgUrl}">
                     <div class="progress-bar"></div>
                 </div>
                 <div style="margin-top:8px;">
@@ -184,39 +177,24 @@ function displayContinue(lastBySerie) {
     }
 }
 
-/* UNLOCK CODE */
-window.unlock = async () => {
-  const user = auth.currentUser;
-  const input = document.getElementById("code");
-  const msg = document.getElementById("msg");
-
-  if (input.value.trim() !== "MEDICOPTER") {
-    msg.innerText = "Code incorrect ❌";
-    return;
-  }
-
-  const ref = doc(db, "users", user.uid);
-  try {
-    await updateDoc(ref, { seriesUnlocked: arrayUnion("MEDICOPTER") });
-  } catch {
-    await setDoc(ref, { seriesUnlocked: ["MEDICOPTER"] }, { merge: true });
-  }
-  msg.innerText = "Débloqué 🔥";
-  applyVIP();
-};
-
-function applyVIP() {
-  document.getElementById("normalSection")?.classList.add("hidden");
-  document.getElementById("normalCard")?.classList.add("hidden");
-  document.getElementById("vipSection")?.classList.remove("hidden");
-  document.getElementById("vipCard")?.classList.remove("hidden");
-}
-
 /* LOGOUT */
 document.getElementById("logoutBtn").onclick = () => {
   signOut(auth).then(() => { window.location.href = "login.html"; });
 };
+
+/* UNLOCK CODE (VIP) */
+window.unlock = async () => {
+  const user = auth.currentUser;
+  const val = document.getElementById("code").value.trim();
+  if(val === "MEDICOPTER") {
+     await updateDoc(doc(db, "users", user.uid), { seriesUnlocked: arrayUnion("MEDICOPTER") });
+     location.reload();
+  }
+};
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
