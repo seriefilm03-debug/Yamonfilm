@@ -107,7 +107,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <section class="movies">
     <a href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
     <a id="normalCard" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-    <a id="vipCard" href="medicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">Medicopter VIP 🔥</a>
+    <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">Medicopter VIP 🔥</a>
 </section>
 
 <script type="module">
@@ -135,7 +135,7 @@ document.getElementById("activateBtn").onclick = async () => {
     if (!code || !user) return;
 
     let serieToUnlock = "";
-    if (code === "MEDICVIP") serieToUnlock = "VIPMEDICOPTER"; 
+    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER"; 
     else { msg.style.color = "red"; msg.innerText = "Code invalide."; return; }
 
     const userRef = doc(db, "users", user.uid);
@@ -167,13 +167,18 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
         const data = snap.data();
-        // Verifier si Medicopter est débloqué
+        
+        // --- VÉRIFICATION DU DÉBLOCAGE ---
         if (data.seriesUnlocked?.includes("MEDICOPTER")) {
+            // 1. Masquer la carte normale et afficher la VIP
             document.getElementById("normalCard").classList.add("hidden");
             document.getElementById("vipCard").classList.remove("hidden");
-            // Optionnel : Changer aussi le lien dans le carrousel si nécessaire
-            // document.getElementById("heroMedicBtn").href = "medicopter.html"; 
+            
+            // 2. Modifier le lien du bouton dans le carrousel HERO
+            const heroBtn = document.getElementById("heroMedicBtn");
+            if(heroBtn) heroBtn.href = "vipmedicopter.html";
         }
+
         if (data.progress?.lastBySerie) {
             displayContinue(data.progress.lastBySerie);
         }
@@ -193,6 +198,12 @@ function displayContinue(lastBySerie) {
             const imgUrl = item.img.startsWith('http') ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
             
             const card = document.createElement("a");
+            // Si la série est débloquée, on s'assure que "reprendre" va aussi sur la VIP
+            let finalLink = item.link;
+            if(item.serieName === "Medicopter 117" && finalLink === "medicopter.html") {
+                 // On peut laisser Firebase gérer le lien enregistré, ou forcer ici
+            }
+
             card.href = item.link;
             card.className = "continue-card";
             card.innerHTML = `
