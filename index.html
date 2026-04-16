@@ -42,7 +42,6 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 
 .hero-slide.active { opacity: 1; }
 
-/* Dégradés pour fondre l'image */
 .hero-slide::after {
     content: "";
     position: absolute;
@@ -119,7 +118,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 
 <h3 class="movies-label">Toutes nos séries</h3>
 <section class="movies">
-    <a href="leclown.html" class="movie" style="background-image: url('https://image.tmdb.org/t/p/w500/i9nO1XgO768nIdF7Y7Fcl6A9XUn.jpg');">
+    <a href="leclown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000004547400/300/le_clown.jpg');">
         Le Clown
     </a>
     
@@ -136,7 +135,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* CONFIG FIREBASE */
 const firebaseConfig = { 
     apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
     authDomain: "yamonfilm-fead8.firebaseapp.com", 
@@ -146,7 +144,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* --- GESTION DU CARROUSEL --- */
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
 
@@ -155,41 +152,28 @@ function rotateCarousel() {
     currentSlide = (currentSlide + 1) % slides.length;
     slides[currentSlide].classList.add('active');
 }
-setInterval(rotateCarousel, 6000); // Change toutes les 6 secondes
+setInterval(rotateCarousel, 6000);
 
-/* --- AUTH ET PROGRESSION --- */
 onAuthStateChanged(auth, async (user) => {
-    if (!user) { 
-        window.location.href = "login.html"; 
-        return; 
-    }
-
+    if (!user) { window.location.href = "login.html"; return; }
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
         const data = snap.data();
-        
-        // 1. Check Accès VIP pour Medicopter
         if (data.seriesUnlocked?.includes("MEDICOPTER")) {
             document.getElementById("normalCard").classList.add("hidden");
             document.getElementById("vipCard").classList.remove("hidden");
         }
-
-        // 2. Charger "Reprendre la lecture"
         if (data.progress && data.progress.lastBySerie) {
             displayContinue(data.progress.lastBySerie);
         }
     }
 });
 
-/* FONCTION POUR AFFICHER LA REPRISE */
 function displayContinue(lastBySerie) {
     const container = document.getElementById("continue-container");
     const section = document.getElementById("continue-watching");
     container.innerHTML = "";
-
-    // Trier les séries par date de visionnage (plus récent en premier)
     const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
-
     if (items.length > 0) {
         section.style.display = "block";
         items.forEach(item => {
