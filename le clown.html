@@ -44,14 +44,19 @@
         .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
         .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0, 200, 0, 0.8); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
         
-        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; display: inline-block; text-decoration: none;}
+        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; text-decoration: none; display: inline-block;}
         .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; max-height: 250px; overflow-y: auto; width: 200px; border-radius: 5px;}
         .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
         .season-menu div:hover{ background: #333; }
         .show{ display:block; }
 
-        /* Style pour le message d'erreur */
-        #lock-msg { color: #e50914; font-weight: bold; margin-top: 15px; display: none; }
+        /* POPUP SYSTEM (Copied from Medicopter) */
+        .popup{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:4000; opacity:0; pointer-events:none; transition:.3s; }
+        .popup.show{ opacity:1; pointer-events:auto; }
+        .popup-box{ background:#1c1c1c; padding:30px; border-radius:12px; text-align:center; max-width:400px; border:1px solid #e50914; animation:fadeIn .3s ease; }
+        .popup-box p{ margin-bottom:20px; color: white; }
+        .popup-box button{ background:#e50914; border:none; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; }
+        @keyframes fadeIn{ from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
     </style>
 </head>
 <body>
@@ -77,10 +82,10 @@
     <div class="hero-content">
         <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Le Clown</h1>
         <p id="overview" style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;"></p>
-        <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black; font-size: 1rem;">▶ Reprendre l'épisode</button>
-        
-        <p id="lock-msg">Pour regarder les autres épisodes, veuillez débloquer la série.</p>
-        <a href="vipclown.html" id="vipBtn" class="btn-main" style="display:none;">🔓 Accéder à la série complète</a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
+            <a href="vipclown.html" class="btn-main">🔓 Accéder à la série complète</a>
+        </div>
     </div>
 </section>
 
@@ -92,6 +97,13 @@
 </div>
 
 <div class="episodes" id="episodes"></div>
+
+<div id="popupMessage" class="popup">
+    <div class="popup-box">
+        <p>Pour regarder les autres épisodes, veuillez cliquer sur <strong>"Accéder à la série complète"</strong>.</p>
+        <button onclick="closePopup()">Fermer</button>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -114,6 +126,10 @@
         0: { 1: "https://app.videas.fr/embed/media/7989729f-3af7-46f1-9e4f-971307009c98/", 2: "https://app.videas.fr/embed/media/0115ecb0-19f6-4695-9968-26915b60d540/" },
         1: { 1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/", 2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/", 3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/", 4: "https://uqload.is/embed-fvk9680x11ze.html", 5: "https://app.videas.fr/embed/media/5ed8e85e-90d2-4f46-ae49-80d063933b02c/", 6: "https://app.videas.fr/embed/media/062ffb1a-1b9f-4ed6-a2f7-2bd22f3cfa5f/" }
     };
+
+    /* POPUP LOGIC */
+    window.showPopup = () => { document.getElementById("popupMessage").classList.add("show"); };
+    window.closePopup = () => { document.getElementById("popupMessage").classList.remove("show"); };
 
     window.toggleMenu = () => {
         document.getElementById("menu").classList.toggle("open");
@@ -178,20 +194,19 @@
             const card = document.createElement("div");
             card.className = "card";
             card.innerHTML = `<div style="position:relative; height:140px;"><img src="${imgPath}" style="width:100%; height:100%; object-fit:cover;">${isWatched ? '<div class="watched-tag">VU</div>' : ''}<div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div></div><div style="padding:10px;"><b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}</div>`;
-            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path || fallbackImg);
+            
+            // LOGIQUE DE BLOCAGE
+            if(currentS == 1 && ep.episode_number == 1) {
+                card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path || fallbackImg);
+            } else {
+                card.onclick = () => window.showPopup();
+            }
+            
             container.appendChild(card);
         });
     }
 
     window.openVideo = (s, e, title, img) => {
-        // VERIFICATION : Accès uniquement à Saison 1 Episode 1
-        if (s !== 1 || e !== 1) {
-            document.getElementById("lock-msg").style.display = "block";
-            document.getElementById("vipBtn").style.display = "inline-block";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return;
-        }
-
         if (!videasSources[s] || !videasSources[s][e]) { alert("Bientôt disponible !"); return; }
         document.getElementById("video-iframe").src = videasSources[s][e];
         document.getElementById("video-overlay").style.display = "flex";
@@ -201,35 +216,22 @@
     window.saveProgress = async (s, e, title, img) => {
         const user = auth.currentUser;
         if(!user) return;
-
         const epKey = `${serieId}-S${s}E${e}`;
         const userRef = doc(db, "users", user.uid);
-        
         const userDoc = await getDoc(userRef);
-        if (userDoc.exists() && userDoc.data().progress) {
-            userProgress = userDoc.data().progress;
-        }
-
+        if (userDoc.exists() && userDoc.data().progress) { userProgress = userDoc.data().progress; }
         if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
-        
-        userProgress.lastBySerie[serieId] = { 
-            s, e, title, img, 
-            serieName: "Le Clown", 
-            link: "leclown.html", 
-            timestamp: Date.now() 
-        };
-
+        userProgress.lastBySerie[serieId] = { s, e, title, img, serieName: "Le Clown", link: "leclown.html", timestamp: Date.now() };
         await setDoc(userRef, { progress: userProgress }, { merge: true });
         checkResume();
     };
 
     function checkResume() {
         const last = userProgress.lastBySerie[serieId];
-        // On ne permet de reprendre que si c'est l'épisode 1 (sinon ça bloquerait au clic)
-        if(last && last.s === 1 && last.e === 1) {
+        if(last && last.s == 1 && last.e == 1) {
             const btn = document.getElementById("resumeBtn");
             btn.style.display = "block";
-            btn.innerText = `▶ Reprendre S${last.s} E${last.e}`;
+            btn.innerText = `▶ Reprendre E${last.e}`;
             btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
         }
     }
