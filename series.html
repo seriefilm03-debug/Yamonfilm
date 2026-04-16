@@ -1,129 +1,145 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes séries - YAMONFILM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Séries - YAMONFILM</title>
+    <style>
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#141414; color:white; padding: 20px; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; }
+        .logo { color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        
+        h2 { margin: 20px 5%; font-size: 24px; }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
+            padding: 20px 5%; 
+        }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#141414;
-  color:white;
-}
+        .card { 
+            background: #222; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            text-decoration: none; 
+            color: white; 
+            transition: 0.3s; 
+            border: 1px solid #333;
+            display: none; /* Masqué par défaut, affiché si débloqué */
+        }
 
-header{
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#000;
-  position:sticky;
-  top:0;
-}
+        .card:hover { transform: scale(1.05); border-color: #e50914; }
+        .card img { width: 100%; height: 150px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .card-info b { font-size: 18px; display: block; margin-bottom: 5px; }
+        .badge { background: #e50914; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 
-h1{
-  font-size:20px;
-  color:#e50914;
-}
-
-.back{
-  color:white;
-  text-decoration:none;
-  font-size:14px;
-  opacity:0.8;
-}
-
-.movies{
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:15px;
-}
-
-.movie{
-  height:180px;
-  border-radius:8px;
-  background-size:cover;
-  display:flex;
-  align-items:flex-end;
-  padding:10px;
-  text-decoration:none;
-  color:white;
-  font-weight:bold;
-  background-color:#222;
-  transition:0.2s;
-}
-
-.movie:hover{
-  transform:scale(1.05);
-}
-</style>
+        #no-series { 
+            text-align: center; 
+            margin-top: 100px; 
+            color: #888; 
+            display: none; 
+        }
+        
+        .btn-unlock {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #e50914;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
 
 <header>
-  <h1>Mes séries</h1>
-  <a class="back" href="index.html">⬅ Retour</a>
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <a href="index.html" style="color: white; text-decoration: none;">Retour</a>
 </header>
 
-<section class="movies" id="seriesContainer">
-  <!-- séries ici -->
-</section>
+<h2>Mes Séries VIP</h2>
+
+<div class="grid" id="series-grid">
+    <a href="vipclown.html" class="card" id="card-LECLOWN">
+        <img src="https://media.senscritique.com/media/000016277047/0/le_clown.jpg" alt="Le Clown">
+        <div class="card-info">
+            <span class="badge">VIP 🔥</span>
+            <b>Le Clown</b>
+            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
+        </div>
+    </a>
+
+    <a href="vipmedicopter.html" class="card" id="card-MEDICOPTER">
+        <img src="s-l1200.jpg" alt="Medicopter 117">
+        <div class="card-info">
+            <span class="badge">VIP 🔥</span>
+            <b>Medicopter 117</b>
+            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
+        </div>
+    </a>
+</div>
+
+<div id="no-series">
+    <p>Vous n'avez aucune série VIP pour le moment.</p>
+    <a href="debloquer.html" class="btn-unlock">Activer un code</a>
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-  authDomain: "yamonfilm-fead8.firebaseapp.com",
-  projectId: "yamonfilm-fead8"
-});
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
+        authDomain: "yamonfilm-fead8.firebaseapp.com", 
+        projectId: "yamonfilm-fead8" 
+    };
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-const container = document.getElementById("seriesContainer");
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
 
-  const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            const unlocked = data.seriesUnlocked || [];
 
-  if (!snap.exists()) {
-    container.innerHTML = "<p>Aucune série débloquée</p>";
-    return;
-  }
+            if (unlocked.length > 0) {
+                let hasVisibleSeries = false;
 
-  const data = snap.data();
-  const series = data.seriesUnlocked || [];
+                // On parcourt les IDs débloqués (ex: LECLOWN, MEDICOPTER)
+                unlocked.forEach(id => {
+                    const card = document.getElementById(`card-${id}`);
+                    if (card) {
+                        card.style.display = "block"; // On affiche la carte correspondante
+                        hasVisibleSeries = true;
+                    }
+                });
 
-  renderSeries(series);
-});
-
-function renderSeries(series){
-
-  container.innerHTML = "";
-
-  // 🎬 MEDICOPTER
-  if(series.includes("MEDICOPTER")){
-    container.innerHTML += `
-      <a href="vipmedicopter.html" class="movie"
-         style="background-image:url('s-l1200.jpg')">
-        Medicopter VIP
-      </a>
-    `;
-  }
-
-  // ➕ AJOUTE D’AUTRES SERIES ICI PLUS TARD
-}
+                if (!hasVisibleSeries) {
+                    document.getElementById("no-series").style.display = "block";
+                }
+            } else {
+                document.getElementById("no-series").style.display = "block";
+            }
+        } else {
+            document.getElementById("no-series").style.display = "block";
+        }
+    });
 </script>
 
 </body>
