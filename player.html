@@ -3,140 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">YAMONFILM - Player</title>
+    <title id="page-title">YAMONFILM - Lecteur</title>
     <style>
-        /* TOUT TON STYLE UNIQUE ICI (Design Medicopter/Clown) */
-        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
-        body{background:#0f0f0f;color:white;overflow-x:hidden}
-        header{position:fixed;top:0;width:100%;padding:15px 40px;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;z-index:1000}
-        .logo{font-size:22px;font-weight:bold;color:#e50914;text-decoration:none}
-        .hero{margin-top:0;height:70vh;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:80px;position:relative}
-        .hero::after{content:"";position:absolute;bottom:0;left:0;width:100%;height:60%;background:linear-gradient(to top,#0f0f0f,transparent)}
-        .hero-content{position:relative;z-index:2;max-width:600px}
-        .hero h1{font-size:50px;margin-bottom:15px}
-        .btn-main{display:inline-block;background:#e50914;color:white;text-decoration:none;padding:15px 35px;border-radius:8px;font-weight:bold;cursor:pointer;border:none}
-        .season-section{padding:40px 80px 10px}
-        .season-btn{background:#333;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer}
-        .episodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:20px 80px 80px}
-        .card{background:#1c1c1c;border-radius:8px;overflow:hidden;cursor:pointer;transition:.3s;border:1px solid #333}
-        .card:hover{transform:scale(1.05);border-color:#e50914}
-        .card img{width:100%;height:150px;object-fit:cover}
-        .card-content{padding:15px}
+        /* --- DESIGN GLOBAL --- */
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#0f0f0f; color:white; overflow-x:hidden; }
         
-        /* POPUP */
-        .popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;opacity:0;pointer-events:none;transition:.3s}
-        .popup.show{opacity:1;pointer-events:auto}
-        .popup-box{background:#1c1c1c;padding:30px;border-radius:12px;text-align:center;max-width:400px;border:1px solid #e50914}
+        header { 
+            position: fixed; top: 0; width: 100%; padding: 15px 5%; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo { color:#e50914; font-size:24px; font-weight:bold; text-decoration:none; }
+        .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 4px; }
+
+        /* --- HERO SECTION --- */
+        .hero { 
+            height: 70vh; width: 100%; background-size: cover; background-position: center; 
+            display: flex; align-items: flex-end; padding: 5%; position: relative; 
+        }
+        .hero::after { 
+            content: ""; position: absolute; inset: 0; 
+            background: linear-gradient(to top, #0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); 
+        }
+        .hero-content { position: relative; z-index: 10; max-width: 700px; }
+        .hero h1 { font-size: clamp(30px, 5vw, 60px); margin-bottom: 10px; }
+        .hero p { color: #ccc; line-height: 1.5; margin-bottom: 20px; font-size: 14px; }
         
-        /* LECTEUR VIDEO */
-        #video-overlay{display:none;position:fixed;inset:0;background:black;z-index:3000;flex-direction:column}
-        #video-iframe{width:100%;height:100%;border:none}
-        .close-video{position:absolute;top:20px;right:20px;font-size:30px;cursor:pointer;z-index:3001}
+        .btn-unlock { 
+            display: inline-block; background: #e50914; color: white; 
+            text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: bold; 
+        }
+
+        /* --- SECTION EPISODES --- */
+        .section-title { padding: 40px 5% 10px; font-size: 20px; font-weight: bold; }
+
+        /* GRILLE ADAPTATIVE : Horizontal sur mobile, Grille sur PC */
+        .episodes-container { 
+            display: flex; gap: 20px; padding: 20px 5% 50px; 
+            overflow-x: auto; scroll-snap-type: x mandatory;
+        }
+
+        .episode-card { 
+            flex: 0 0 280px; background: #1c1c1c; border-radius: 8px; 
+            overflow: hidden; cursor: pointer; transition: 0.3s; 
+            border: 1px solid #333; scroll-snap-align: start;
+        }
+        .episode-card:hover { transform: scale(1.03); border-color: #e50914; }
+        .episode-card img { width: 100%; height: 155px; object-fit: cover; }
+        .ep-info { padding: 12px; }
+        .ep-info b { font-size: 14px; display: block; margin-bottom: 5px; }
+        
+        /* Sur PC, on remet en grille */
+        @media (min-width: 1024px) {
+            .episodes-container { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+                flex-wrap: wrap; overflow-x: visible;
+            }
+        }
+
+        /* --- POPUP & LECTEUR --- */
+        .popup { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+            display: none; justify-content: center; align-items: center; z-index: 2000; 
+        }
+        .popup-box { background: #181818; padding: 30px; border-radius: 10px; text-align: center; border: 1px solid #e50914; }
+        
+        #video-player { 
+            display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
+        }
+        .close-player { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: white; z-index: 3001; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
 <header>
     <a href="index.html" class="logo">YAMONFILM</a>
+    <a href="index.html" class="back-link">Retour</a>
 </header>
 
-<section class="hero" id="hero">
+<section class="hero" id="hero-bg">
     <div class="hero-content">
-        <h1 id="title">Chargement...</h1>
-        <p id="overview"></p>
-        <div id="hero-actions" style="margin-top:20px;"></div>
+        <h1 id="serie-title">Chargement...</h1>
+        <p id="serie-desc"></p>
+        <div id="status-area"></div>
     </div>
 </section>
 
-<div class="season-section">
-    <button class="season-btn" id="seasonBtn">Saison 1 ▼</button>
-</div>
+<h3 class="section-title">Épisodes</h3>
+<div class="episodes-container" id="episodes-list">
+    </div>
 
-<div class="episodes" id="episodes-container"></div>
-
-<div id="video-overlay">
-    <span class="close-video" onclick="closeVideo()">✕</span>
-    <iframe id="video-iframe" src="" allowfullscreen></iframe>
-</div>
-
-<div id="popupMessage" class="popup">
+<div class="popup" id="lock-popup">
     <div class="popup-box">
-        <p id="popup-text">Pour voir la suite, débloquez la série.</p>
-        <button class="btn-main" onclick="closePopup()" style="margin-top:20px">Fermer</button>
+        <h3>Contenu VIP 🔥</h3><br>
+        <p>Ce contenu est réservé aux membres VIP.</p><br>
+        <a href="debloquer.html" class="btn-unlock">Activer un code</a>
+        <button onclick="closePopup()" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer; display:block; width:100%;">Plus tard</button>
     </div>
 </div>
 
+<div id="video-player">
+    <span class="close-player" onclick="stopVideo()">✕</span>
+    <iframe id="video-frame" src="" allowfullscreen></iframe>
+</div>
+
 <script type="module">
-    // CONFIGURATION FIREBASE & API
-    const apiKey = "182c7173698e34803715eacab5c693a7";
-    const imgBase = "https://image.tmdb.org/t/p/original";
+    const TMDB_KEY = "182c7173698e34803715eacab5c693a7";
+    
+    // 1. Lire les infos dans l'adresse (URL)
+    const params = new URLSearchParams(window.location.search);
+    const tmdbId = params.get('id');    // ex: 16678
+    const isVip = params.get('vip') === 'true'; // true ou false
 
-    // RECUPERATION DES INFOS DANS L'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const tmdbId = urlParams.get('id'); // ID TMDB
-    const firebaseId = urlParams.get('fid'); // ID FIREBASE (ex: LECLOWN)
-    const isVip = urlParams.get('vip') === 'true'; // Est-ce la version VIP ?
+    async function init() {
+        if(!tmdbId) return;
 
-    async function loadContent() {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+        // Récupérer infos de la série
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}&language=fr-FR`);
         const data = await res.json();
 
-        document.getElementById("title").textContent = data.name;
-        document.getElementById("page-title").textContent = data.name + " - YAMONFILM";
-        document.getElementById("overview").textContent = data.overview;
-        document.getElementById("hero").style.backgroundImage = `url(${imgBase}${data.backdrop_path})`;
+        document.getElementById("serie-title").innerText = data.name;
+        document.getElementById("page-title").innerText = data.name + " - YAMONFILM";
+        document.getElementById("serie-desc").innerText = data.overview || "Pas de description disponible.";
+        document.getElementById("hero-bg").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
 
-        // Si version gratuite, on met le bouton d'achat
         if(!isVip) {
-            document.getElementById("hero-actions").innerHTML = `
-                <a href="debloquer.html" class="btn-main">🔓 Débloquer la série complète</a>
-            `;
+            document.getElementById("status-area").innerHTML = `<a href="debloquer.html" class="btn-unlock">🔓 Débloquer la version VIP</a>`;
         }
 
-        loadEpisodes(1);
+        loadEpisodes();
     }
 
-    async function loadEpisodes(season) {
-        const container = document.getElementById("episodes-container");
-        container.innerHTML = "";
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+    async function loadEpisodes() {
+        const list = document.getElementById("episodes-list");
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/1?api_key=${TMDB_KEY}&language=fr-FR`);
         const data = await res.json();
 
         data.episodes.forEach(ep => {
             const card = document.createElement("div");
-            card.className = "card";
-            const img = ep.still_path ? imgBase+ep.still_path : imgBase+data.poster_path;
-            
+            card.className = "episode-card";
+            const img = ep.still_path ? `https://image.tmdb.org/t/p/w500${ep.still_path}` : `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+
             card.innerHTML = `
                 <img src="${img}">
-                <div class="card-content">
-                    <h4>${ep.episode_number}. ${ep.name}</h4>
+                <div class="ep-info">
+                    <b>S1 : E${ep.episode_number} - ${ep.name}</b>
                 </div>
             `;
 
-            // LOGIQUE DE BLOCAGE
-            if (isVip) {
-                // Si c'est la page VIP, tout est cliquable (ajoute tes liens ici)
-                card.onclick = () => alert("Lancer la vidéo VIP pour l'épisode " + ep.episode_number);
-            } else {
-                // Si c'est gratuit
-                if (season == 1 && ep.episode_number == 1) {
-                    card.onclick = () => alert("Lancer l'épisode 1 gratuit");
+            // LOGIQUE DE CLIC
+            card.onclick = () => {
+                if (isVip) {
+                    playVideo("LIEN_VIDEO_VIP_ICI"); // Tu mettras tes liens ici plus tard
                 } else {
-                    card.onclick = () => document.getElementById("popupMessage").classList.add("show");
+                    // Si gratuit, on autorise seulement l'épisode 1
+                    if (ep.episode_number === 1) {
+                        playVideo("https://www.youtube.com/embed/dQw4w9WgXcQ"); // Exemple gratuit
+                    } else {
+                        document.getElementById("lock-popup").style.display = "flex";
+                    }
                 }
-            }
-            container.appendChild(card);
+            };
+            list.appendChild(card);
         });
     }
 
-    window.closePopup = () => document.getElementById("popupMessage").classList.remove("show");
-    window.closeVideo = () => {
-        document.getElementById("video-overlay").style.display = "none";
-        document.getElementById("video-iframe").src = "";
+    window.playVideo = (url) => {
+        document.getElementById("video-frame").src = url;
+        document.getElementById("video-player").style.display = "block";
     };
 
-    loadContent();
+    window.stopVideo = () => {
+        document.getElementById("video-frame").src = "";
+        document.getElementById("video-player").style.display = "none";
+    };
+
+    window.closePopup = () => {
+        document.getElementById("lock-popup").style.display = "none";
+    };
+
+    init();
 </script>
+
 </body>
 </html>
