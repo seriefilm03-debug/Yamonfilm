@@ -19,7 +19,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 }
 .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
 
-/* HERO CARROUSEL */
+/* HERO CARROUSEL (STYLE NETFLIX) */
 .hero-container {
     position: relative;
     width: 100%;
@@ -42,6 +42,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 
 .hero-slide.active { opacity: 1; }
 
+/* Dégradés pour fondre l'image */
 .hero-slide::after {
     content: "";
     position: absolute;
@@ -51,11 +52,11 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 }
 
 .hero-content { position: relative; z-index: 10; max-width: 600px; }
-.hero-content h1 { font-size: clamp(30px, 6vw, 70px); margin-bottom: 10px; }
-.hero-content p { font-size: clamp(14px, 2vw, 20px); margin-bottom: 20px; color: #ccc; }
+.hero-content h1 { font-size: clamp(35px, 6vw, 70px); margin-bottom: 10px; }
+.hero-content p { font-size: clamp(14px, 2vw, 20px); margin-bottom: 25px; color: #ccc; line-height: 1.4; }
 
 .play-btn {
-    padding: 12px 30px;
+    padding: 12px 35px;
     background: white;
     color: black;
     text-decoration: none;
@@ -68,19 +69,20 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 }
 .play-btn:hover { background: #e50914; color: white; }
 
-/* REPRENDRE LA LECTURE */
+/* SECTION REPRENDRE LA LECTURE */
 .continue-section { padding: 40px 5% 10px; display: none; }
 .continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+.continue-grid::-webkit-scrollbar { display: none; }
 .continue-card { min-width: 260px; text-decoration: none; color: white; transition: 0.3s; }
 .continue-card:hover { transform: scale(1.05); }
-.img-container { position: relative; width: 100%; height: 145px; border-radius: 4px; overflow: hidden; }
+.img-container { position: relative; width: 100%; height: 145px; border-radius: 4px; overflow: hidden; background: #222; }
 .img-container img { width: 100%; height: 100%; object-fit: cover; }
 .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
 
 /* GRILLE DES SERIES */
-.movies-label { padding: 20px 5% 0; font-size: 22px; }
+.movies-label { padding: 30px 5% 0; font-size: 22px; font-weight: bold; }
 .movies{ padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.movie { height: 280px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
+.movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
 .movie:hover { transform: scale(1.05); border-color: #555; }
 
 .hidden { display: none; }
@@ -93,18 +95,18 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 </div>
 
 <section class="hero-container">
-    <div class="hero-slide active" style="background-image: url('https://image.tmdb.org/t/p/original/t363S5W8pG73k2qCAn29C06D9Wv.jpg');">
+    <div class="hero-slide active" style="background-image: url('https://image.tmdb.org/t/p/original/m9Oa3q6q7WfWv3pGIn089N07UfM.jpg');">
         <div class="hero-content">
             <h1>Le Clown</h1>
-            <p>Un justicier masqué combat le crime organisé dans une lutte sans merci pour la justice.</p>
+            <p>Max Zander, un agent d'élite, devient le Clown pour venger son ami et combattre le crime organisé là où la loi échoue.</p>
             <a href="leclown.html" class="play-btn">▶ Lecture</a>
         </div>
     </div>
 
-    <div class="hero-slide" style="background-image: url('https://image.tmdb.org/t/p/original/9vU3L8K9YmXqK2G3G7G6X5W4V3U.jpg');">
+    <div class="hero-slide" style="background-image: url('https://image.tmdb.org/t/p/original/6K99m4T2C5A1v7HAszZ3fM26I5p.jpg');">
         <div class="hero-content">
             <h1>Medicopter 117</h1>
-            <p>Chaque seconde compte pour l'équipe de sauvetage héliporté la plus célèbre d'Europe.</p>
+            <p>Une course contre la montre permanente pour les équipages de l'hélicoptère de sauvetage Medicopter 117.</p>
             <a href="medicopter.html" class="play-btn">▶ Lecture</a>
         </div>
     </div>
@@ -115,7 +117,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
     <div id="continue-container" class="continue-grid"></div>
 </section>
 
-<h3 class="movies-label">Nos Séries</h3>
+<h3 class="movies-label">Toutes nos séries</h3>
 <section class="movies">
     <a href="leclown.html" class="movie" style="background-image: url('https://image.tmdb.org/t/p/w500/i9nO1XgO768nIdF7Y7Fcl6A9XUn.jpg');">
         Le Clown
@@ -134,43 +136,58 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+/* CONFIG FIREBASE */
+const firebaseConfig = { 
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
+    authDomain: "yamonfilm-fead8.firebaseapp.com", 
+    projectId: "yamonfilm-fead8" 
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- LOGIQUE DU CARROUSEL ---
+/* --- GESTION DU CARROUSEL --- */
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
 
-function showNextSlide() {
+function rotateCarousel() {
     slides[currentSlide].classList.remove('active');
     currentSlide = (currentSlide + 1) % slides.length;
     slides[currentSlide].classList.add('active');
 }
-setInterval(showNextSlide, 5000); // Change toutes les 5 secondes
+setInterval(rotateCarousel, 6000); // Change toutes les 6 secondes
 
-// --- AUTH & REPRENDRE LA LECTURE ---
+/* --- AUTH ET PROGRESSION --- */
 onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "login.html"; return; }
+    if (!user) { 
+        window.location.href = "login.html"; 
+        return; 
+    }
 
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
         const data = snap.data();
+        
+        // 1. Check Accès VIP pour Medicopter
         if (data.seriesUnlocked?.includes("MEDICOPTER")) {
             document.getElementById("normalCard").classList.add("hidden");
             document.getElementById("vipCard").classList.remove("hidden");
         }
-        if (data.progress?.lastBySerie) {
+
+        // 2. Charger "Reprendre la lecture"
+        if (data.progress && data.progress.lastBySerie) {
             displayContinue(data.progress.lastBySerie);
         }
     }
 });
 
+/* FONCTION POUR AFFICHER LA REPRISE */
 function displayContinue(lastBySerie) {
     const container = document.getElementById("continue-container");
     const section = document.getElementById("continue-watching");
     container.innerHTML = "";
+
+    // Trier les séries par date de visionnage (plus récent en premier)
     const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
 
     if (items.length > 0) {
@@ -185,8 +202,8 @@ function displayContinue(lastBySerie) {
                     <img src="${imgUrl}">
                     <div class="progress-bar"></div>
                 </div>
-                <div style="margin-top:8px;">
-                    <b>${item.serieName}</b><br>
+                <div style="margin-top:10px;">
+                    <b style="font-size:14px;">${item.serieName}</b><br>
                     <span style="font-size:12px; color:#aaa;">S${item.s} : E${item.e}</span>
                 </div>`;
             container.appendChild(card);
@@ -195,7 +212,5 @@ function displayContinue(lastBySerie) {
 }
 </script>
 
-</body>
-</html>
 </body>
 </html>
