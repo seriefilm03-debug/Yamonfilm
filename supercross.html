@@ -18,45 +18,46 @@
         .logo { color:#e50914; font-size:24px; font-weight:bold; text-decoration:none; }
         .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 4px; }
 
-        /* HERO SECTION - IMAGE CENTRÉE */
+        /* HERO SECTION - CORRECTION IMAGE PC/MOBILE */
         .hero { 
-            height: 60vh; width: 100%; 
-            background-size: cover; 
-            background-position: center center; 
-            display: flex; align-items: flex-end; padding: 5%; position: relative; 
+            height: 100vh; width: 100%; 
+            background-size: cover; /* Remplit l'écran */
+            background-position: center top; /* Garde les visages visibles */
+            display: flex; align-items: center; padding: 5%; position: relative; 
         }
+        
+        /* Ajustement spécial pour PC pour ne pas couper l'image */
+        @media (min-width: 1024px) {
+            .hero { 
+                background-size: 100% auto; /* Affiche toute la largeur sur PC */
+                background-position: center center;
+            }
+        }
+
         .hero::after { 
             content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(to top, #141414, transparent 90%); 
-        }
-        .hero-content { position: relative; z-index: 10; max-width: 800px; margin-bottom: 20px; }
-        .hero h1 { font-size: clamp(30px, 7vw, 60px); margin-bottom: 10px; }
-        .hero p { color: #ccc; line-height: 1.4; font-size: 16px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-
-        /* LECTEUR STYLE NETFLIX (RESPONSIVE) */
-        .player-section { padding: 0 5% 50px; }
-        .video-container {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-        }
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* Ratio 16:9 */
-            height: 0;
-        }
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            background: linear-gradient(to top, #141414 10%, transparent 90%), 
+                        linear-gradient(to right, #141414 20%, transparent); 
         }
 
-        .label { color: #808080; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        .hero-content { position: relative; z-index: 10; max-width: 800px; }
+        .hero h1 { font-size: clamp(40px, 8vw, 80px); margin-bottom: 15px; font-weight: bold; }
+        .hero p { color: #ccc; line-height: 1.4; font-size: 18px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+
+        /* BOUTON LECTURE */
+        .play-btn { 
+            display: inline-flex; align-items: center; background: white; color: black; 
+            text-decoration: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; 
+            font-size: 20px; transition: 0.3s; border: none; cursor: pointer;
+        }
+        .play-btn:hover { background: #e50914; color: white; transform: scale(1.05); }
+
+        /* LECTEUR PLEIN ÉCRAN (OVERLAY) */
+        #video-overlay { 
+            display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
+        }
+        .close-video { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; color: white; z-index: 3001; font-weight: bold; }
+        #video-frame { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -70,27 +71,24 @@
     <div class="hero-content">
         <h1 id="movie-title">Supercross</h1>
         <p id="movie-desc">Chargement du résumé...</p>
+        <button class="play-btn" onclick="openPlayer()">▶ Lecture</button>
     </div>
 </section>
 
-<div class="player-section">
-    <p class="label">Lecture du film</p>
-    <div class="video-container">
-        <div class="video-wrapper">
-            <iframe 
-                title="Supercross" 
-                src="https://clip.place/videos/embed/1NHGrUazqLKi5GGT4Ak3A4" 
-                allow="fullscreen" 
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
-                style="border: 0px;">
-            </iframe>
-        </div>
-    </div>
+<div id="video-overlay">
+    <span class="close-video" onclick="closePlayer()">✕</span>
+    <iframe 
+        id="video-frame"
+        src="" 
+        allow="fullscreen" 
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+    </iframe>
 </div>
 
 <script>
     const TMDB_KEY = "182c7173698e34803715eacab5c693a7";
     const MOVIE_ID = "17186";
+    const VIDEO_URL = "https://clip.place/videos/embed/1NHGrUazqLKi5GGT4Ak3A4";
 
     async function loadMovieData() {
         try {
@@ -100,12 +98,24 @@
             document.getElementById("movie-title").innerText = data.title;
             document.getElementById("movie-desc").innerText = data.overview || "Deux frères s'affrontent dans une compétition de Supercross de haut niveau.";
             
-            // Image de fond originale centrée
+            // Image de fond haute qualité
             const bgUrl = `https://image.tmdb.org/t/p/original${data.backdrop_path}`;
             document.getElementById("hero-bg").style.backgroundImage = `url(${bgUrl})`;
         } catch (error) {
             console.error("Erreur TMDB:", error);
         }
+    }
+
+    function openPlayer() {
+        document.getElementById("video-frame").src = VIDEO_URL;
+        document.getElementById("video-overlay").style.display = "block";
+        document.body.style.overflow = "hidden"; // Bloque le scroll
+    }
+
+    function closePlayer() {
+        document.getElementById("video-frame").src = "";
+        document.getElementById("video-overlay").style.display = "none";
+        document.body.style.overflow = "auto"; // Réactive le scroll
     }
 
     loadMovieData();
