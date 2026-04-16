@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supercross - YAMONFILM</title>
+    <style>
+        /* --- STYLE GLOBAL --- */
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#0f0f0f; color:white; overflow-x:hidden; }
+        
+        /* NAVBAR */
+        header { 
+            position: fixed; top: 0; width: 100%; padding: 15px 5%; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo { color:#e50914; font-size:24px; font-weight:bold; text-decoration:none; }
+        .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 4px; }
+
+        /* HERO SECTION (Auto-remplie par TMDB) */
+        .hero { 
+            height: 70vh; width: 100%; background-size: cover; background-position: center; 
+            display: flex; align-items: flex-end; padding: 5%; position: relative; 
+        }
+        .hero::after { 
+            content: ""; position: absolute; inset: 0; 
+            background: linear-gradient(to top, #0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); 
+        }
+        .hero-content { position: relative; z-index: 10; max-width: 700px; }
+        .hero h1 { font-size: clamp(30px, 5vw, 60px); margin-bottom: 10px; }
+        .hero p { color: #ccc; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
+        
+        .btn-play { 
+            display: inline-block; background: #e50914; color: white; 
+            text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: bold; 
+            cursor: pointer; border: none; font-size: 16px;
+        }
+
+        /* POPUP DE BLOCAGE */
+        .popup { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+            display: none; justify-content: center; align-items: center; z-index: 2000; 
+        }
+        .popup-box { background: #181818; padding: 30px; border-radius: 10px; text-align: center; border: 1px solid #e50914; max-width: 350px; }
+        
+        /* LECTEUR VIDEO */
+        #video-overlay { 
+            display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
+        }
+        .close-video { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: white; z-index: 3001; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <a href="index.html" class="back-link">Retour</a>
+</header>
+
+<section class="hero" id="hero-bg">
+    <div class="hero-content">
+        <h1 id="movie-title">Chargement...</h1>
+        <p id="movie-desc"></p>
+        <button id="main-action" class="btn-play">▶ Regarder le film</button>
+    </div>
+</section>
+
+<div class="popup" id="lock-popup">
+    <div class="popup-box">
+        <h3 style="color:#e50914">CONTENU VIP 🔥</h3><br>
+        <p>Ce film est réservé aux membres VIP. Veuillez activer votre code.</p><br>
+        <a href="debloquer.html" class="btn-play">Activer un code</a>
+        <button onclick="closePopup()" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer; display:block; width:100%;">Fermer</button>
+    </div>
+</div>
+
+<div id="video-overlay">
+    <span class="close-video" onclick="stopVideo()">✕</span>
+    <iframe id="video-frame" src="" allowfullscreen></iframe>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
+        authDomain: "yamonfilm-fead8.firebaseapp.com", 
+        projectId: "yamonfilm-fead8" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const TMDB_KEY = "182c7173698e34803715eacab5c693a7";
+    const MOVIE_ID = "17186"; // Supercross
+    const FIREBASE_ID = "SUPERCROSS"; // L'ID à débloquer dans Firebase
+
+    async function loadMovieData() {
+        // Récupération des infos TMDB
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${MOVIE_ID}?api_key=${TMDB_KEY}&language=fr-FR`);
+        const data = await res.json();
+
+        document.getElementById("movie-title").innerText = data.title;
+        document.getElementById("movie-desc").innerText = data.overview || "Résumé non disponible.";
+        document.getElementById("hero-bg").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "login.html"; return; }
+
+            // Vérifier si débloqué
+            const snap = await getDoc(doc(db, "users", user.uid));
+            const unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+            const isVip = unlocked.includes(FIREBASE_ID);
+
+            const btn = document.getElementById("main-action");
+            
+            btn.onclick = () => {
+                if (isVip) {
+                    // SI VIP : Lance la vidéo (Remplace par ton lien réel)
+                    playVideo("https://www.youtube.com/embed/dQw4w9WgXcQ"); 
+                } else {
+                    // SI PAS VIP : Affiche la popup
+                    document.getElementById("lock-popup").style.display = "flex";
+                }
+            };
+        });
+    }
+
+    window.playVideo = (url) => {
+        document.getElementById("video-frame").src = url;
+        document.getElementById("video-overlay").style.display = "block";
+    };
+
+    window.stopVideo = () => {
+        document.getElementById("video-frame").src = "";
+        document.getElementById("video-overlay").style.display = "none";
+    };
+
+    window.closePopup = () => {
+        document.getElementById("lock-popup").style.display = "none";
+    };
+
+    loadMovieData();
+</script>
+
+</body>
+</html>
