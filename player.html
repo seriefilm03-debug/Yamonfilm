@@ -3,190 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">YAMONFILM - Lecteur</title>
+    <title>YAMONFILM - Visionnage</title>
     <style>
-        /* --- DESIGN GLOBAL --- */
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-        body{ background:#0f0f0f; color:white; overflow-x:hidden; }
-        
-        header { 
-            position: fixed; top: 0; width: 100%; padding: 15px 5%; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
-        }
+        body{ background:#0f0f0f; color:white; }
+        header { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); }
         .logo { color:#e50914; font-size:24px; font-weight:bold; text-decoration:none; }
-        .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 4px; }
-
-        /* --- HERO SECTION --- */
-        .hero { 
-            height: 70vh; width: 100%; background-size: cover; background-position: center; 
-            display: flex; align-items: flex-end; padding: 5%; position: relative; 
-        }
-        .hero::after { 
-            content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(to top, #0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); 
-        }
-        .hero-content { position: relative; z-index: 10; max-width: 700px; }
-        .hero h1 { font-size: clamp(30px, 5vw, 60px); margin-bottom: 10px; }
-        .hero p { color: #ccc; line-height: 1.5; margin-bottom: 20px; font-size: 14px; }
+        .hero { height: 60vh; width: 100%; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 5%; position: relative; }
+        .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #0f0f0f, transparent); }
+        .hero-content { position: relative; z-index: 10; }
+        .btn-vip { background:#e50914; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold; display:inline-block; margin-top:15px; }
         
-        .btn-unlock { 
-            display: inline-block; background: #e50914; color: white; 
-            text-decoration: none; padding: 12px 30px; border-radius: 4px; font-weight: bold; 
-        }
+        .episodes { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 30px 5%; }
+        .episode-card { background:#1c1c1c; border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid #333; transition: 0.3s; }
+        .episode-card:hover { border-color:#e50914; transform: scale(1.02); }
+        .episode-card img { width:100%; height:140px; object-fit:cover; }
+        .ep-info { padding:10px; font-size:14px; }
 
-        /* --- SECTION EPISODES --- */
-        .section-title { padding: 40px 5% 10px; font-size: 20px; font-weight: bold; }
-
-        /* GRILLE ADAPTATIVE : Horizontal sur mobile, Grille sur PC */
-        .episodes-container { 
-            display: flex; gap: 20px; padding: 20px 5% 50px; 
-            overflow-x: auto; scroll-snap-type: x mandatory;
-        }
-
-        .episode-card { 
-            flex: 0 0 280px; background: #1c1c1c; border-radius: 8px; 
-            overflow: hidden; cursor: pointer; transition: 0.3s; 
-            border: 1px solid #333; scroll-snap-align: start;
-        }
-        .episode-card:hover { transform: scale(1.03); border-color: #e50914; }
-        .episode-card img { width: 100%; height: 155px; object-fit: cover; }
-        .ep-info { padding: 12px; }
-        .ep-info b { font-size: 14px; display: block; margin-bottom: 5px; }
-        
-        /* Sur PC, on remet en grille */
-        @media (min-width: 1024px) {
-            .episodes-container { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-                flex-wrap: wrap; overflow-x: visible;
-            }
-        }
-
-        /* --- POPUP & LECTEUR --- */
-        .popup { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
-            display: none; justify-content: center; align-items: center; z-index: 2000; 
-        }
-        .popup-box { background: #181818; padding: 30px; border-radius: 10px; text-align: center; border: 1px solid #e50914; }
-        
-        #video-player { 
-            display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
-        }
-        .close-player { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; color: white; z-index: 3001; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* MODAL / POPUP */
+        #popup { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center; }
+        .popup-box { background:#181818; padding:30px; border-radius:10px; text-align:center; border:1px solid #e50914; }
     </style>
 </head>
 <body>
 
 <header>
     <a href="index.html" class="logo">YAMONFILM</a>
-    <a href="index.html" class="back-link">Retour</a>
+    <a href="index.html" style="color:white; text-decoration:none;">Retour</a>
 </header>
 
-<section class="hero" id="hero-bg">
+<div class="hero" id="hero">
     <div class="hero-content">
-        <h1 id="serie-title">Chargement...</h1>
-        <p id="serie-desc"></p>
-        <div id="status-area"></div>
-    </div>
-</section>
-
-<h3 class="section-title">Épisodes</h3>
-<div class="episodes-container" id="episodes-list">
-    </div>
-
-<div class="popup" id="lock-popup">
-    <div class="popup-box">
-        <h3>Contenu VIP 🔥</h3><br>
-        <p>Ce contenu est réservé aux membres VIP.</p><br>
-        <a href="debloquer.html" class="btn-unlock">Activer un code</a>
-        <button onclick="closePopup()" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer; display:block; width:100%;">Plus tard</button>
+        <h1 id="title">Chargement...</h1>
+        <div id="vip-status"></div>
     </div>
 </div>
 
-<div id="video-player">
-    <span class="close-player" onclick="stopVideo()">✕</span>
-    <iframe id="video-frame" src="" allowfullscreen></iframe>
+<div class="episodes" id="ep-list"></div>
+
+<div id="popup">
+    <div class="popup-box">
+        <h3>Contenu VIP 🔥</h3><br>
+        <p>Activez votre code pour voir cet épisode.</p><br>
+        <a href="debloquer.html" class="btn-vip">Activer un code</a>
+        <button onclick="document.getElementById('popup').style.display='none'" style="margin-top:15px; background:none; color:grey; border:none; cursor:pointer;">Fermer</button>
+    </div>
 </div>
 
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const TMDB_KEY = "182c7173698e34803715eacab5c693a7";
-    
-    // 1. Lire les infos dans l'adresse (URL)
     const params = new URLSearchParams(window.location.search);
-    const tmdbId = params.get('id');    // ex: 16678
-    const isVip = params.get('vip') === 'true'; // true ou false
+    const id = params.get('id');    // ID TMDB (ex: 16678)
+    const fid = params.get('fid');  // ID Firebase (ex: LECLOWN)
 
-    async function init() {
-        if(!tmdbId) return;
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href="login.html"; return; }
+        
+        // 1. On vérifie si la série est débloquée dans Firebase
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+        const isVip = unlocked.includes(fid);
 
-        // Récupérer infos de la série
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}&language=fr-FR`);
+        // 2. On récupère les infos TMDB
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}&language=fr-FR`);
         const data = await res.json();
-
-        document.getElementById("serie-title").innerText = data.name;
-        document.getElementById("page-title").innerText = data.name + " - YAMONFILM";
-        document.getElementById("serie-desc").innerText = data.overview || "Pas de description disponible.";
-        document.getElementById("hero-bg").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
-
+        
+        document.getElementById("title").innerText = data.name;
+        document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+        
         if(!isVip) {
-            document.getElementById("status-area").innerHTML = `<a href="debloquer.html" class="btn-unlock">🔓 Débloquer la version VIP</a>`;
+            document.getElementById("vip-status").innerHTML = `<a href="debloquer.html" class="btn-vip">🔓 Débloquer la série</a>`;
         }
 
-        loadEpisodes();
-    }
+        // 3. On charge les épisodes
+        const epRes = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/1?api_key=${TMDB_KEY}&language=fr-FR`);
+        const epData = await epRes.json();
 
-    async function loadEpisodes() {
-        const list = document.getElementById("episodes-list");
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/1?api_key=${TMDB_KEY}&language=fr-FR`);
-        const data = await res.json();
-
-        data.episodes.forEach(ep => {
+        epData.episodes.forEach(ep => {
             const card = document.createElement("div");
             card.className = "episode-card";
-            const img = ep.still_path ? `https://image.tmdb.org/t/p/w500${ep.still_path}` : `https://image.tmdb.org/t/p/w500${data.poster_path}`;
-
             card.innerHTML = `
-                <img src="${img}">
-                <div class="ep-info">
-                    <b>S1 : E${ep.episode_number} - ${ep.name}</b>
-                </div>
+                <img src="https://image.tmdb.org/t/p/w500${ep.still_path || data.poster_path}">
+                <div class="ep-info"><b>E${ep.episode_number} - ${ep.name}</b></div>
             `;
-
-            // LOGIQUE DE CLIC
+            
             card.onclick = () => {
-                if (isVip) {
-                    playVideo("LIEN_VIDEO_VIP_ICI"); // Tu mettras tes liens ici plus tard
+                if (isVip || ep.episode_number === 1) {
+                    alert("Lecture de l'épisode !"); // Ici tu mettras ton lien vidéo plus tard
                 } else {
-                    // Si gratuit, on autorise seulement l'épisode 1
-                    if (ep.episode_number === 1) {
-                        playVideo("https://www.youtube.com/embed/dQw4w9WgXcQ"); // Exemple gratuit
-                    } else {
-                        document.getElementById("lock-popup").style.display = "flex";
-                    }
+                    document.getElementById("popup").style.display = "flex";
                 }
             };
-            list.appendChild(card);
+            document.getElementById("ep-list").appendChild(card);
         });
-    }
-
-    window.playVideo = (url) => {
-        document.getElementById("video-frame").src = url;
-        document.getElementById("video-player").style.display = "block";
-    };
-
-    window.stopVideo = () => {
-        document.getElementById("video-frame").src = "";
-        document.getElementById("video-player").style.display = "none";
-    };
-
-    window.closePopup = () => {
-        document.getElementById("lock-popup").style.display = "none";
-    };
-
-    init();
+    });
 </script>
-
 </body>
 </html>
