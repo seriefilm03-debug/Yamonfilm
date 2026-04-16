@@ -1,235 +1,213 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Le Clown - YAMONFILM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Clown - YAMONFILM</title>
+    <style>
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
-<style>
-/* --- STYLE GLOBAL & MENU --- */
-*{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-body{ background:#0f0f0f; color:white; overflow-x: hidden; }
+        .navbar{
+            position:fixed; top:0; left:0; width:100%; height:60px;
+            display:flex; justify-content:space-between; align-items:center;
+            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            z-index:1000;
+        }
+        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
 
-.navbar{
-  position:fixed; top:0; left:0; width:100%; height:60px;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-  z-index:1000;
-}
-.logo{ color:#e50914; font-size:clamp(18px,2vw,28px); font-weight:bold; text-decoration:none; }
-.menu-btn{ font-size:28px; cursor:pointer; }
+        #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
+        #video-overlay iframe { width: 100%; height: 90%; border: none; }
+        .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
-.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
-.overlay.show{ opacity:1; pointer-events:auto; }
-
-.side-menu{ position:fixed; top:0; right:-100%; width:320px; max-width:90%; height:100%; background:#111; padding:20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
-.side-menu.open{ right:0; }
-.side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:16px; padding:10px 0; cursor:pointer; text-align:left; }
-.side-menu input { padding: 12px; border-radius: 5px; border: 1px solid #333; background: #222; color: white; margin-top: 10px; }
-.btn-unlock { background: #e50914; color: white !important; padding: 12px !important; border-radius: 5px; font-weight: bold; text-align: center !important; }
-
-/* --- LECTEUR VIDEO --- */
-#video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
-#video-overlay iframe { width: 100%; height: 85%; border: none; background: #000; }
-.server-bar { width: 100%; background: #1c1c1c; padding: 15px; display: flex; justify-content: center; gap: 10px; border-top: 2px solid #e50914; flex-wrap: wrap; }
-.btn-server { background: #333; color: white; border: 1px solid #444; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-.btn-server.active { background: #e50914; border-color: #e50914; }
-
-.close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; z-index: 3001; }
-
-/* --- CONTENU --- */
-.hero{ height:70vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:60px 5%; position:relative; }
-.hero::after{ content:""; position:absolute; bottom:0; left:0; width:100%; height:60%; background:linear-gradient(to top,#0f0f0f,transparent); }
-.hero-content{ position:relative; z-index:2; max-width:700px; }
-.hero h1{ font-size:clamp(30px, 5vw, 60px); margin-bottom:10px; }
-.season-section{ padding:30px 5% 10px; display: flex; align-items: center; gap: 20px; }
-.btn-main{ background:#e50914; color:white; padding:12px 25px; border-radius:8px; font-weight:bold; cursor:pointer; border:none; }
-.season-menu{ position:absolute; background:#1c1c1c; border-radius:8px; margin-top:10px; display:none; overflow-y:auto; max-height: 250px; width: 160px; z-index: 100; border: 1px solid #333; }
-.season-menu div{ padding:12px 20px; cursor:pointer; }
-.episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5% 80px; }
-.card{ background:#1c1c1c; border-radius:12px; overflow:hidden; cursor:pointer; transition:.4s; border: 1px solid #333; }
-.card:hover{ transform:scale(1.05); border-color: #e50914; }
-.card img{ width:100%; height:150px; object-fit:cover; }
-.card-content{ padding:15px; }
-.badge{ font-size:12px; background:#e50914; padding:4px 8px; border-radius:5px; }
-.show{ display:block; }
-</style>
+        .hero{ height:60vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; }
+        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f,transparent); }
+        .hero-content{ position:relative; z-index:2; max-width:700px; }
+        
+        .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
+        .card{ background:#1c1c1c; border-radius:8px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
+        .card:hover{ transform: scale(1.05); border-color: #e50914; }
+        .card img{ width:100%; height:140px; object-fit:cover; }
+        
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
+        .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0, 200, 0, 0.8); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        
+        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px;}
+        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; max-height: 200px; overflow-y: auto; }
+        .season-menu div{ padding:10px 20px; cursor:pointer; }
+        .season-menu div:hover{ background: #333; }
+        .show{ display:block; }
+    </style>
 </head>
 <body>
 
-<div class="navbar">
-  <a href="index.html" class="logo">YAMONFILM</a>
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-</div>
-
-<div class="overlay" id="overlay"></div>
-
-<div class="side-menu" id="menu">
-  <a href="account.html">Mon compte</a>
-  <a href="series.html">Mes séries</a>
-  <button id="logoutBtn">Déconnexion</button>
-  <hr style="border:0.5px solid #333; margin:10px 0;">
-  <input type="text" id="code" placeholder="Entrez un code">
-  <button class="btn-unlock" id="unlockBtn">Valider</button>
-  <p id="msg" style="font-size: 12px; text-align: center; margin-top: 5px;"></p>
-</div>
+<div class="navbar"><a href="index.html" class="logo">YAMONFILM</a></div>
 
 <div id="video-overlay">
     <span class="close-video" onclick="closeVideo()">&times;</span>
     <iframe id="video-iframe" src="" allowfullscreen></iframe>
-    <div class="server-bar">
-        <button class="btn-server active" onclick="changeServer(0)">Uqload (Kweflix)</button>
-        <button class="btn-server" onclick="changeServer(1)">Serveur Principal</button>
-        <button class="btn-server" onclick="changeServer(2)">Serveur Secours</button>
-    </div>
 </div>
 
 <section class="hero" id="hero">
     <div class="hero-content">
-        <h1 id="title">Chargement...</h1>
-        <p id="meta" style="color: #e50914; font-weight: bold; margin-bottom: 10px;"></p>
-        <p id="overview" style="color: #ccc; line-height: 1.4;"></p>
+        <h1 id="title">Le Clown</h1>
+        <p id="overview" style="color:#ccc; margin:10px 0;"></p>
+        <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
     </div>
 </section>
 
-<div class="season-section">
-    <h3>Choisir :</h3>
-    <div class="season-dropdown">
-        <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-        <div class="season-menu" id="seasonMenu"></div>
-    </div>
+<div style="padding:20px 5%;">
+    <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+    <div class="season-menu" id="seasonMenu"></div>
 </div>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, updateDoc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-  authDomain: "yamonfilm-fead8.firebaseapp.com",
-  projectId: "yamonfilm-fead8"
-});
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+    let userProgress = { watched: [], lastBySerie: {} };
+    const serieId = "LECLOWN"; 
 
-/* MENU ACTIONS */
-window.toggleMenu = () => { document.getElementById("menu").classList.toggle("open"); document.getElementById("overlay").classList.toggle("show"); };
-document.getElementById("overlay").onclick = () => { document.getElementById("menu").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); };
+    // --- TES SOURCES MISES À JOUR ---
+    const videasSources = { 
+        0: { // Téléfilms
+            1: "https://app.videas.fr/embed/media/7989729f-3af7-46f1-9e4f-971307009c98/",
+            2: "https://app.videas.fr/embed/media/0115ecb0-19f6-4695-9968-26915b60d540/"
+        },
+        1: { // Saison 1
+            1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/",
+            2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/",
+            3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/",
+            4: "https://uqload.is/embed-fvk9680x11ze.html",
+            5: "https://app.videas.fr/embed/media/5ed8e85e-90d2-4f46-ae49-80d063933b02c/",
+            6: "https://app.videas.fr/embed/media/062ffb1a-1b9f-4ed6-a2f7-2bd22f3cfa5f/"
+        }
+    };
 
-/* UNLOCK CODE */
-document.getElementById("unlockBtn").onclick = async () => {
-  const codeVal = document.getElementById("code").value.trim();
-  if(codeVal === "MEDICOPTER"){
-    const ref = doc(db, "users", auth.currentUser.uid);
-    try { await updateDoc(ref, { seriesUnlocked: arrayUnion("MEDICOPTER") }); } 
-    catch { await setDoc(ref, { seriesUnlocked: ["MEDICOPTER"] }, { merge: true }); }
-    document.getElementById("msg").innerText = "Débloqué ! 🔥";
-  }
-};
+    const apiKey = "182c7173698e34803715eacab5c693a7";
+    const tmdbId = 2322; // ID TMDB du Clown
+    let currentEpisodes = [];
+    let currentS = 1;
 
-document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "login.html");
-</script>
-
-<script>
-/* --- CONFIGURATION DES LIENS UQLOAD --- */
-// Ajoute ici les codes que tu trouves sur Kweflix
-const uqloadLinks = {
-    "1-1": "lf31635ab18i", // Le code que tu m'as donné
-    "1-2": "ID_EPISODE_2", 
-    "1-3": "ID_EPISODE_3",
-    // Format : "Saison-Episode": "ID"
-};
-
-const apiKey="182c7173698e34803715eacab5c693a7";
-const seriesId=16678; 
-const imgBase="https://image.tmdb.org/t/p/original";
-let currentS = 1, currentE = 1;
-
-function openVideo(s, e) {
-    currentS = s; currentE = e;
-    changeServer(0);
-    document.getElementById("video-overlay").style.display = "flex";
-    document.body.style.overflow = "hidden";
-}
-
-function changeServer(index) {
-    const key = `${currentS}-${currentE}`;
-    const uqId = uqloadLinks[key];
-
-    const sources = [
-        // Serveur 0 : Uqload (Si pas d'ID, on bascule sur Embed.su)
-        uqId ? `https://uqload.is/embed-${uqId}.html` : `https://embed.su/embed/tv/${seriesId}/${currentS}/${currentE}`,
-        // Serveur 1 : Embed.su
-        `https://embed.su/embed/tv/${seriesId}/${currentS}/${currentE}`,
-        // Serveur 2 : Vidsrc
-        `https://vidsrc.pro/embed/tv/${seriesId}/${currentS}/${currentE}`
-    ];
-
-    document.getElementById("video-iframe").src = sources[index];
-    const btns = document.querySelectorAll(".btn-server");
-    btns.forEach((b, i) => b.classList.toggle("active", i === index));
-}
-
-function closeVideo() {
-    document.getElementById("video-overlay").style.display = "none";
-    document.getElementById("video-iframe").src = "";
-    document.body.style.overflow = "auto";
-}
-
-async function loadSeries(){
-    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`);
-    const data=await res.json();
-    document.getElementById("title").textContent=data.name;
-    document.getElementById("meta").textContent=`⭐ ${data.vote_average.toFixed(1)} / 10 • ${data.number_of_seasons} Saisons`;
-    document.getElementById("overview").textContent=data.overview;
-    document.getElementById("hero").style.backgroundImage=`linear-gradient(to right, rgba(0,0,0,0.85), transparent), url(${imgBase}${data.backdrop_path})`;
-    loadSeasonsMenu(data.number_of_seasons);
-}
-
-function loadSeasonsMenu(total){
-    const menu = document.getElementById("seasonMenu");
-    menu.innerHTML="";
-    for(let i=1;i<=total;i++){
-        const div=document.createElement("div");
-        div.textContent="Saison "+i;
-        div.onclick=()=>{
-            document.getElementById("seasonBtn").innerHTML="Saison "+i+" ▼";
-            menu.classList.remove("show");
-            loadEpisodes(i);
-        };
-        menu.appendChild(div);
-    }
-    loadEpisodes(1);
-}
-
-async function loadEpisodes(seasonNumber){
-    const container = document.getElementById("episodes");
-    container.innerHTML="<p>Chargement...</p>";
-    const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${seasonNumber}?api_key=${apiKey}&language=fr-FR`);
-    const data=await res.json();
-    container.innerHTML="";
-    data.episodes.forEach(ep=>{
-        const card=document.createElement("div");
-        card.className="card";
-        card.innerHTML=`
-            <img src="${ep.still_path ? imgBase+ep.still_path : 'https://via.placeholder.com/300x170?text=YAMONFILM'}">
-            <div class="card-content">
-                <span class="badge">E${ep.episode_number}</span>
-                <h4 style="margin-top:10px;">${ep.name}</h4>
-            </div>
-        `;
-        card.onclick=()=> openVideo(seasonNumber, ep.episode_number);
-        container.appendChild(card);
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().progress) {
+                userProgress = userDoc.data().progress;
+                if(!userProgress.lastBySerie) userProgress.lastBySerie = {};
+                checkResume();
+            }
+            loadSeries();
+        } else { window.location.href = "login.html"; }
     });
-}
-document.getElementById("seasonBtn").onclick=()=>document.getElementById("seasonMenu").classList.toggle("show");
-loadSeries();
-</script>
 
+    window.saveProgress = async (s, e, title, img) => {
+        const user = auth.currentUser;
+        if(!user) return;
+        const epKey = `${serieId}-S${s}E${e}`;
+        if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
+        
+        userProgress.lastBySerie[serieId] = { 
+            s, e, title, img, 
+            serieName: "Le Clown", 
+            link: "leclown.html",
+            timestamp: Date.now() 
+        };
+
+        await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
+        renderEpisodes();
+        checkResume();
+    };
+
+    function checkResume() {
+        const last = userProgress.lastBySerie[serieId];
+        if(last) {
+            const btn = document.getElementById("resumeBtn");
+            btn.style.display = "block";
+            btn.innerText = `▶ Reprendre ${last.s == 0 ? 'Téléfilm' : 'S'+last.s} E${last.e}`;
+            btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
+        }
+    }
+
+    async function loadSeries() {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        document.getElementById("overview").innerText = data.overview;
+        document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+        
+        const menu = document.getElementById("seasonMenu");
+        menu.innerHTML = "";
+        
+        // Ajout manuel de la Saison 0 (Spéciaux/Téléfilms)
+        const d0 = document.createElement("div"); d0.innerText = "Téléfilms (S0)";
+        d0.onclick = () => { currentS = 0; document.getElementById("seasonBtn").innerText = "Saison 0 ▼"; loadEpisodes(0); menu.classList.remove("show"); };
+        menu.appendChild(d0);
+
+        for(let i=1; i<=data.number_of_seasons; i++) {
+            const d = document.createElement("div"); d.innerText = "Saison "+i;
+            d.onclick = () => { currentS = i; document.getElementById("seasonBtn").innerText = "Saison "+i+" ▼"; loadEpisodes(i); menu.classList.remove("show"); };
+            menu.appendChild(d);
+        }
+        loadEpisodes(1);
+    }
+
+    async function loadEpisodes(s) {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        currentEpisodes = data.episodes;
+        renderEpisodes();
+    }
+
+    function renderEpisodes() {
+        const container = document.getElementById("episodes");
+        container.innerHTML = "";
+        currentEpisodes.forEach(ep => {
+            const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
+            const isWatched = userProgress.watched.includes(epKey);
+            const epImage = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : "s-l1200.jpg";
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <div style="position:relative; height:140px;">
+                    <img src="${epImage}" style="width:100%; height:100%; object-fit:cover;">
+                    ${isWatched ? '<div class="watched-tag">VU</div>' : ''}
+                    <div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div>
+                </div>
+                <div style="padding:10px;">
+                    <b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}
+                </div>
+            `;
+            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
+            container.appendChild(card);
+        });
+    }
+
+    window.openVideo = (s, e, title, img) => {
+        if (!videasSources[s] || !videasSources[s][e]) {
+            alert("Cet épisode n'est pas disponible.");
+            return;
+        }
+        const url = videasSources[s][e];
+        document.getElementById("video-iframe").src = url;
+        document.getElementById("video-overlay").style.display = "flex";
+        window.saveProgress(s, e, title, img);
+    };
+
+    window.closeVideo = () => { 
+        document.getElementById("video-overlay").style.display="none"; 
+        document.getElementById("video-iframe").src=""; 
+    };
+
+    document.getElementById("seasonBtn").onclick = () => document.getElementById("seasonMenu").classList.toggle("show");
+</script>
 </body>
 </html>
