@@ -74,15 +74,15 @@
     const db = getFirestore(app);
 
     let userProgress = { watched: [], lastBySerie: {} };
+    let serieBackdrop = ""; // Stocke l'image de secours de la série
     const serieId = "LECLOWN"; 
 
-    // --- TES SOURCES MISES À JOUR ---
     const videasSources = { 
-        0: { // Téléfilms
+        0: { 
             1: "https://app.videas.fr/embed/media/7989729f-3af7-46f1-9e4f-971307009c98/",
             2: "https://app.videas.fr/embed/media/0115ecb0-19f6-4695-9968-26915b60d540/"
         },
-        1: { // Saison 1
+        1: { 
             1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/",
             2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/",
             3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/",
@@ -93,7 +93,7 @@
     };
 
     const apiKey = "182c7173698e34803715eacab5c693a7";
-    const tmdbId = 2322; // ID TMDB du Clown
+    const tmdbId = 2322; 
     let currentEpisodes = [];
     let currentS = 1;
 
@@ -140,13 +140,13 @@
     async function loadSeries() {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
         const data = await res.json();
+        serieBackdrop = data.backdrop_path;
         document.getElementById("overview").innerText = data.overview;
         document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
         
         const menu = document.getElementById("seasonMenu");
         menu.innerHTML = "";
         
-        // Ajout manuel de la Saison 0 (Spéciaux/Téléfilms)
         const d0 = document.createElement("div"); d0.innerText = "Téléfilms (S0)";
         d0.onclick = () => { currentS = 0; document.getElementById("seasonBtn").innerText = "Saison 0 ▼"; loadEpisodes(0); menu.classList.remove("show"); };
         menu.appendChild(d0);
@@ -172,7 +172,11 @@
         currentEpisodes.forEach(ep => {
             const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
             const isWatched = userProgress.watched.includes(epKey);
-            const epImage = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : "s-l1200.jpg";
+            
+            // Logique d'image : Miniature épisode OU Image de la série si vide
+            const epImage = ep.still_path 
+                ? `https://image.tmdb.org/t/p/w300${ep.still_path}` 
+                : `https://image.tmdb.org/t/p/w300${serieBackdrop}`;
 
             const card = document.createElement("div");
             card.className = "card";
@@ -186,7 +190,7 @@
                     <b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}
                 </div>
             `;
-            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
+            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path || serieBackdrop);
             container.appendChild(card);
         });
     }
