@@ -6,90 +6,75 @@
     <title>Supercross - YAMONFILM</title>
     <style>
         /* --- STYLE GLOBAL --- */
-        *{ box-sizing:border-box; margin:0; padding:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        
-        html, body { 
-            height: 100%; width: 100%; 
-            background: #141414; color: white; 
-            overflow: hidden; 
-        }
+        *{ box-sizing:border-box; margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #141414; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
         /* NAVBAR */
-        header { 
-            position: absolute; top: 0; width: 100%; padding: 20px 5%; 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-        .logo { color:#e50914; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight:bold; text-decoration:none; }
-        .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 4px; transition: 0.3s; }
-        .back-link:hover { background: #e50914; }
+        header { position: fixed; top: 0; width: 100%; padding: 20px 5%; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .logo { color:#e50914; font-size: 24px; font-weight:bold; text-decoration:none; }
+        .back-link { color: #aaa; text-decoration: none; font-size: 14px; }
+        .back-link:hover { color: white; }
 
-        /* HERO SECTION - CONFIGURATION PC / TV */
-        .hero { 
-            position: relative;
+        /* CONTENEUR PRINCIPAL (LA FICHE) */
+        .movie-container {
+            max-width: 1000px;
             width: 100%;
-            height: 100vh;
+            background: #1f1f1f;
+            border-radius: 12px;
             display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 0 8%;
-            background-repeat: no-repeat;
-            background-position: right center; 
-            background-size: contain; /* L'image s'affiche entière sur PC */
+            flex-direction: row; /* Côte à côte sur PC */
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-top: 60px;
         }
 
-        /* EFFET DE FONDU NETFLIX */
-        .hero::after { 
-            content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(to right, #141414 30%, rgba(20, 20, 20, 0.4) 60%, transparent 100%),
-                        linear-gradient(to top, #141414 5%, transparent 30%);
+        /* PHOTO DU FILM (GAUCHE) */
+        .movie-poster {
+            flex: 0 0 350px; /* Largeur fixe de l'affiche sur PC */
+            background-color: #000;
         }
+        .movie-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-        .hero-content { position: relative; z-index: 10; max-width: 50%; }
-        .hero h1 { font-size: clamp(2.5rem, 6vw, 5rem); margin-bottom: 0.3em; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .hero p { 
-            font-size: clamp(0.9rem, 1.5vw, 1.2rem); 
-            line-height: 1.5; color: #ccc; margin-bottom: 2em;
-            display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+        /* INFOS DU FILM (DROITE) */
+        .movie-details {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
         }
+        .movie-details h1 { font-size: 32px; margin-bottom: 15px; color: white; }
+        .movie-details p { font-size: 16px; color: #ccc; line-height: 1.6; margin-bottom: 30px; }
 
         /* BOUTON LECTURE */
-        .play-btn { 
-            display: inline-flex; align-items: center; background: white; color: black; 
-            padding: 15px 45px; border-radius: 4px; font-weight: bold; font-size: 1.2rem; 
-            cursor: pointer; border: none; transition: 0.2s;
+        .play-btn {
+            background: #e50914;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-block;
+            width: fit-content;
         }
-        .play-btn:hover { background: #e50914; color: white; transform: scale(1.05); }
+        .play-btn:hover { background: #b20710; transform: translateY(-2px); }
 
-        /* --- CORRECTION MOBILE (STRICTE - PAS DE ZOOM) --- */
+        /* --- ADAPTATION MOBILE --- */
         @media (max-width: 768px) {
-            .hero { 
-                background-position: top center; /* Image en haut */
-                background-size: 100% auto; /* L'image fait la largeur exacte du tel, donc pas de zoom */
-                align-items: flex-end; /* Texte descendu en bas */
-                padding-bottom: 20%;
-                justify-content: center;
-                text-align: center;
-            }
-            .hero::after { 
-                /* Fondu qui part du bas pour remonter vers l'image */
-                background: linear-gradient(to top, #141414 45%, rgba(20, 20, 20, 0.6) 65%, rgba(20,20,20,0) 85%);
-            }
-            .hero-content { max-width: 100%; }
-            .hero p { display: none; } /* Cache le résumé sur tel pour la clarté */
-            .hero h1 { font-size: 2.8rem; margin-bottom: 1.5rem; }
+            .movie-container { flex-direction: column; } /* L'un sur l'autre */
+            .movie-poster { flex: 0 0 auto; height: 400px; }
+            .movie-details { padding: 25px; text-align: center; }
+            .play-btn { width: 100%; }
         }
 
         /* LECTEUR VIDÉO PLEIN ÉCRAN */
-        #video-overlay { 
-            display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
-        }
-        .close-video { 
-            position: absolute; top: 20px; right: 20px; 
-            font-size: 40px; cursor: pointer; color: white; z-index: 3100;
-            background: rgba(0,0,0,0.5); width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
+        #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; }
+        .close-video { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; color: white; z-index: 3100; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -97,25 +82,24 @@
 
 <header>
     <a href="index.html" class="logo">YAMONFILM</a>
-    <a href="index.html" class="back-link">← Retour</a>
+    <a href="index.html" class="back-link">← Retour à l'accueil</a>
 </header>
 
-<section class="hero" id="hero-bg">
-    <div class="hero-content">
-        <h1 id="movie-title">Supercross</h1>
-        <p id="movie-desc">Chargement du résumé...</p>
-        <button class="play-btn" onclick="openPlayer()">▶ Lecture</button>
+<div class="movie-container">
+    <div class="movie-poster">
+        <img id="poster-img" src="" alt="Affiche du film">
     </div>
-</section>
+
+    <div class="movie-details">
+        <h1 id="movie-title">Chargement...</h1>
+        <p id="movie-desc">Résumé en cours de chargement depuis la base de données...</p>
+        <button class="play-btn" onclick="openPlayer()">▶ REGARDER LE FILM</button>
+    </div>
+</div>
 
 <div id="video-overlay">
     <span class="close-video" onclick="closePlayer()">✕</span>
-    <iframe 
-        id="video-frame" 
-        src="" 
-        allow="fullscreen" 
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
-    </iframe>
+    <iframe id="video-frame" src="" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 </div>
 
 <script>
@@ -129,11 +113,11 @@
             const data = await res.json();
             
             document.getElementById("movie-title").innerText = data.title;
-            document.getElementById("movie-desc").innerText = data.overview;
+            document.getElementById("movie-desc").innerText = data.overview || "Résumé non disponible.";
             
-            // Image originale
-            const bgUrl = `https://image.tmdb.org/t/p/original${data.backdrop_path}`;
-            document.getElementById("hero-bg").style.backgroundImage = `url(${bgUrl})`;
+            // On récupère l'affiche verticale (poster_path)
+            const posterUrl = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+            document.getElementById("poster-img").src = posterUrl;
         } catch (error) {
             console.error("Erreur TMDB:", error);
         }
@@ -149,7 +133,6 @@
         document.getElementById("video-overlay").style.display = "none";
     }
 
-    // Chargement auto
     loadMovieData();
 </script>
 
