@@ -8,12 +8,14 @@
         body { background: #141414; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .unlock-card { background: #111; padding: 40px; border-radius: 8px; border: 1px solid #333; width: 90%; max-width: 400px; text-align: center; }
         .logo { color: #e50914; font-size: 30px; font-weight: bold; text-decoration: none; display: block; margin-bottom: 20px; }
+        h2 { margin-bottom: 10px; }
         input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-bottom: 20px; font-size: 16px; text-align: center; outline: none; }
         input:focus { border-color: #e50914; }
         button { width: 100%; padding: 15px; background: #e50914; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 16px; transition: 0.3s; }
         button:hover { background: #b20710; transform: scale(1.02); }
-        #msg { margin-top: 15px; font-size: 14px; font-weight: bold; }
+        #msg { margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 20px; }
         .back-link { display: block; margin-top: 20px; color: #aaa; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: white; }
     </style>
 </head>
 <body>
@@ -35,15 +37,21 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
+        authDomain: "yamonfilm-fead8.firebaseapp.com", 
+        projectId: "yamonfilm-fead8" 
+    };
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     // --- BASE DE DONNÉES DES CODES ---
+    // Pour ajouter une série : "CODE" : { id: "ID_FIREBASE", name: "NOM", target: "PAGE_A_OUVRIR" }
     const CODES_DATABASE = {
-        "MEDICVIP": { id: "MEDICOPTER", name: "Medicopter 117" },
-        "CLOWNVIP": { id: "LECLOWN", name: "Le Clown" }
+        "MEDICVIP": { id: "MEDICOPTER", name: "Medicopter 117", target: "vipmedicopter.html" },
+        "CLOWNVIP": { id: "LECLOWN", name: "Le Clown", target: "vipclown.html" }
     };
 
     document.getElementById("btn").onclick = async () => {
@@ -63,23 +71,32 @@
             const snap = await getDoc(userRef);
             let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
 
+            // Si la série n'est pas encore débloquée
             if (!unlocked.includes(serie.id)) {
                 unlocked.push(serie.id);
                 await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
+                
                 msg.style.color = "lime";
-                msg.innerText = `Félicitations ! ${serie.name} est maintenant débloquée en version VIP.`;
-                setTimeout(() => window.location.href = "index.html", 2500);
+                msg.innerText = `Félicitations ! ${serie.name} débloquée.`;
+                
+                // Redirection vers la page VIP après 2 secondes
+                setTimeout(() => window.location.href = serie.target, 2000);
             } else {
+                // Si déjà débloquée, on redirige quand même pour aider le client
                 msg.style.color = "orange";
-                msg.innerText = "Cette série est déjà active sur votre compte.";
+                msg.innerText = "Série déjà active. Redirection...";
+                setTimeout(() => window.location.href = serie.target, 2000);
             }
         } else {
-            msg.style.color = "red";
-            msg.innerText = "Code invalide.";
+            msg.style.color = "#e50914";
+            msg.innerText = "Code invalide. Vérifiez l'orthographe.";
         }
     };
 
-    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+    // Protection : si pas connecté, retour au login
+    onAuthStateChanged(auth, (user) => { 
+        if (!user) window.location.href = "login.html"; 
+    });
 </script>
 </body>
 </html>
