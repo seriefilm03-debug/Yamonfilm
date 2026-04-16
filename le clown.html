@@ -109,7 +109,6 @@
         1: { 1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/", 2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/", 3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/", 4: "https://uqload.is/embed-fvk9680x11ze.html", 5: "https://app.videas.fr/embed/media/5ed8e85e-90d2-4f46-ae49-80d063933b02c/", 6: "https://app.videas.fr/embed/media/062ffb1a-1b9f-4ed6-a2f7-2bd22f3cfa5f/" }
     };
 
-    // GESTION DU MENU
     window.toggleMenu = () => {
         document.getElementById("menu").classList.toggle("open");
         document.getElementById("overlay").classList.toggle("show");
@@ -127,7 +126,6 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // LOGOUT
     document.getElementById("logoutBtn").onclick = () => {
         signOut(auth).then(() => { window.location.href = "login.html"; });
     };
@@ -174,7 +172,7 @@
             const card = document.createElement("div");
             card.className = "card";
             card.innerHTML = `<div style="position:relative; height:140px;"><img src="${imgPath}" style="width:100%; height:100%; object-fit:cover;">${isWatched ? '<div class="watched-tag">VU</div>' : ''}<div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div></div><div style="padding:10px;"><b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}</div>`;
-            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
+            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path || fallbackImg);
             container.appendChild(card);
         });
     }
@@ -189,10 +187,27 @@
     window.saveProgress = async (s, e, title, img) => {
         const user = auth.currentUser;
         if(!user) return;
+
         const epKey = `${serieId}-S${s}E${e}`;
+        const userRef = doc(db, "users", user.uid);
+        
+        // On récupère la progression la plus fraîche
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists() && userDoc.data().progress) {
+            userProgress = userDoc.data().progress;
+        }
+
         if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
-        userProgress.lastBySerie[serieId] = { s, e, title, img, serieName: "Le Clown", link: "leclown.html", timestamp: Date.now() };
-        await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
+        
+        // On met à jour SEULEMENT la série en cours dans lastBySerie
+        userProgress.lastBySerie[serieId] = { 
+            s, e, title, img, 
+            serieName: "Le Clown", 
+            link: "leclown.html", 
+            timestamp: Date.now() 
+        };
+
+        await setDoc(userRef, { progress: userProgress }, { merge: true });
         checkResume();
     };
 
