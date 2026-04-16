@@ -8,6 +8,7 @@
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
         body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
+        /* NAV & MENU */
         .navbar{
             position:fixed; top:0; left:0; width:100%; height:60px;
             display:flex; justify-content:space-between; align-items:center;
@@ -15,33 +16,54 @@
             z-index:1000;
         }
         .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
 
+        /* OVERLAY & SIDE MENU */
+        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+        .overlay.show{ opacity:1; pointer-events:auto; }
+        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+        .side-menu.open{ right:0; }
+        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+
+        /* VIDEO PLAYER */
         #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
         #video-overlay iframe { width: 100%; height: 90%; border: none; }
         .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
-        .hero{ height:60vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; }
-        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f,transparent); }
+        /* HERO */
+        .hero{ height:65vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; background-color: #111; }
+        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); }
         .hero-content{ position:relative; z-index:2; max-width:700px; }
         
+        /* EPISODES */
         .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
-        .card{ background:#1c1c1c; border-radius:8px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
+        .card{ background:#1c1c1c; border-radius:4px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
         .card:hover{ transform: scale(1.05); border-color: #e50914; }
-        .card img{ width:100%; height:140px; object-fit:cover; }
+        .card img{ width:100%; height:140px; object-fit:cover; background: #222; }
         
         .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
         .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0, 200, 0, 0.8); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
         
         .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px;}
-        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; max-height: 200px; overflow-y: auto; }
-        .season-menu div{ padding:10px 20px; cursor:pointer; }
+        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; max-height: 250px; overflow-y: auto; width: 200px; border-radius: 5px;}
+        .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
         .season-menu div:hover{ background: #333; }
         .show{ display:block; }
     </style>
 </head>
 <body>
 
-<div class="navbar"><a href="index.html" class="logo">YAMONFILM</a></div>
+<div class="navbar">
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="menu">
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
+    <button id="logoutBtn">Déconnexion</button>
+</div>
 
 <div id="video-overlay">
     <span class="close-video" onclick="closeVideo()">&times;</span>
@@ -50,22 +72,24 @@
 
 <section class="hero" id="hero">
     <div class="hero-content">
-        <h1 id="title">Le Clown</h1>
-        <p id="overview" style="color:#ccc; margin:10px 0;"></p>
-        <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
+        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Le Clown</h1>
+        <p id="overview" style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;"></p>
+        <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black; font-size: 1rem;">▶ Reprendre l'épisode</button>
     </div>
 </section>
 
 <div style="padding:20px 5%;">
-    <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-    <div class="season-menu" id="seasonMenu"></div>
+    <div style="position: relative;">
+        <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+        <div class="season-menu" id="seasonMenu"></div>
+    </div>
 </div>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
@@ -73,29 +97,23 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const tmdbId = 2322;
+    const apiKey = "182c7173698e34803715eacab5c693a7";
+    const serieId = "LECLOWN";
     let userProgress = { watched: [], lastBySerie: {} };
-    let serieBackdrop = ""; // Stocke l'image de secours de la série
-    const serieId = "LECLOWN"; 
+    let currentS = 1;
+    let fallbackImg = "https://image.tmdb.org/t/p/original/m9Oa3q6q7WfWv3pGIn089N07UfM.jpg";
 
     const videasSources = { 
-        0: { 
-            1: "https://app.videas.fr/embed/media/7989729f-3af7-46f1-9e4f-971307009c98/",
-            2: "https://app.videas.fr/embed/media/0115ecb0-19f6-4695-9968-26915b60d540/"
-        },
-        1: { 
-            1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/",
-            2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/",
-            3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/",
-            4: "https://uqload.is/embed-fvk9680x11ze.html",
-            5: "https://app.videas.fr/embed/media/5ed8e85e-90d2-4f46-ae49-80d063933b02c/",
-            6: "https://app.videas.fr/embed/media/062ffb1a-1b9f-4ed6-a2f7-2bd22f3cfa5f/"
-        }
+        0: { 1: "https://app.videas.fr/embed/media/7989729f-3af7-46f1-9e4f-971307009c98/", 2: "https://app.videas.fr/embed/media/0115ecb0-19f6-4695-9968-26915b60d540/" },
+        1: { 1: "https://app.videas.fr/embed/media/39492b20-b7f3-4073-9707-66f91500d67c/", 2: "https://app.videas.fr/embed/media/bd6252db-e7fe-4bcf-a16b-6b9242fec1c3/", 3: "https://app.videas.fr/embed/media/72ae51d1-4fc5-4e39-a963-d8b09eb7aecd/", 4: "https://uqload.is/embed-fvk9680x11ze.html", 5: "https://app.videas.fr/embed/media/5ed8e85e-90d2-4f46-ae49-80d063933b02c/", 6: "https://app.videas.fr/embed/media/062ffb1a-1b9f-4ed6-a2f7-2bd22f3cfa5f/" }
     };
 
-    const apiKey = "182c7173698e34803715eacab5c693a7";
-    const tmdbId = 2322; 
-    let currentEpisodes = [];
-    let currentS = 1;
+    // GESTION DU MENU
+    window.toggleMenu = () => {
+        document.getElementById("menu").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("show");
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -109,44 +127,20 @@
         } else { window.location.href = "login.html"; }
     });
 
-    window.saveProgress = async (s, e, title, img) => {
-        const user = auth.currentUser;
-        if(!user) return;
-        const epKey = `${serieId}-S${s}E${e}`;
-        if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
-        
-        userProgress.lastBySerie[serieId] = { 
-            s, e, title, img, 
-            serieName: "Le Clown", 
-            link: "leclown.html",
-            timestamp: Date.now() 
-        };
-
-        await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
-        renderEpisodes();
-        checkResume();
+    // LOGOUT
+    document.getElementById("logoutBtn").onclick = () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
     };
-
-    function checkResume() {
-        const last = userProgress.lastBySerie[serieId];
-        if(last) {
-            const btn = document.getElementById("resumeBtn");
-            btn.style.display = "block";
-            btn.innerText = `▶ Reprendre ${last.s == 0 ? 'Téléfilm' : 'S'+last.s} E${last.e}`;
-            btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
-        }
-    }
 
     async function loadSeries() {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
         const data = await res.json();
-        serieBackdrop = data.backdrop_path;
-        document.getElementById("overview").innerText = data.overview;
-        document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+        const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : fallbackImg;
+        document.getElementById("hero").style.backgroundImage = `url(${backdrop})`;
+        document.getElementById("overview").innerText = data.overview || "Max Zander, un agent d'élite, décide de combattre le crime sous l'identité du Clown.";
         
         const menu = document.getElementById("seasonMenu");
         menu.innerHTML = "";
-        
         const d0 = document.createElement("div"); d0.innerText = "Téléfilms (S0)";
         d0.onclick = () => { currentS = 0; document.getElementById("seasonBtn").innerText = "Saison 0 ▼"; loadEpisodes(0); menu.classList.remove("show"); };
         menu.appendChild(d0);
@@ -160,57 +154,59 @@
     }
 
     async function loadEpisodes(s) {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
-        const data = await res.json();
-        currentEpisodes = data.episodes;
-        renderEpisodes();
+        let res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+        let data = await res.json();
+        if (!data.episodes || data.episodes.length === 0) {
+            res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=de-DE`);
+            data = await res.json();
+        }
+        renderEpisodes(data.episodes);
     }
 
-    function renderEpisodes() {
+    function renderEpisodes(episodes) {
         const container = document.getElementById("episodes");
         container.innerHTML = "";
-        currentEpisodes.forEach(ep => {
+        if(!episodes) return;
+        episodes.forEach(ep => {
             const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
             const isWatched = userProgress.watched.includes(epKey);
-            
-            // Logique d'image : Miniature épisode OU Image de la série si vide
-            const epImage = ep.still_path 
-                ? `https://image.tmdb.org/t/p/w300${ep.still_path}` 
-                : `https://image.tmdb.org/t/p/w300${serieBackdrop}`;
-
+            const imgPath = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : fallbackImg;
             const card = document.createElement("div");
             card.className = "card";
-            card.innerHTML = `
-                <div style="position:relative; height:140px;">
-                    <img src="${epImage}" style="width:100%; height:100%; object-fit:cover;">
-                    ${isWatched ? '<div class="watched-tag">VU</div>' : ''}
-                    <div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div>
-                </div>
-                <div style="padding:10px;">
-                    <b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}
-                </div>
-            `;
-            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path || serieBackdrop);
+            card.innerHTML = `<div style="position:relative; height:140px;"><img src="${imgPath}" style="width:100%; height:100%; object-fit:cover;">${isWatched ? '<div class="watched-tag">VU</div>' : ''}<div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div></div><div style="padding:10px;"><b style="color:#e50914;">${currentS == 0 ? 'TF' : 'E'}${ep.episode_number}</b> - ${ep.name}</div>`;
+            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
             container.appendChild(card);
         });
     }
 
     window.openVideo = (s, e, title, img) => {
-        if (!videasSources[s] || !videasSources[s][e]) {
-            alert("Cet épisode n'est pas disponible.");
-            return;
-        }
-        const url = videasSources[s][e];
-        document.getElementById("video-iframe").src = url;
+        if (!videasSources[s] || !videasSources[s][e]) { alert("Bientôt disponible !"); return; }
+        document.getElementById("video-iframe").src = videasSources[s][e];
         document.getElementById("video-overlay").style.display = "flex";
         window.saveProgress(s, e, title, img);
     };
 
-    window.closeVideo = () => { 
-        document.getElementById("video-overlay").style.display="none"; 
-        document.getElementById("video-iframe").src=""; 
+    window.saveProgress = async (s, e, title, img) => {
+        const user = auth.currentUser;
+        if(!user) return;
+        const epKey = `${serieId}-S${s}E${e}`;
+        if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
+        userProgress.lastBySerie[serieId] = { s, e, title, img, serieName: "Le Clown", link: "leclown.html", timestamp: Date.now() };
+        await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
+        checkResume();
     };
 
+    function checkResume() {
+        const last = userProgress.lastBySerie[serieId];
+        if(last) {
+            const btn = document.getElementById("resumeBtn");
+            btn.style.display = "block";
+            btn.innerText = `▶ Reprendre ${last.s == 0 ? 'TF' : 'S'+last.s} E${last.e}`;
+            btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
+        }
+    }
+
+    window.closeVideo = () => { document.getElementById("video-overlay").style.display="none"; document.getElementById("video-iframe").src=""; };
     document.getElementById("seasonBtn").onclick = () => document.getElementById("seasonMenu").classList.toggle("show");
 </script>
 </body>
