@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activer un Code - YAMONFILM</title>
+    <style>
+        body { background: #141414; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .unlock-card { background: #111; padding: 40px; border-radius: 8px; border: 1px solid #333; width: 100%; max-width: 400px; text-align: center; }
+        .logo { color: #e50914; font-size: 30px; font-weight: bold; text-decoration: none; display: block; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-bottom: 20px; font-size: 16px; text-align: center; }
+        button { width: 100%; padding: 15px; background: #e50914; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #b20710; }
+        #msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
+        .back-link { display: block; margin-top: 20px; color: #aaa; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="unlock-card">
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <h2>Activer une série</h2>
+    <p style="color: #888; margin-bottom: 20px;">Entrez votre code VIP ci-dessous</p>
+    
+    <input type="text" id="code" placeholder="EXEMPLE : MEDICVIP" autocomplete="off">
+    <button id="btn">Débloquer maintenant</button>
+    <p id="msg"></p>
+
+    <a href="index.html" class="back-link">← Retour à l'accueil</a>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- CONFIGURATION DES CODES (C'est ici que tu ajoutes tes séries) ---
+    const CODES_DATABASE = {
+        "MEDICVIP": { id: "MEDICOPTER", redirect: "vipmedicopter.html" },
+        "CLOWNVIP": { id: "LECLOWN", redirect: "vipclown.html" },
+        "ALERTE11": { id: "ALERTECOBRA", redirect: "vipalerte.html" }
+    };
+
+    document.getElementById("btn").onclick = async () => {
+        const inputCode = document.getElementById("code").value.trim().toUpperCase();
+        const msg = document.getElementById("msg");
+        const user = auth.currentUser;
+
+        if (!user) {
+            msg.style.color = "yellow"; msg.innerText = "Connectez-vous d'abord.";
+            return;
+        }
+
+        const action = CODES_DATABASE[inputCode];
+
+        if (action) {
+            const userRef = doc(db, "users", user.uid);
+            const snap = await getDoc(userRef);
+            let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+
+            if (!unlocked.includes(action.id)) {
+                unlocked.push(action.id);
+                await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
+                msg.style.color = "lime";
+                msg.innerText = "Succès ! Redirection en cours...";
+                setTimeout(() => window.location.href = action.redirect, 1500);
+            } else {
+                msg.style.color = "orange";
+                msg.innerText = "Cette série est déjà débloquée. Redirection...";
+                setTimeout(() => window.location.href = action.redirect, 1000);
+            }
+        } else {
+            msg.style.color = "red";
+            msg.innerText = "Code invalide. Vérifiez l'orthographe.";
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+</script>
+</body>
+</html>
