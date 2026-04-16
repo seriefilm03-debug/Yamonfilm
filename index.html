@@ -135,7 +135,7 @@ document.getElementById("activateBtn").onclick = async () => {
     if (!code || !user) return;
 
     let serieToUnlock = "";
-    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER"; 
+    if (code === "MEDICVIP") serieToUnlock = "VIPMEDICOPTER"; 
     else { msg.style.color = "red"; msg.innerText = "Code invalide."; return; }
 
     const userRef = doc(db, "users", user.uid);
