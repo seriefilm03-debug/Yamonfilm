@@ -5,59 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supercross - YAMONFILM</title>
     <style>
-        /* --- STYLE STYLE NETFLIX --- */
+        /* --- RESET TOTAL --- */
         *{ box-sizing:border-box; margin:0; padding:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-        body{ background:#141414; color:white; overflow-x:hidden; }
         
-        /* NAVBAR */
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            background: #141414; 
+            color: white; 
+            overflow: hidden; /* Empêche le scroll inutile sur TV/PC */
+        }
+
+        /* NAVBAR RÉACTIVE */
         header { 
-            position: fixed; top: 0; width: 100%; padding: 15px 5%; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+            position: absolute; top: 0; width: 100%; padding: 2% 5%; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
-        .logo { color:#e50914; font-size:24px; font-weight:bold; text-decoration:none; }
-        .back-link { color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 4px; }
+        .logo { color:#e50914; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight:bold; text-decoration:none; }
+        .back-link { color: white; text-decoration: none; font-size: clamp(0.8rem, 1.5vw, 1.1rem); background: rgba(255,255,255,0.2); padding: 0.8em 1.5em; border-radius: 4px; }
 
-        /* HERO SECTION - CORRECTION IMAGE PC/MOBILE */
+        /* CONTAINER PRINCIPAL ADAPTATIF */
         .hero { 
-            height: 100vh; width: 100%; 
-            background-size: cover; /* Remplit l'écran */
-            background-position: center top; /* Garde les visages visibles */
-            display: flex; align-items: center; padding: 5%; position: relative; 
-        }
-        
-        /* Ajustement spécial pour PC pour ne pas couper l'image */
-        @media (min-width: 1024px) {
-            .hero { 
-                background-size: 100% auto; /* Affiche toute la largeur sur PC */
-                background-position: center center;
-            }
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 8%;
+            background-repeat: no-repeat;
+            background-position: center right; /* L'image se cale à droite */
+            background-size: contain; /* L'image s'affiche TOUJOURS en entier sur PC/TV */
         }
 
+        /* EFFET DE FONDU NETFLIX */
         .hero::after { 
             content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(to top, #141414 10%, transparent 90%), 
-                        linear-gradient(to right, #141414 20%, transparent); 
+            background: linear-gradient(to right, #141414 25%, rgba(20, 20, 20, 0.8) 40%, transparent 90%),
+                        linear-gradient(to top, #141414 5%, transparent 30%);
         }
 
-        .hero-content { position: relative; z-index: 10; max-width: 800px; }
-        .hero h1 { font-size: clamp(40px, 8vw, 80px); margin-bottom: 15px; font-weight: bold; }
-        .hero p { color: #ccc; line-height: 1.4; font-size: 18px; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        /* CONTENU QUI S'ADAPTE À LA TAILLE */
+        .hero-content { 
+            position: relative; 
+            z-index: 10; 
+            max-width: 50%; /* Prend la moitié de l'écran sur PC */
+        }
+
+        .hero h1 { 
+            font-size: clamp(2rem, 8vw, 5rem); 
+            margin-bottom: 0.5em; 
+            font-weight: bold; 
+        }
+
+        .hero p { 
+            font-size: clamp(0.9rem, 2vw, 1.4rem); 
+            line-height: 1.5; 
+            color: #ccc; 
+            margin-bottom: 2em;
+            max-width: 90%;
+            display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
+        }
 
         /* BOUTON LECTURE */
         .play-btn { 
-            display: inline-flex; align-items: center; background: white; color: black; 
-            text-decoration: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; 
-            font-size: 20px; transition: 0.3s; border: none; cursor: pointer;
+            display: inline-flex; align-items: center; 
+            background: white; color: black; 
+            padding: 1em 2.5em; border-radius: 4px; 
+            font-weight: bold; font-size: clamp(1rem, 2vw, 1.5rem); 
+            cursor: pointer; border: none; transition: 0.2s;
         }
         .play-btn:hover { background: #e50914; color: white; transform: scale(1.05); }
 
-        /* LECTEUR PLEIN ÉCRAN (OVERLAY) */
+        /* --- ADAPTATION MOBILE (ÉCRAN VERTICAL) --- */
+        @media (max-width: 768px) {
+            .hero { 
+                background-position: center center;
+                background-size: cover; /* Remplit l'écran sur mobile */
+                justify-content: center;
+                text-align: center;
+                padding: 0 5%;
+            }
+            .hero::after { 
+                background: linear-gradient(to top, #141414 20%, rgba(20, 20, 20, 0.4) 50%, #141414 90%);
+            }
+            .hero-content { max-width: 100%; margin-top: 20%; }
+            .hero p { max-width: 100%; -webkit-line-clamp: 3; }
+        }
+
+        /* LECTEUR VIDÉO PLEIN ÉCRAN */
         #video-overlay { 
             display: none; position: fixed; inset: 0; background: black; z-index: 3000; 
         }
-        .close-video { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; color: white; z-index: 3001; font-weight: bold; }
-        #video-frame { width: 100%; height: 100%; border: none; }
+        .close-video { 
+            position: absolute; top: 20px; right: 20px; 
+            font-size: 40px; cursor: pointer; color: white; z-index: 3100;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -77,12 +122,7 @@
 
 <div id="video-overlay">
     <span class="close-video" onclick="closePlayer()">✕</span>
-    <iframe 
-        id="video-frame"
-        src="" 
-        allow="fullscreen" 
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
-    </iframe>
+    <iframe id="video-frame" src="" allow="fullscreen" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 </div>
 
 <script>
@@ -94,28 +134,21 @@
         try {
             const res = await fetch(`https://api.themoviedb.org/3/movie/${MOVIE_ID}?api_key=${TMDB_KEY}&language=fr-FR`);
             const data = await res.json();
-
             document.getElementById("movie-title").innerText = data.title;
-            document.getElementById("movie-desc").innerText = data.overview || "Deux frères s'affrontent dans une compétition de Supercross de haut niveau.";
-            
-            // Image de fond haute qualité
+            document.getElementById("movie-desc").innerText = data.overview;
             const bgUrl = `https://image.tmdb.org/t/p/original${data.backdrop_path}`;
             document.getElementById("hero-bg").style.backgroundImage = `url(${bgUrl})`;
-        } catch (error) {
-            console.error("Erreur TMDB:", error);
-        }
+        } catch (e) { console.log(e); }
     }
 
     function openPlayer() {
         document.getElementById("video-frame").src = VIDEO_URL;
         document.getElementById("video-overlay").style.display = "block";
-        document.body.style.overflow = "hidden"; // Bloque le scroll
     }
 
     function closePlayer() {
         document.getElementById("video-frame").src = "";
         document.getElementById("video-overlay").style.display = "none";
-        document.body.style.overflow = "auto"; // Réactive le scroll
     }
 
     loadMovieData();
