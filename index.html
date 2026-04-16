@@ -1,98 +1,99 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YAMONFILM</title>
-    <style>
-        /* --- STYLE GLOBAL --- */
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-        body{ background:#141414; color:white; overflow-x:hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMONFILM</title>
 
-        /* NAV & MENU LATÉRAL */
-        .navbar{
-            position:fixed; top:0; left:0; width:100%; height:60px;
-            display:flex; justify-content:space-between; align-items:center;
-            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            z-index:1000;
-        }
-        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
-        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; transition: 0.3s; }
+<style>
+/* --- STYLE DE BASE --- */
+*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
+body{ background:#141414; color:white; overflow-x:hidden; }
 
-        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
-        .overlay.show{ opacity:1; pointer-events:auto; }
-        
-        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:70px 20px 20px; display:flex; flex-direction:column; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
-        .side-menu.open{ right:0; }
-        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:17px; padding:12px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222; width: 100%; }
-        
-        .promo-section { margin-top: 20px; padding-top: 20px; }
-        .promo-input { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; }
-        .activate-btn { background: #e50914; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; margin-top: 10px; font-weight: bold; cursor: pointer; }
+/* NAV & MENU LATÉRAL */
+.navbar{
+  position:fixed; top:0; left:0; width:100%; height:60px;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  z-index:1000;
+}
+.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
+.menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
 
-        /* HERO CARROUSEL */
-        .hero-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
-        .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease-in-out; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
-        .hero-slide.active { opacity: 1; }
-        .hero-slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent 60%), linear-gradient(to top, #141414, transparent 40%); }
-        .hero-content { position: relative; z-index: 10; max-width: 600px; }
-        .hero-content h1 { font-size: clamp(35px, 6vw, 70px); margin-bottom: 10px; }
-        .play-btn { padding: 12px 35px; background: white; color: black; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-flex; align-items: center; transition: 0.3s; margin-top: 15px; }
-        .play-btn:hover { background: #e50914; color: white; }
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+.overlay.show{ opacity:1; pointer-events:auto; }
+.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+.side-menu.open{ right:0; }
+.side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
 
-        /* REPRENDRE LA LECTURE */
-        .continue-section { padding: 40px 5% 10px; display: none; }
-        .continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .continue-card { min-width: 260px; text-decoration: none; color: white; transition: 0.3s; }
-        .continue-card:hover { transform: scale(1.05); }
-        .img-container { position: relative; width: 100%; height: 145px; border-radius: 4px; overflow: hidden; background: #222; }
-        .img-container img { width: 100%; height: 100%; object-fit: cover; }
-        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
+/* STYLE AJOUTÉ POUR LE CODE PROMO */
+.promo-box { padding: 10px 0; border-bottom: 1px solid #222; }
+.promo-input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; }
+.activate-btn { background: #e50914; color: white; width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; }
 
-        /* GRILLE SERIES */
-        .movies-label { padding: 30px 5% 0; font-size: 22px; font-weight: bold; }
-        .movies{ padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
-        .movie:hover { transform: scale(1.05); border-color: #555; }
-        .hidden { display: none; }
-    </style>
+/* HERO CARROUSEL */
+.hero-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
+.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease-in-out; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
+.hero-slide.active { opacity: 1; }
+.hero-slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent 60%), linear-gradient(to top, #141414, transparent 40%); }
+.hero-content { position: relative; z-index: 10; max-width: 600px; }
+.hero-content h1 { font-size: clamp(35px, 6vw, 70px); margin-bottom: 10px; }
+
+.play-btn { padding: 12px 35px; background: white; color: black; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-flex; transition: 0.3s; }
+.play-btn:hover { background: #e50914; color: white; }
+
+/* REPRENDRE LA LECTURE */
+.continue-section { padding: 40px 5% 10px; display: none; }
+.continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+.continue-card { min-width: 260px; text-decoration: none; color: white; transition: 0.3s; }
+.continue-card:hover { transform: scale(1.05); }
+.img-container { position: relative; width: 100%; height: 145px; border-radius: 4px; overflow: hidden; background: #222; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; }
+.progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
+
+/* GRILLE SERIES */
+.movies-label { padding: 30px 5% 0; font-size: 22px; font-weight: bold; }
+.movies{ padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+.movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
+.movie:hover { transform: scale(1.05); border-color: #555; }
+.hidden { display: none; }
+</style>
 </head>
 <body>
 
 <div class="navbar">
-    <a href="index.html" class="logo">YAMONFILM</a>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <a href="index.html" class="logo">YAMONFILM</a>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="side-menu" id="menu">
-    <span style="color: #666; font-size: 12px; margin-bottom: 5px;">NAVIGATION</span>
-    <a href="account.html">Mon Compte</a>
-    <a href="series.html">Mes Séries</a>
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
     
-    <div class="promo-section">
+    <div class="promo-box">
         <span style="color: #666; font-size: 12px;">ACTIVER UN CODE</span>
-        <input type="text" id="promoCode" class="promo-input" placeholder="Ex: MEDICVIP">
+        <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
         <button id="activateBtn" class="activate-btn">Activer</button>
-        <p id="promoMsg" style="font-size: 12px; margin-top: 8px; text-align: center;"></p>
+        <p id="promoMsg" style="font-size: 11px; margin-top: 5px; text-align: center;"></p>
     </div>
 
-    <button id="logoutBtn" style="margin-top: auto; color: #e50914; border: none;">Déconnexion</button>
+    <button id="logoutBtn" style="margin-top: auto;">Déconnexion</button>
 </div>
 
 <section class="hero-container">
-    <div class="hero-slide active" style="background-image: url('https://image.tmdb.org/t/p/original/m9Oa3q6q7WfWv3pGIn089N07UfM.jpg');">
+    <div class="hero-slide active" style="background-image: url('https://media.senscritique.com/media/000006485088/0/le_clown.jpg');">
         <div class="hero-content">
             <h1>Le Clown</h1>
-            <p>Max Zander, un agent d'élite, devient le Clown pour venger son ami et combattre le crime organisé.</p>
-            <a href="leclown.html" class="play-btn">▶ Lecture</a>
+            <p>Le justicier au masque de cuir revient pour faire régner la justice.</p><br>
+            <a href="le clown.html" class="play-btn">▶ Lecture</a>
         </div>
     </div>
-    <div class="hero-slide" style="background-image: url('https://image.tmdb.org/t/p/original/6K99m4T2C5A1v7HAszZ3fM26I5p.jpg');">
+    <div class="hero-slide" style="background-image: url('s-l1200.jpg');">
         <div class="hero-content">
             <h1>Medicopter 117</h1>
-            <p>Chaque seconde compte pour les sauveteurs du Medicopter 117. Une course contre la mort à chaque vol.</p>
-            <a href="medicopter.html" class="play-btn">▶ Lecture</a>
+            <p>Des vies en jeu, une équipe d'élite prête à tout.</p><br>
+            <a href="mediopter.html" class="play-btn">▶ Lecture</a>
         </div>
     </div>
 </section>
@@ -104,15 +105,9 @@
 
 <h3 class="movies-label">Nos Séries</h3>
 <section class="movies">
-    <a href="leclown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000004547400/300/le_clown.jpg');">
-        Le Clown
-    </a>
-    <a id="normalCard" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">
-        Medicopter 117
-    </a>
-    <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">
-        Medicopter VIP 🔥
-    </a>
+    <a href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
+    <a id="normalCard" href="mediopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
+    <a id="vipCard" href="vipmedicopter.html" class="movie hidden" style="background-image: url('s-l1200.jpg');">Medicopter VIP 🔥</a>
 </section>
 
 <script type="module">
@@ -125,16 +120,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// MENU SIDEBAR
 window.toggleMenu = () => {
     document.getElementById("menu").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
 };
 
-// DECONNEXION
 document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "login.html");
 
-// ACTIVATION DE CODE
+// LOGIQUE D'ACTIVATION AJOUTÉE
 document.getElementById("activateBtn").onclick = async () => {
     const code = document.getElementById("promoCode").value.trim().toUpperCase();
     const msg = document.getElementById("promoMsg");
@@ -142,7 +135,7 @@ document.getElementById("activateBtn").onclick = async () => {
     if (!code || !user) return;
 
     let serieToUnlock = "";
-    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER";
+    if (code === "MEDICVIP") serieToUnlock = "MEDICOPTER"; // Exemple de code
     else { msg.style.color = "red"; msg.innerText = "Code invalide."; return; }
 
     const userRef = doc(db, "users", user.uid);
@@ -159,7 +152,7 @@ document.getElementById("activateBtn").onclick = async () => {
     }
 };
 
-// CARROUSEL AUTOMATIQUE
+// Carrousel
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
 setInterval(() => {
@@ -168,20 +161,15 @@ setInterval(() => {
     slides[currentSlide].classList.add('active');
 }, 6000);
 
-// AUTH & PROGRESSION
 onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists()) {
         const data = snap.data();
-        
-        // Check VIP
         if (data.seriesUnlocked?.includes("MEDICOPTER")) {
             document.getElementById("normalCard").classList.add("hidden");
             document.getElementById("vipCard").classList.remove("hidden");
         }
-
-        // Section Reprendre (Une case par série)
         if (data.progress?.lastBySerie) {
             displayContinue(data.progress.lastBySerie);
         }
@@ -192,27 +180,25 @@ function displayContinue(lastBySerie) {
     const container = document.getElementById("continue-container");
     const section = document.getElementById("continue-watching");
     container.innerHTML = "";
-
-    // Trier les séries par date (plus récent en premier)
+    
     const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
 
     if (items.length > 0) {
         section.style.display = "block";
         items.forEach(item => {
-            // Fix URL Image (TMDB ou URL brute)
-            const imgUrl = (item.img && item.img.startsWith('http')) ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
+            const imgUrl = item.img.startsWith('http') ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
             
             const card = document.createElement("a");
             card.href = item.link;
             card.className = "continue-card";
             card.innerHTML = `
                 <div class="img-container">
-                    <img src="${imgUrl}" onerror="this.src='s-l1200.jpg'">
+                    <img src="${imgUrl}">
                     <div class="progress-bar"></div>
                 </div>
                 <div style="margin-top:10px;">
-                    <b style="font-size:14px;">${item.serieName}</b><br>
-                    <span style="font-size:12px; color:#aaa;">${item.s === 0 ? 'TF' : 'S'+item.s} : E${item.e} - ${item.title}</span>
+                    <b>${item.serieName}</b><br>
+                    <span style="font-size:12px; color:#aaa;">S${item.s} : E${item.e} - ${item.title}</span>
                 </div>`;
             container.appendChild(card);
         });
