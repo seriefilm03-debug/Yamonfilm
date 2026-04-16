@@ -9,6 +9,7 @@
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
         body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
+        /* NAV & MENU */
         .navbar{
             position:fixed; top:0; left:0; width:100%; height:60px;
             display:flex; justify-content:space-between; align-items:center;
@@ -16,6 +17,19 @@
             z-index:1000;
         }
         .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
+
+        /* OVERLAY & SIDE MENU */
+        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+        .overlay.show{ opacity:1; pointer-events:auto; }
+        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+        .side-menu.open{ right:0; }
+        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+
+        /* STYLE BARRE DROITE PROMO */
+        .promo-section { margin-top: 10px; padding: 10px 0; border-bottom: 1px solid #222; }
+        .promo-input { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; font-size: 14px; }
+        .activate-btn { background: #e50914; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; margin-top: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
         /* --- LECTEUR VIDEO --- */
         #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
@@ -23,8 +37,8 @@
         .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
         /* --- HERO & EPISODES --- */
-        .hero{ height:60vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; }
-        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f,transparent); }
+        .hero{ height:65vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; }
+        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); }
         .hero-content{ position:relative; z-index:2; max-width:700px; }
         
         .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
@@ -32,19 +46,40 @@
         .card:hover{ transform: scale(1.05); border-color: #e50914; }
         .card img{ width:100%; height:140px; object-fit:cover; }
         
-        /* Barre de progression Netflix Style */
         .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
         .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #00ff00; font-size: 10px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
         
-        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; margin-right: 10px;}
-        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; }
-        .season-menu div{ padding:10px 20px; cursor:pointer; }
+        .btn-main{ background:#e50914; color:white; padding:12px 25px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; display: inline-flex; align-items: center; transition: 0.2s; }
+        .btn-main:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; border-radius: 5px; }
+        .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
         .show{ display:block; }
+
+        .btn-group { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="navbar"><a href="index.html" class="logo">YAMONFILM</a></div>
+<div class="navbar">
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="menu">
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
+    
+    <div class="promo-section">
+        <span style="color: #666; font-size: 12px;">ACTIVER UN CODE</span>
+        <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
+        <button id="activateBtnMenu" class="activate-btn">Activer</button>
+        <p id="promoMsgMenu" style="font-size: 11px; margin-top: 5px; text-align: center;"></p>
+    </div>
+
+    <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
+</div>
 
 <div id="video-overlay">
     <span class="close-video" onclick="closeVideo()">&times;</span>
@@ -53,9 +88,10 @@
 
 <section class="hero" id="hero">
     <div class="hero-content">
-        <h1 id="title">Medicopter 117</h1>
-        <p id="overview" style="color:#ccc; margin:10px 0;"></p>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Medicopter 117</h1>
+        <p id="overview" style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;"></p>
+        
+        <div class="btn-group">
             <button id="unlockBtn" class="btn-main">🔓 Débloquer la série VIP</button>
             <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
         </div>
@@ -64,15 +100,17 @@
 </section>
 
 <div style="padding:20px 5%;">
-    <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-    <div class="season-menu" id="seasonMenu"></div>
+    <div style="position: relative;">
+        <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+        <div class="season-menu" id="seasonMenu"></div>
+    </div>
 </div>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
@@ -82,6 +120,12 @@
 
     let userProgress = { watched: [], lastBySerie: {} };
     const serieId = "MEDICOPTER"; 
+
+    // TOGGLE MENU
+    window.toggleMenu = () => {
+        document.getElementById("menu").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("show");
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -93,7 +137,6 @@
                     if(!userProgress.lastBySerie) userProgress.lastBySerie = {};
                     checkResume();
                 }
-                // Cacher le bouton si déjà débloqué
                 if (userData.seriesUnlocked && userData.seriesUnlocked.includes(serieId)) {
                     document.getElementById("unlockBtn").style.display = "none";
                 }
@@ -102,34 +145,46 @@
         } else { window.location.href = "login.html"; }
     });
 
-    // --- BOUTON DEBLOCAGE RAPIDE ---
+    // DECONNEXION
+    document.getElementById("logoutBtn").onclick = () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+    };
+
+    // BOUTON DEBLOCAGE DIRECT
     document.getElementById("unlockBtn").onclick = async () => {
         const user = auth.currentUser;
         if (!user) return;
-
         const msg = document.getElementById("unlockMsg");
         const userRef = doc(db, "users", user.uid);
-        
         try {
             const snap = await getDoc(userRef);
-            let unlocked = [];
-            if (snap.exists() && snap.data().seriesUnlocked) {
-                unlocked = snap.data().seriesUnlocked;
-            }
-
+            let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
             if (!unlocked.includes(serieId)) {
                 unlocked.push(serieId);
                 await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
                 msg.style.color = "#00ff00";
-                msg.innerText = "Série ajoutée à 'Mes Séries' !";
+                msg.innerText = "Série débloquée ! Elle est maintenant dans 'Mes Séries'.";
                 document.getElementById("unlockBtn").style.display = "none";
-            } else {
-                msg.innerText = "Déjà dans votre liste.";
             }
-        } catch (e) {
-            msg.style.color = "red";
-            msg.innerText = "Erreur lors du déblocage.";
-        }
+        } catch (e) { msg.style.color = "red"; msg.innerText = "Erreur de connexion."; }
+    };
+
+    // LOGIQUE CODE PROMO BARRE LATERALE
+    document.getElementById("activateBtnMenu").onclick = async () => {
+        const code = document.getElementById("promoCode").value.trim().toUpperCase();
+        const msg = document.getElementById("promoMsgMenu");
+        if (!code || !auth.currentUser) return;
+        let serieToUnlock = (code === "MEDICVIP") ? "MEDICOPTER" : "";
+        if (!serieToUnlock) { msg.style.color="red"; msg.innerText="Code invalide."; return; }
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const snap = await getDoc(userRef);
+        let unlocked = snap.data().seriesUnlocked || [];
+        if (!unlocked.includes(serieToUnlock)) {
+            unlocked.push(serieToUnlock);
+            await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
+            msg.style.color="lime"; msg.innerText="Débloqué !";
+            setTimeout(() => location.reload(), 1000);
+        } else { msg.innerText="Déjà actif."; }
     };
 
     window.saveProgress = async (s, e, title, img) => {
@@ -137,14 +192,12 @@
         if(!user) return;
         const epKey = `${serieId}-S${s}E${e}`;
         if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
-        
         userProgress.lastBySerie[serieId] = { 
             s, e, title, img, 
             serieName: "Medicopter 117", 
-            link: window.location.pathname,
+            link: "medicopter.html",
             timestamp: Date.now() 
         };
-
         await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
         renderEpisodes();
         checkResume();
@@ -154,7 +207,7 @@
         const last = userProgress.lastBySerie[serieId];
         if(last) {
             const btn = document.getElementById("resumeBtn");
-            btn.style.display = "block";
+            btn.style.display = "inline-flex";
             btn.innerText = `▶ Reprendre S${last.s}E${last.e}`;
             btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
         }
