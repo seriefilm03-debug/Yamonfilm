@@ -28,7 +28,6 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 
 /* STYLE AJOUTÉ POUR LE CODE PROMO */
 .promo-box { padding: 10px 0; border-bottom: 1px solid #222; }
-.promo-input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; }
 .activate-btn { background: #e50914; color: white; width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; text-align: center; text-decoration: none; display: block;}
 
 /* HERO CARROUSEL */
@@ -51,12 +50,46 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .img-container img { width: 100%; height: 100%; object-fit: cover; }
 .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
 
-/* GRILLE SERIES */
+/* --- GRILLE SERIES (MODIFIÉE POUR EFFET NETFLIX) --- */
 .movies-label { padding: 30px 5% 0; font-size: 22px; font-weight: bold; }
-.movies{ padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
+
+.movies { 
+    display: flex; 
+    gap: 15px; 
+    padding: 20px 5%; 
+    overflow-x: auto; 
+    scroll-snap-type: x mandatory; 
+    scrollbar-width: none; 
+}
+.movies::-webkit-scrollbar { display: none; }
+
+.movie { 
+    flex: 0 0 200px; 
+    height: 300px; 
+    background-size: cover; 
+    background-position: center; 
+    border-radius: 4px; 
+    display: flex; 
+    align-items: flex-end; 
+    padding: 15px; 
+    text-decoration: none; 
+    color: white; 
+    font-weight: bold; 
+    transition: 0.3s; 
+    border: 1px solid transparent;
+    scroll-snap-align: start;
+}
 .movie:hover { transform: scale(1.05); border-color: #555; }
-.hidden { display: none; }
+
+/* ADAPTATION PC */
+@media (min-width: 1024px) {
+    .movies { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+        overflow-x: hidden; 
+    }
+    .movie { flex: none; }
+}
 </style>
 </head>
 <body>
@@ -84,14 +117,14 @@ body{ background:#141414; color:white; overflow-x:hidden; }
         <div class="hero-content">
             <h1>Le Clown</h1>
             <p>Le justicier au masque de cuir revient pour faire régner la justice.</p><br>
-            <a id="heroClownBtn" href="le clown.html" class="play-btn">▶ Lecture</a>
+            <a href="player.html?id=16678&fid=LECLOWN" class="play-btn">▶ Lecture</a>
         </div>
     </div>
     <div class="hero-slide" style="background-image: url('s-l1200.jpg');">
         <div class="hero-content">
             <h1>Medicopter 117</h1>
             <p>Des vies en jeu, une équipe d'élite prête à tout.</p><br>
-            <a id="heroMedicBtn" href="medicopter.html" class="play-btn">▶ Lecture</a>
+            <a href="player.html?id=40996&fid=MEDICOPTER" class="play-btn">▶ Lecture</a>
         </div>
     </div>
 </section>
@@ -103,8 +136,8 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 
 <h3 class="movies-label">Nos Séries</h3>
 <section class="movies">
-    <a id="cardClown" href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
-    <a id="cardMedic" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
+    <a href="player.html?id=16678&fid=LECLOWN" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
+    <a href="player.html?id=40996&fid=MEDICOPTER" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
 </section>
 
 <script type="module">
@@ -135,67 +168,7 @@ setInterval(() => {
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
-    
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (snap.exists()) {
-        const data = snap.data();
-        const unlocked = data.seriesUnlocked || [];
-
-        // --- GESTION DU DÉBLOCAGE LE CLOWN ---
-        if (unlocked.includes("LECLOWN")) {
-            document.getElementById("heroClownBtn").href = "vipclown.html";
-            const cardClown = document.getElementById("cardClown");
-            cardClown.href = "vipclown.html";
-            cardClown.innerText = "Le Clown VIP 🔥";
-        }
-
-        // --- GESTION DU DÉBLOCAGE MEDICOPTER ---
-        if (unlocked.includes("MEDICOPTER")) {
-            document.getElementById("heroMedicBtn").href = "vipmedicopter.html";
-            const cardMedic = document.getElementById("cardMedic");
-            cardMedic.href = "vipmedicopter.html";
-            cardMedic.innerText = "Medicopter VIP 🔥";
-        }
-
-        if (data.progress?.lastBySerie) {
-            displayContinue(data.progress.lastBySerie, unlocked);
-        }
-    }
 });
-
-function displayContinue(lastBySerie, unlocked) {
-    const container = document.getElementById("continue-container");
-    const section = document.getElementById("continue-watching");
-    container.innerHTML = "";
-    
-    const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
-
-    if (items.length > 0) {
-        section.style.display = "block";
-        items.forEach(item => {
-            const imgUrl = item.img.startsWith('http') ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
-            
-            let finalLink = item.link;
-            // Redirection automatique si la série a été débloquée entre temps
-            if(item.serieName === "Le Clown" && unlocked.includes("LECLOWN")) finalLink = "vipclown.html";
-            if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
-
-            const card = document.createElement("a");
-            card.href = finalLink;
-            card.className = "continue-card";
-            card.innerHTML = `
-                <div class="img-container">
-                    <img src="${imgUrl}">
-                    <div class="progress-bar"></div>
-                </div>
-                <div style="margin-top:10px;">
-                    <b>${item.serieName}</b><br>
-                    <span style="font-size:12px; color:#aaa;">S${item.s} : E${item.e} - ${item.title}</span>
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-}
 </script>
 </body>
 </html>
