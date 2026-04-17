@@ -151,7 +151,7 @@ onAuthStateChanged(auth, async (user) => {
         if (unlocked.includes("LECLOWN")) {
             document.getElementById("heroClownBtn").href = "vipclown.html";
             const cardClown = document.getElementById("cardClown");
-            cardClown.href = "vipclown.html";
+            cardClown.href = "vipleclown.html";
             cardClown.innerText = "Le Clown VIP 🔥";
         }
 
@@ -183,7 +183,7 @@ function displayContinue(lastBySerie, unlocked) {
             
             let finalLink = item.link;
             // Redirection automatique si la série a été débloquée entre temps
-            if(item.serieName === "Le Clown" && unlocked.includes("LECLOWN")) finalLink = "vipclown.html";
+            if(item.serieName === "Le Clown" && unlocked.includes("LECLOWN")) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
 
             const card = document.createElement("a");
