@@ -340,7 +340,7 @@ loadEpisodes(1);
 /* Charger épisodes */
 async function loadEpisodes(season){
 episodesContainer.innerHTML="";
-const res=await fetch(`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
+const res=await fetch(`https://www.themoviedb.org/tv/586/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`);
 const data=await res.json();
 
 data.episodes.forEach(ep=>{
