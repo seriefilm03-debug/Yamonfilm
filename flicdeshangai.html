@@ -1,75 +1,233 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Série - YAMONFILM</title>
-    <style>
-        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-        body{ background:#0f0f0f; color:white; overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Série 586 - YAMONFILM</title>
 
-        .navbar{
-            position:fixed; top:0; left:0; width:100%; height:60px;
-            display:flex; justify-content:space-between; align-items:center;
-            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            z-index:1000;
-        }
-        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
-        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
-        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
-        .overlay.show{ opacity:1; pointer-events:auto; }
-        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
-        .side-menu.open{ right:0; }
-        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+.navbar{
+    position:fixed; top:0; left:0; width:100%; height:60px;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    z-index:1000;
+}
+.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+.menu-btn{ font-size:28px; cursor:pointer; }
 
-        #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
-        #video-overlay iframe { width: 100%; height: 90%; border: none; }
-        .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); opacity:0; pointer-events:none; transition:.3s; }
+.overlay.show{ opacity:1; pointer-events:auto; }
 
-        .hero{ height:65vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; background-color: #111; }
-        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); }
-        .hero-content{ position:relative; z-index:2; max-width:700px; }
+.side-menu{
+    position:fixed; top:0; right:-100%; width:300px; height:100%;
+    background:#111; padding:80px 20px; transition:.3s;
+}
+.side-menu.open{ right:0; }
 
-        .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
-        .card{ background:#1c1c1c; border-radius:4px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
-        .card:hover{ transform: scale(1.05); border-color: #e50914; }
-        .card img{ width:100%; height:140px; object-fit:cover; background: #222; }
+.hero{
+    height:65vh; display:flex; align-items:flex-end;
+    padding:40px 5%; background-size:cover;
+}
+.hero::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to top,#0f0f0f, transparent);
+}
 
-        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; text-decoration: none; display: inline-block;}
-    </style>
+.btn-main{
+    background:#e50914; color:white;
+    padding:12px 20px; border-radius:5px;
+    border:none; cursor:pointer; font-weight:bold;
+}
+
+.episodes{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px; padding:20px 5%;
+}
+.card{
+    background:#1c1c1c;
+    border-radius:4px;
+    overflow:hidden;
+    cursor:pointer;
+    border:1px solid #333;
+}
+.card:hover{ border-color:#e50914; }
+
+#video-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:black;
+    z-index:3000;
+    justify-content:center;
+    align-items:center;
+}
+#video-overlay iframe{
+    width:100%;
+    height:90%;
+}
+.close-video{
+    position:absolute;
+    top:10px;
+    right:20px;
+    font-size:30px;
+    cursor:pointer;
+}
+
+.popup{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.7);
+    display:flex; justify-content:center; align-items:center;
+    opacity:0; pointer-events:none;
+}
+.popup.show{ opacity:1; pointer-events:auto; }
+.popup-box{
+    background:#1c1c1c;
+    padding:30px;
+    border-radius:10px;
+    border:1px solid #e50914;
+}
+</style>
 </head>
+
 <body>
 
 <div class="navbar">
-    <a href="index.html" class="logo">YAMONFILM</a>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+<a href="index.html" class="logo">YAMONFILM</a>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div id="video-overlay">
-    <span class="close-video" onclick="closeVideo()">&times;</span>
-    <iframe id="video-iframe" src="" allowfullscreen></iframe>
+<span class="close-video" onclick="closeVideo()">✖</span>
+<iframe id="video-iframe" src="" allowfullscreen></iframe>
 </div>
 
 <section class="hero" id="hero">
-    <div class="hero-content">
-        <h1 style="font-size: 3rem;">Série 586</h1>
-        <button class="btn-main" onclick="openVideo()">▶ Regarder</button>
-    </div>
+<div>
+<h1 id="title">Chargement...</h1>
+<p id="overview"></p>
+<button id="resumeBtn" class="btn-main" style="display:none;">▶ Reprendre</button>
+</div>
 </section>
 
-<script>
-    function openVideo() {
-        document.getElementById("video-iframe").src = "https://app.videas.fr/embed/media/da8697ea-9c6e-4056-ba3b-0ef81ad8552f/";
-        document.getElementById("video-overlay").style.display = "flex";
+<div class="episodes" id="episodes"></div>
+
+<div id="popupMessage" class="popup">
+<div class="popup-box">
+<p>Débloque toute la série pour voir les autres épisodes.</p>
+<button onclick="closePopup()">Fermer</button>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+ authDomain: "yamonfilm-fead8.firebaseapp.com",
+ projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const tmdbId = 586;
+const apiKey = "182c7173698e34803715eacab5c693a7";
+const serieId = "SERIE586";
+
+let userProgress = { watched: [], lastBySerie:{} };
+
+const videasSources = {
+    1: {
+        1: "https://app.videas.fr/embed/media/da8697ea-9c6e-4056-ba3b-0ef81ad8552f/"
+    }
+};
+
+onAuthStateChanged(auth, async (user)=>{
+    if(!user) return location.href="login.html";
+
+    const ref = await getDoc(doc(db,"users",user.uid));
+    if(ref.exists() && ref.data().progress){
+        userProgress = ref.data().progress;
     }
 
-    function closeVideo() {
-        document.getElementById("video-overlay").style.display = "none";
-        document.getElementById("video-iframe").src = "";
-    }
+    loadSerie();
+});
 
-    function toggleMenu() {}
+async function loadSerie(){
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+    const data = await res.json();
+
+    document.getElementById("title").innerText = data.name;
+    document.getElementById("overview").innerText = data.overview;
+
+    loadEpisodes();
+}
+
+async function loadEpisodes(){
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/1?api_key=${apiKey}&language=fr-FR`);
+    const data = await res.json();
+
+    const container = document.getElementById("episodes");
+    container.innerHTML = "";
+
+    data.episodes.forEach(ep=>{
+        const div = document.createElement("div");
+        div.className="card";
+        div.innerHTML=`<div style="padding:15px;">E${ep.episode_number} - ${ep.name}</div>`;
+
+        if(ep.episode_number === 1){
+            div.onclick = ()=> openVideo(1,1,ep.name);
+        }else{
+            div.onclick = showPopup;
+        }
+
+        container.appendChild(div);
+    });
+}
+
+function openVideo(s,e,title){
+    document.getElementById("video-iframe").src = videasSources[s][e];
+    document.getElementById("video-overlay").style.display="flex";
+    saveProgress(s,e,title);
+}
+
+async function saveProgress(s,e,title){
+    const user = auth.currentUser;
+    if(!user) return;
+
+    const key = `${serieId}-S${s}E${e}`;
+
+    if(!userProgress.watched.includes(key))
+        userProgress.watched.push(key);
+
+    userProgress.lastBySerie[serieId] = { s,e,title };
+
+    await setDoc(doc(db,"users",user.uid), {progress:userProgress}, {merge:true});
+
+    document.getElementById("resumeBtn").style.display="block";
+    document.getElementById("resumeBtn").onclick=()=>openVideo(s,e,title);
+}
+
+function closeVideo(){
+    document.getElementById("video-overlay").style.display="none";
+    document.getElementById("video-iframe").src="";
+}
+
+function showPopup(){
+    document.getElementById("popupMessage").classList.add("show");
+}
+function closePopup(){
+    document.getElementById("popupMessage").classList.remove("show");
+}
+
+window.toggleMenu = ()=>{};
 </script>
 
 </body>
