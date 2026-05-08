@@ -8,10 +8,6 @@
 
 <style>
 
-/* =========================
-STYLE GLOBAL
-========================= */
-
 *{
     box-sizing:border-box;
     margin:0;
@@ -78,7 +74,7 @@ body{
     pointer-events:auto;
 }
 
-/* MENU DROITE */
+/* MENU */
 
 .side-menu{
     position:fixed;
@@ -214,7 +210,7 @@ body{
     display:block;
 }
 
-/* ÉPISODES */
+/* EPISODES */
 
 .episodes{
     display:grid;
@@ -300,20 +296,30 @@ body{
     padding:30px;
     border-radius:12px;
     text-align:center;
-    max-width:400px;
+    max-width:450px;
     border:1px solid #e50914;
 }
 
 .popup-box p{
     margin-bottom:20px;
+    line-height:1.6;
 }
 
-.popup-box button{
+.popup-buttons{
+    display:flex;
+    gap:15px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.popup-btn{
     background:#e50914;
-    border:none;
     color:white;
-    padding:10px 20px;
+    text-decoration:none;
+    padding:12px 20px;
     border-radius:6px;
+    font-weight:bold;
+    border:none;
     cursor:pointer;
 }
 
@@ -347,7 +353,7 @@ body{
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-<!-- MENU DROITE -->
+<!-- MENU -->
 
 <div class="side-menu" id="menu">
 
@@ -380,8 +386,7 @@ body{
 
     <button
         id="logoutBtn"
-        style="margin-top:auto;color:#e50914;"
-    >
+        style="margin-top:auto;color:#e50914;">
         Déconnexion
     </button>
 
@@ -394,13 +399,37 @@ body{
     <div class="popup-box">
 
         <p>
-            Pour voir tous les épisodes, veuillez cliquer sur
-            <strong>"Débloquer la série VIP"</strong>.
+            Pour débloquer toute la série :<br><br>
+
+            1. Cliquez sur <strong>"Payer maintenant"</strong><br><br>
+
+            2. Une fois le paiement effectué,
+            vous serez redirigé vers la série complète.<br><br>
+
+            3. Revenez ensuite cliquer sur
+            <strong>"Débloquer la série VIP"</strong>
+            pour débloquer définitivement la série sur votre compte.
         </p>
 
-        <button onclick="closePopup()">
-            Fermer
-        </button>
+        <div class="popup-buttons">
+
+            <a
+                href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g"
+                class="popup-btn">
+
+                Payer maintenant
+
+            </a>
+
+            <button
+                class="popup-btn"
+                onclick="closePopup()">
+
+                Fermer
+
+            </button>
+
+        </div>
 
     </div>
 
@@ -457,7 +486,7 @@ body{
 
 </div>
 
-<!-- ÉPISODES -->
+<!-- EPISODES -->
 
 <div class="episodes" id="episodes"></div>
 
@@ -480,9 +509,7 @@ import {
     getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* =========================================================
-CONFIG SIMPLE
-========================================================= */
+/* CONFIG */
 
 const CONFIG = {
 
@@ -494,23 +521,20 @@ const CONFIG = {
 
     promoCode : "MEDICVIP",
 
+    stripeLink :
+    "https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g",
+
     videos : {
 
         1 : {
 
-            1 : "https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/",
-
-            2 : "https://TON-LIEN.com",
-
-            3 : "https://TON-LIEN.com"
+            1 : "https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"
 
         }
 
     }
 
 };
-
-/* ========================================================= */
 
 const firebaseConfig = {
 
@@ -586,36 +610,11 @@ document.getElementById("logoutBtn").onclick = () => {
 
 };
 
-/* DEBLOQUER SERIE */
+/* BOUTON DEBLOQUER */
 
-document.getElementById("unlockBtn").onclick = async () => {
+document.getElementById("unlockBtn").onclick = () => {
 
-    const user = auth.currentUser;
-
-    if(!user) return;
-
-    const userRef = doc(db,"users",user.uid);
-
-    const snap = await getDoc(userRef);
-
-    let unlocked =
-        snap.exists()
-        ? (snap.data().seriesUnlocked || [])
-        : [];
-
-    if(!unlocked.includes(CONFIG.serieId)){
-
-        unlocked.push(CONFIG.serieId);
-
-        await setDoc(userRef, {
-
-            seriesUnlocked : unlocked
-
-        }, { merge:true });
-
-        alert("Série débloquée !");
-
-    }
+    showPopup();
 
 };
 
@@ -741,7 +740,7 @@ async function loadEpisodes(season){
 
 }
 
-/* AFFICHAGE EPISODES */
+/* AFFICHER EPISODES */
 
 function renderEpisodes(){
 
@@ -772,17 +771,15 @@ function renderEpisodes(){
         `;
 
         /*
-        SEUL LE PREMIER ÉPISODE EST OUVERT
+        PREMIER EPISODE GRATUIT
         */
 
         if(currentSeason == 1 && ep.episode_number == 1){
 
             card.onclick = () => {
 
-                openVideo(
-                    currentSeason,
-                    ep.episode_number
-                );
+                window.location.href =
+                "https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
 
             };
 
@@ -805,68 +802,6 @@ function renderEpisodes(){
     });
 
 }
-
-/* OUVRIR VIDEO */
-
-window.openVideo = async (s,e) => {
-
-    const user = auth.currentUser;
-
-    if(!user) return;
-
-    const userDoc =
-        await getDoc(doc(db,"users",user.uid));
-
-    const data = userDoc.data();
-
-    const unlocked =
-        data.seriesUnlocked || [];
-
-    /*
-    PREMIER EPISODE GRATUIT
-    */
-
-    if(!(s == 1 && e == 1)){
-
-        /*
-        VERIFICATION DEBLOCAGE
-        */
-
-        if(!unlocked.includes(CONFIG.serieId)){
-
-            showPopup();
-
-            return;
-
-        }
-
-    }
-
-    const url =
-        CONFIG.videos?.[s]?.[e];
-
-    if(url){
-
-        document.getElementById("video-iframe").src =
-            url;
-
-        document.getElementById("video-overlay").style.display =
-            "flex";
-
-    }
-
-};
-
-/* FERMER VIDEO */
-
-window.closeVideo = () => {
-
-    document.getElementById("video-overlay").style.display =
-        "none";
-
-    document.getElementById("video-iframe").src = "";
-
-};
 
 /* MENU SAISON */
 
