@@ -497,22 +497,36 @@ async function loadEpisodes(season){
         ON CHERCHE SI UN LIEN EXISTE
         */
 
-        const lienEpisode =
-            CONFIG.liensEpisodes?.[season]?.[ep.episode_number];
+       const lienEpisode =
+    CONFIG.liensEpisodes?.[season]?.[ep.episode_number];
 
-        if(lienEpisode){
+/*
+SEUL LE PREMIER ÉPISODE EST GRATUIT
+*/
 
-            // ÉPISODE DISPONIBLE
+if(season == 1 && ep.episode_number == 1 && lienEpisode){
 
-            card.style.border = "2px solid #e50914";
+    // PREMIER ÉPISODE = OUVERT
 
-            card.onclick = () => {
+    card.style.border = "2px solid #e50914";
 
-                window.location.href = lienEpisode;
+    card.onclick = () => {
 
-            };
+        window.location.href = lienEpisode;
 
-        }else{
+    };
+
+}else{
+
+    // TOUS LES AUTRES = POPUP
+
+    card.onclick = () => {
+
+        showPopup();
+
+    };
+
+}
 
             // PAS DE LIEN
 
