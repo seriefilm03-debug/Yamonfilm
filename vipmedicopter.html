@@ -1,161 +1,136 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicopter 117 - YAMONFILM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medicopter 117 - YAMONFILM</title>
 
-    <style>
-        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-        body{ background:#0f0f0f; color:white; overflow-x: hidden; }
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+body{background:#0f0f0f;color:white;overflow-x:hidden;}
 
-        .navbar{
-            position:fixed; top:0; left:0; width:100%; height:60px;
-            display:flex; justify-content:space-between; align-items:center;
-            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            z-index:1000;
-        }
+.navbar{
+position:fixed;top:0;left:0;width:100%;height:60px;
+display:flex;justify-content:space-between;align-items:center;
+padding:0 20px;background:rgba(0,0,0,0.7);z-index:1000;
+}
 
-        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
-        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
+.logo{color:#e50914;font-size:26px;font-weight:bold;text-decoration:none;}
+.menu-btn{font-size:28px;cursor:pointer;}
 
-        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
-        .overlay.show{ opacity:1; pointer-events:auto; }
+/* MENU */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);opacity:0;pointer-events:none;transition:.3s;z-index:1500;}
+.overlay.show{opacity:1;pointer-events:auto;}
 
-        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
-        .side-menu.open{ right:0; }
+.side-menu{
+position:fixed;top:0;right:-100%;width:300px;height:100%;
+background:#111;padding:80px 20px;transition:.3s;z-index:2000;
+display:flex;flex-direction:column;gap:10px;
+}
+.side-menu.open{right:0;}
 
-        .side-menu a, .side-menu button{
-            color:white; text-decoration:none; background:none; border:none;
-            font-size:18px; padding:10px 0; cursor:pointer; text-align:left;
-            border-bottom: 1px solid #222;
-        }
+.side-menu a,.side-menu button{
+background:none;border:none;color:white;text-align:left;
+padding:10px 0;cursor:pointer;font-size:16px;
+border-bottom:1px solid #222;
+}
 
-        .promo-section { margin-top: 10px; padding: 10px 0; border-bottom: 1px solid #222; }
+/* HERO */
+.hero{
+margin-top:60px;
+height:70vh;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:40px;
+position:relative;
+}
 
-        .promo-input {
-            width: 100%; padding: 12px; background: #222;
-            border: 1px solid #444; color: white; border-radius: 4px;
-            margin-top: 10px; font-size: 14px;
-        }
+.hero::after{
+content:"";
+position:absolute;inset:0;
+background:linear-gradient(to top,#0f0f0f,transparent);
+}
 
-        .activate-btn {
-            background: #e50914; color: white; border: none;
-            padding: 12px; width: 100%; border-radius: 4px;
-            margin-top: 10px; font-weight: bold; cursor: pointer;
-        }
+.hero-content{position:relative;z-index:2;max-width:700px;}
 
-        #video-overlay{
-            display:none; position:fixed; inset:0; background:black;
-            z-index:3000; justify-content:center; align-items:center;
-        }
+.btn-main{
+background:#e50914;
+border:none;
+color:white;
+padding:12px 25px;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+margin-top:10px;
+}
 
-        #video-overlay iframe{ width:100%; height:90%; border:none; }
+.episodes{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:15px;
+padding:20px;
+}
 
-        .close-video{ position:absolute; top:15px; right:25px; font-size:35px; cursor:pointer; }
+.card{
+background:#1c1c1c;
+border-radius:10px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+border:1px solid #333;
+}
 
-        .hero{
-            height:65vh;
-            background-size:cover;
-            background-position:center;
-            display:flex;
-            align-items:flex-end;
-            padding:40px 5%;
-            position:relative;
-        }
+.card:hover{transform:scale(1.05);border-color:#e50914;}
 
-        .hero::after{
-            content:"";
-            position:absolute;
-            inset:0;
-            background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent);
-        }
+.card img{width:100%;height:140px;object-fit:cover;}
+.card-content{padding:10px;}
 
-        .hero-content{ position:relative; z-index:2; max-width:700px; }
-
-        .episodes{
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-            gap:20px;
-            padding:20px 5%;
-        }
-
-        .card{
-            background:#1c1c1c;
-            border-radius:8px;
-            overflow:hidden;
-            cursor:pointer;
-            transition:0.3s;
-            border:1px solid #333;
-            position:relative;
-        }
-
-        .card:hover{ transform:scale(1.05); border-color:#e50914; }
-
-        .card img{ width:100%; height:140px; object-fit:cover; }
-
-        .btn-main{
-            background:#e50914;
-            color:white;
-            padding:12px 25px;
-            border-radius:5px;
-            font-weight:bold;
-            cursor:pointer;
-            border:none;
-            margin-top:10px;
-        }
-    </style>
+.locked{
+opacity:0.4;
+pointer-events:none;
+}
+</style>
 </head>
 
 <body>
 
 <div class="navbar">
-    <a href="index.html" class="logo">YAMONFILM</a>
-    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+<a class="logo" href="index.html">YAMONFILM</a>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="side-menu" id="menu">
-    <a href="account.html">Mon compte</a>
-    <a href="series.html">Mes séries</a>
+<a href="account.html">Mon compte</a>
+<a href="series.html">Mes séries</a>
 
-    <div class="promo-section">
-        <input id="promoCode" class="promo-input" placeholder="Code...">
-        <button id="activateBtnMenu" class="activate-btn">Activer</button>
-    </div>
+<button id="unlockBtn">🔓 Débloquer VIP</button>
 
-    <button id="logoutBtn">Déconnexion</button>
-</div>
-
-<div id="video-overlay">
-    <span class="close-video" onclick="closeVideo()">×</span>
-    <iframe id="video-iframe"></iframe>
+<button id="logoutBtn">Déconnexion</button>
 </div>
 
 <section class="hero" id="hero">
-    <div class="hero-content">
-        <h1>Medicopter 117</h1>
-        <p id="overview"></p>
-        <button id="unlockBtn" class="btn-main">Débloquer VIP</button>
-    </div>
-</section>
-
-<div style="padding:20px 5%;">
-    <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+<div class="hero-content">
+<h1>Medicopter 117</h1>
+<p id="overview"></p>
 </div>
+</section>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-    authDomain: "yamonfilm-fead8.firebaseapp.com",
-    projectId: "yamonfilm-fead8"
+apiKey: "AIzaSyAQnexePSWAJdgCz2WO2BFKL8Z_jnDKbqE",
+authDomain: "yamonfilm-fead8.firebaseapp.com",
+projectId: "yamonfilm-fead8"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -163,67 +138,105 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const serieId = "MEDICOPTER";
-let userProgress = { watched: [], lastBySerie: {} };
+let unlocked = false;
 
-const videasSources = {
-    1: {
-        1: "https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"
-    }
+/* 🔥 VIDEAS LIENS */
+const videas = {
+1:{
+1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/",
+2:"https://app.videas.fr/embed/media/7c3cfb1b-2488-4fc6-9a59-5fa244fa30f9/"
+}
 };
 
 function toggleMenu(){
-    document.getElementById("menu").classList.toggle("open");
-    document.getElementById("overlay").classList.toggle("show");
+document.getElementById("menu").classList.toggle("open");
+document.getElementById("overlay").classList.toggle("show");
 }
-
 window.toggleMenu = toggleMenu;
 
-async function loadSeries(){
-    const res = await fetch(`https://api.themoviedb.org/3/tv/40996?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR`);
-    const data = await res.json();
-
-    document.getElementById("overview").innerText = data.overview;
-    document.getElementById("hero").style.backgroundImage =
-        `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
-
-    loadEpisodes(1);
+/* 🔐 SECURITE */
+onAuthStateChanged(auth, async (user)=>{
+if(!user){
+window.location.href="login.html";
+return;
 }
 
-async function loadEpisodes(s){
-    const container = document.getElementById("episodes");
-    container.innerHTML = "";
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-    const res = await fetch(`https://api.themoviedb.org/3/tv/40996/season/${s}?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR`);
-    const data = await res.json();
-
-    data.episodes.forEach(ep => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-            <img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
-            <div style="padding:10px">${ep.name}</div>
-        `;
-
-        card.onclick = () => {
-            const url = videasSources[s]?.[ep.episode_number];
-            if(url){
-                document.getElementById("video-iframe").src = url;
-                document.getElementById("video-overlay").style.display="flex";
-            }
-        };
-
-        container.appendChild(card);
-    });
+if(snap.exists()){
+const data = snap.data();
+unlocked = data.seriesUnlocked?.includes(serieId);
 }
 
-window.closeVideo = () => {
-    document.getElementById("video-overlay").style.display="none";
-    document.getElementById("video-iframe").src="";
+loadSeries();
+loadEpisodes();
+});
+
+/* 🔓 UNLOCK VIP */
+document.getElementById("unlockBtn").onclick = async ()=>{
+const user = auth.currentUser;
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+let arr = snap.exists()? (snap.data().seriesUnlocked || []) : [];
+
+if(!arr.includes(serieId)){
+arr.push(serieId);
+await setDoc(ref,{seriesUnlocked:arr},{merge:true});
+alert("Série débloquée !");
+location.reload();
+}
 };
 
-// IMPORTANT FIX
-loadSeries();
+/* 🚪 LOGOUT */
+document.getElementById("logoutBtn").onclick = ()=>{
+signOut(auth).then(()=>location.href="login.html");
+};
+
+/* 🎬 SERIES */
+async function loadSeries(){
+const res = await fetch("https://api.themoviedb.org/3/tv/40996?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR");
+const data = await res.json();
+
+document.getElementById("overview").innerText = data.overview;
+document.getElementById("hero").style.backgroundImage =
+`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+}
+
+/* 🎥 EPISODES */
+async function loadEpisodes(){
+const res = await fetch("https://api.themoviedb.org/3/tv/40996/season/1?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR");
+const data = await res.json();
+
+const container = document.getElementById("episodes");
+container.innerHTML="";
+
+data.episodes.forEach(ep=>{
+
+const link = videas[1]?.[ep.episode_number];
+
+const div = document.createElement("div");
+div.className="card" + (!unlocked && ep.episode_number>1 ? " locked" : "");
+
+div.innerHTML=`
+<img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
+<div class="card-content">
+<b>E${ep.episode_number}</b> - ${ep.name}
+</div>
+`;
+
+div.onclick=()=>{
+if(link){
+window.location.href = link;
+}
+};
+
+container.appendChild(div);
+});
+}
 
 </script>
 
