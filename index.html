@@ -83,7 +83,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 }
 .card:hover{ background:#333; }
 
-/* 🔥 BARRE DE CODE VIP */
+/* 🔥 BARRE CODE VIP */
 #codeBox{
   position:fixed;
   top:15px;
@@ -161,6 +161,30 @@ document.getElementById("logoutBtn").onclick = () => {
   signOut(auth).then(() => window.location.href = "login.html");
 };
 
+/* 🔥 UPDATE UI */
+function updateUI(unlocked) {
+
+  const currentPage = window.location.pathname.split("/").pop();
+
+  if (unlocked.includes("MEDICOPTER")) {
+    document.getElementById("medicCard").href = "vipmedicopter.html";
+
+    if (currentPage === "medicopter.html") {
+      window.location.replace("vipmedicopter.html");
+    }
+  } else {
+    document.getElementById("medicCard").href = "medicopter.html";
+  }
+
+  if (unlocked.includes("LECLOWN")) {
+    document.getElementById("clownCard").href = "vipleclown.html";
+
+    if (currentPage === "le clown.html") {
+      window.location.replace("vipleclown.html");
+    }
+  }
+}
+
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -175,13 +199,17 @@ onAuthStateChanged(auth, async (user) => {
 
   let unlocked = snap.data().seriesUnlocked || [];
 
+  updateUI(unlocked);
+
   const vipInput = document.getElementById("vipInput");
 
-  /* 🔥 CODE VIP ENTER */
+  /* 🔥 CODE VIP */
   vipInput.addEventListener("keydown", async (e) => {
     if (e.key !== "Enter") return;
 
     const code = vipInput.value.trim().toUpperCase();
+
+    let changed = false;
 
     if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
       await updateDoc(userRef, {
@@ -189,6 +217,7 @@ onAuthStateChanged(auth, async (user) => {
       });
       unlocked.push("MEDICOPTER");
       alert("🎉 MEDICOPTER débloqué !");
+      changed = true;
     }
 
     else if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
@@ -197,36 +226,19 @@ onAuthStateChanged(auth, async (user) => {
       });
       unlocked.push("LECLOWN");
       alert("🎉 LE CLOWN débloqué !");
+      changed = true;
     }
 
     else {
-      alert("❌ Code invalide");
+      alert("❌ Code invalide ou déjà utilisé");
     }
 
     vipInput.value = "";
+
+    if (changed) {
+      updateUI(unlocked);
+    }
   });
-
-  const currentPage = window.location.pathname.split("/").pop();
-
-  /* 🔥 MEDICOPTER */
-  if (unlocked.includes("MEDICOPTER")) {
-    document.getElementById("medicCard").href = "vipmedicopter.html";
-
-    if (currentPage === "medicopter.html") {
-      window.location.replace("vipmedicopter.html");
-    }
-  } else {
-    document.getElementById("medicCard").href = "medicopter.html";
-  }
-
-  /* 🔥 CLOWN */
-  if (unlocked.includes("LECLOWN")) {
-    document.getElementById("clownCard").href = "vipleclown.html";
-
-    if (currentPage === "le clown.html") {
-      window.location.replace("vipleclown.html");
-    }
-  }
 
 });
 </script>
