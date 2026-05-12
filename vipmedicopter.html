@@ -93,22 +93,21 @@ onAuthStateChanged(auth, async (user) => {
 
 currentUser = user;
 
-if (!user) return;
+if (!user) {
+console.log("❌ utilisateur non connecté");
+return;
+}
+
+console.log("✅ connecté :", user.uid);
 
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 if (snap.exists()) {
-
 const data = snap.data();
 
-/* cacher popup si déjà VIP */
-if (data.vipMode === true) {
-document.getElementById("vipPopup").style.display = "none";
-}
-
-/* cacher si série déjà débloquée */
-if (data.seriesUnlocked?.includes(serieId)) {
+/* cacher popup si VIP */
+if (data.vipMode === true || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
@@ -118,25 +117,30 @@ document.getElementById("vipPopup").style.display = "none";
 
 document.getElementById("unlockPopupBtn").onclick = async () => {
 
-if (!currentUser) {
-alert("Vous devez être connecté !");
+if (!auth.currentUser) {
+alert("Connexion en cours... réessayez dans 2 secondes");
 return;
 }
 
-const ref = doc(db, "users", currentUser.uid);
+const user = auth.currentUser;
+
+const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
 
 let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
 
+/* ajout série */
 if (!unlocked.includes(serieId)) {
 unlocked.push(serieId);
 }
 
+/* sauvegarde VIP */
 await setDoc(ref, {
 seriesUnlocked: unlocked,
 vipMode: true
 }, { merge: true });
 
+/* fermer popup */
 document.getElementById("vipPopup").style.display = "none";
 
 alert("🎉 VIP débloqué !");
