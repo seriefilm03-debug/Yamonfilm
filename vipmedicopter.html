@@ -6,11 +6,20 @@
 <title>Medicopter VIP</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f0f0f;color:white;}
+body{
+margin:0;
+font-family:Arial;
+background:#0f0f0f;
+color:white;
+}
 
 .btn-main{
-background:#e50914;color:white;border:none;
-padding:12px 20px;border-radius:5px;cursor:pointer;
+background:#e50914;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:5px;
+cursor:pointer;
 }
 
 /* POPUP */
@@ -84,22 +93,26 @@ const db = getFirestore(app);
 
 /* ---------------- VARIABLES ---------------- */
 
-let currentUser = null;
 const serieId = "MEDICOPTER";
+let currentUser = null;
 
-/* ---------------- AUTH ---------------- */
+/* ---------------- CHECK AUTH PROPRE ---------------- */
+
+function waitAuth() {
 
 onAuthStateChanged(auth, async (user) => {
 
 currentUser = user;
 
-/* 🔴 SI PAS CONNECTÉ → LOGIN */
+/* ❌ pas connecté */
 if (!user) {
+console.log("❌ redirect login.html");
 window.location.href = "login.html";
 return;
 }
 
-console.log("✅ connecté :", user.uid);
+/* ✅ connecté */
+console.log("✅ user OK :", user.uid);
 
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
@@ -107,12 +120,15 @@ const snap = await getDoc(ref);
 if (snap.exists()) {
 const data = snap.data();
 
-/* cacher popup si VIP */
-if (data.vipMode === true || data.seriesUnlocked?.includes(serieId)) {
+/* cacher popup si déjà VIP */
+if (data.vipMode || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
 });
+}
+
+waitAuth();
 
 /* ---------------- BOUTON POPUP ---------------- */
 
@@ -120,7 +136,6 @@ document.getElementById("unlockPopupBtn").onclick = async () => {
 
 const user = auth.currentUser;
 
-/* 🔴 sécurité */
 if (!user) {
 window.location.href = "login.html";
 return;
@@ -136,13 +151,12 @@ if (!unlocked.includes(serieId)) {
 unlocked.push(serieId);
 }
 
-/* sauvegarde VIP */
+/* save */
 await setDoc(ref, {
 seriesUnlocked: unlocked,
 vipMode: true
 }, { merge: true });
 
-/* fermer popup */
 document.getElementById("vipPopup").style.display = "none";
 
 alert("🎉 VIP débloqué !");
