@@ -151,68 +151,78 @@ button:hover{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { 
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+setPersistence,
+browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-  authDomain: "yamonfilm-fead8.firebaseapp.com",
-  projectId: "yamonfilm-fead8"
+apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+authDomain: "yamonfilm-fead8.firebaseapp.com",
+projectId: "yamonfilm-fead8"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* ---------------- LOGIN ---------------- */
+/* 🔥 IMPORTANT : GARDER LA SESSION CONNECTÉE */
+setPersistence(auth, browserLocalPersistence)
+.then(() => {
+console.log("🔐 session persistante activée");
+})
+.catch((error) => {
+console.log("Erreur persistence :", error);
+});
 
+/* LOGIN */
 window.login = () => {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      window.location.href = "index.html";
-    })
-    .catch(err => {
-      document.getElementById("error").innerText = err.message;
-    });
+signInWithEmailAndPassword(auth, email, password)
+.then(() => {
+window.location.href = "index.html";
+})
+.catch(err => {
+document.getElementById("error").innerText = err.message;
+});
 };
 
-/* ---------------- REGISTER FIXÉ ---------------- */
-
+/* REGISTER */
 window.register = () => {
-  const email = document.getElementById("registerEmail").value;
-  const password = document.getElementById("registerPassword").value;
+const email = document.getElementById("registerEmail").value;
+const password = document.getElementById("registerPassword").value;
 
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      // 🔥 création + connexion forcée
-      return signInWithEmailAndPassword(auth, email, password);
-    })
-    .then(() => {
-      window.location.href = "index.html";
-    })
-    .catch(err => {
-      document.getElementById("error").innerText = err.message;
-    });
+createUserWithEmailAndPassword(auth, email, password)
+.then(() => {
+return signInWithEmailAndPassword(auth, email, password);
+})
+.then(() => {
+window.location.href = "index.html";
+})
+.catch(err => {
+document.getElementById("error").innerText = err.message;
+});
 };
 
-/* ---------------- UI ---------------- */
-
+/* UI */
 window.showLogin = () => {
-  document.getElementById("loginBox").style.display = "block";
-  document.getElementById("registerBox").style.display = "none";
+document.getElementById("loginBox").style.display = "block";
+document.getElementById("registerBox").style.display = "none";
 
-  document.getElementById("tabLogin").classList.add("active");
-  document.getElementById("tabRegister").classList.remove("active");
+document.getElementById("tabLogin").classList.add("active");
+document.getElementById("tabRegister").classList.remove("active");
 };
 
 window.showRegister = () => {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("registerBox").style.display = "block";
+document.getElementById("loginBox").style.display = "none";
+document.getElementById("registerBox").style.display = "block";
 
-  document.getElementById("tabRegister").classList.add("active");
-  document.getElementById("tabLogin").classList.remove("active");
+document.getElementById("tabRegister").classList.add("active");
+document.getElementById("tabLogin").classList.remove("active");
 };
 </script>
 
