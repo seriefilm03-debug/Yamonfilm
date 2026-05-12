@@ -74,31 +74,20 @@ cursor:pointer;
 
 <script type="module">
 
-/* ================= FIREBASE ================= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyA...",
-authDomain: "yamonfilm-fead8.firebaseapp.com",
-projectId: "yamonfilm-fead8"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* ================= VARIABLES ================= */
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const serieId = "MEDICOPTER";
+
+/* =========================
+   🔐 AUTH PROPRE ET FIABLE
+========================= */
+
 let currentUser = null;
 
-/* ================= AUTH ================= */
-
 onAuthStateChanged(auth, async (user) => {
-
-console.log("AUTH CHECK");
 
 if (!user) {
 window.location.href = "login.html";
@@ -115,25 +104,23 @@ const snap = await getDoc(ref);
 if (snap.exists()) {
 const data = snap.data();
 
-/* cacher popup si déjà VIP */
+/* cacher popup si déjà débloqué */
 if (data.vipMode || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
 });
 
-/* ================= BOUTON VIP ================= */
+/* =========================
+   🔓 BOUTON DEBLOCAGE FIX
+========================= */
 
-document.getElementById("unlockBtn").addEventListener("click", async () => {
-
-console.log("CLICK BOUTON VIP");
+document.getElementById("unlockBtn").onclick = async () => {
 
 if (!currentUser) {
-alert("Connexion en cours, réessaie...");
+window.location.href = "login.html";
 return;
 }
-
-try {
 
 const ref = doc(db, "users", currentUser.uid);
 const snap = await getDoc(ref);
@@ -144,6 +131,7 @@ if (snap.exists()) {
 unlocked = snap.data().seriesUnlocked || [];
 }
 
+/* ajout série */
 if (!unlocked.includes(serieId)) {
 unlocked.push(serieId);
 }
@@ -156,15 +144,11 @@ vipMode: true
 document.getElementById("vipPopup").style.display = "none";
 
 alert("🎉 VIP débloqué !");
+};
 
-} catch (e) {
-console.error(e);
-alert("Erreur Firebase");
-}
-
-});
-
-/* ================= EPISODES TEST ================= */
+/* =========================
+   🎬 EPISODES TEST
+========================= */
 
 function loadEpisodes(){
 const container = document.getElementById("episodes");
