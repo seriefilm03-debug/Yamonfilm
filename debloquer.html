@@ -4,50 +4,85 @@
 <meta charset="UTF-8">
 <title>Débloquer VIP</title>
 </head>
+
 <body style="background:#141414;color:white;font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh;">
 
 <div style="text-align:center;width:300px;">
 <h2>Activation VIP</h2>
 
 <input id="code" placeholder="CODE" style="width:100%;padding:10px;margin-top:10px;">
-<button id="btn" style="width:100%;padding:10px;margin-top:10px;background:red;color:white;">Activer</button>
+<button id="btn" style="width:100%;padding:10px;margin-top:10px;background:red;color:white;cursor:pointer;">
+Activer
+</button>
 
 <p id="msg"></p>
 </div>
 
 <script type="module">
 
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* 🔥 FIREBASE CONFIG */
+const firebaseConfig = {
+apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+authDomain: "yamonfilm-fead8.firebaseapp.com",
+projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* 🔑 CODES */
 const CODES = {
 MEDICVIP: "MEDICOPTER",
 CLOWNVIP: "LECLOWN"
 };
 
+let currentUser = null;
 let userRef = null;
 
+/* LOGIN CHECK */
 onAuthStateChanged(auth, (user) => {
-if (!user) return window.location.href = "login.html";
+if (!user) {
+window.location.href = "login.html";
+return;
+}
+
+currentUser = user;
 userRef = doc(db, "users", user.uid);
 });
 
+/* ACTIVATION CODE */
 document.getElementById("btn").onclick = async () => {
 
 const code = document.getElementById("code").value.trim().toUpperCase();
 const msg = document.getElementById("msg");
 
-const serieId = CODES[code];
-
-if (!serieId) {
-msg.innerText = "Code invalide";
+if (!currentUser) {
+msg.innerText = "Non connecté";
 msg.style.color = "red";
 return;
 }
 
+const serieId = CODES[code];
+
+if (!serieId) {
+msg.innerText = "❌ Code invalide";
+msg.style.color = "red";
+return;
+}
+
+try {
 const snap = await getDoc(userRef);
-let unlocked = snap.exists() ? snap.data().seriesUnlocked || [] : [];
+
+let unlocked = [];
+
+if (snap.exists()) {
+unlocked = snap.data().seriesUnlocked || [];
+}
 
 if (!unlocked.includes(serieId)) {
 unlocked.push(serieId);
@@ -56,15 +91,23 @@ await setDoc(userRef, {
 seriesUnlocked: unlocked
 }, { merge: true });
 
-msg.innerText = "✔ Débloqué !";
+msg.innerText = "✔ Débloqué avec succès !";
 msg.style.color = "lime";
 } else {
 msg.innerText = "Déjà débloqué";
+msg.style.color = "orange";
 }
 
+/* retour index */
 setTimeout(() => {
 window.location.href = "index.html";
-}, 1000);
+}, 1200);
+
+} catch (e) {
+console.log(e);
+msg.innerText = "Erreur Firebase";
+msg.style.color = "red";
+}
 };
 
 </script>
