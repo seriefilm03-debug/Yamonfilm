@@ -1,41 +1,687 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YAMONFILM</title>
+
+<style>
+
+/* =========================
+   BASE
+========================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#141414;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:60px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:0 20px;
+
+  background:
+  linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.9),
+    transparent
+  );
+
+  z-index:1000;
+}
+
+.logo{
+  color:#e50914;
+  font-size:28px;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+.menu-btn{
+  font-size:28px;
+  cursor:pointer;
+  z-index:2100;
+}
+
+/* =========================
+   MENU
+========================= */
+
+.overlay{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.6);
+
+  backdrop-filter:blur(6px);
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:0.3s;
+
+  z-index:1500;
+}
+
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.side-menu{
+  position:fixed;
+
+  top:0;
+  right:-100%;
+
+  width:300px;
+  height:100%;
+
+  background:#111;
+
+  padding:80px 20px 20px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:15px;
+
+  transition:0.3s;
+
+  z-index:2000;
+
+  border-left:1px solid #333;
+}
+
+.side-menu.open{
+  right:0;
+}
+
+.side-menu a,
+.side-menu button{
+
+  color:white;
+
+  text-decoration:none;
+
+  background:none;
+  border:none;
+
+  font-size:18px;
+
+  padding:10px 0;
+
+  cursor:pointer;
+
+  text-align:left;
+
+  border-bottom:1px solid #222;
+}
+
+/* =========================
+   VIP BOX
+========================= */
+
+.promo-box{
+  padding:10px 0;
+  border-bottom:1px solid #222;
+}
+
+.activate-btn{
+
+  background:#e50914;
+
+  color:white;
+
+  width:100%;
+
+  padding:10px;
+
+  border-radius:4px;
+
+  border:none;
+
+  font-weight:bold;
+
+  margin-top:10px;
+
+  cursor:pointer;
+
+  text-align:center;
+
+  text-decoration:none;
+
+  display:block;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero-container{
+  position:relative;
+  width:100%;
+  height:80vh;
+  overflow:hidden;
+}
+
+.hero-slide{
+  position:absolute;
+  inset:0;
+
+  opacity:0;
+
+  transition:opacity 1.5s ease-in-out;
+
+  background-size:cover;
+  background-position:center;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  padding:0 5%;
+}
+
+.hero-slide.active{
+  opacity:1;
+}
+
+.hero-slide::after{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+  linear-gradient(
+    to right,
+    rgba(0,0,0,0.8),
+    transparent 60%
+  ),
+
+  linear-gradient(
+    to top,
+    #141414,
+    transparent 40%
+  );
+}
+
+.hero-content{
+  position:relative;
+  z-index:10;
+  max-width:600px;
+}
+
+.hero-content h1{
+  font-size:clamp(35px,6vw,70px);
+  margin-bottom:10px;
+}
+
+.play-btn{
+
+  padding:12px 35px;
+
+  background:white;
+
+  color:black;
+
+  text-decoration:none;
+
+  font-weight:bold;
+
+  border-radius:4px;
+
+  display:inline-flex;
+
+  transition:0.3s;
+}
+
+.play-btn:hover{
+  background:#e50914;
+  color:white;
+}
+
+/* =========================
+   CONTINUE
+========================= */
+
+.continue-section{
+  padding:40px 5% 10px;
+  display:none;
+}
+
+.continue-grid{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding:10px 0;
+  scrollbar-width:none;
+}
+
+.continue-card{
+  min-width:260px;
+  text-decoration:none;
+  color:white;
+  transition:0.3s;
+}
+
+.continue-card:hover{
+  transform:scale(1.05);
+}
+
+.img-container{
+  position:relative;
+  width:100%;
+  height:145px;
+  border-radius:4px;
+  overflow:hidden;
+  background:#222;
+}
+
+.img-container img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.progress-bar{
+  position:absolute;
+  bottom:0;
+  left:0;
+
+  height:4px;
+
+  background:#e50914;
+
+  width:100%;
+}
+
+/* =========================
+   MOVIES
+========================= */
+
+.movies-label{
+  padding:30px 5% 0;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.movies{
+
+  padding:20px 5%;
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fill,minmax(200px,1fr));
+
+  gap:15px;
+}
+
+.movie{
+
+  height:300px;
+
+  background-size:cover;
+  background-position:center;
+
+  border-radius:4px;
+
+  display:flex;
+  align-items:flex-end;
+
+  padding:15px;
+
+  text-decoration:none;
+
+  color:white;
+
+  font-weight:bold;
+
+  transition:0.3s;
+
+  border:2px solid transparent;
+}
+
+.movie:hover{
+  transform:scale(1.05);
+}
+
+.movie.vip{
+  border:2px solid #e50914;
+}
+
+/* =========================
+   VIP ROUGE
+========================= */
+
+.vip{
+  border:2px solid #e50914 !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<div class="navbar">
+
+  <a href="index.html" class="logo">
+    YAMONFILM
+  </a>
+
+  <div class="menu-btn"
+  onclick="toggleMenu()">
+
+    ☰
+
+  </div>
+
+</div>
+
+<!-- =========================
+     OVERLAY
+========================= -->
+
+<div class="overlay"
+id="overlay"
+onclick="toggleMenu()"></div>
+
+<!-- =========================
+     MENU
+========================= -->
+
+<div class="side-menu" id="menu">
+
+  <a href="account.html">
+    Mon compte
+  </a>
+
+  <a href="series.html">
+    Mes séries
+  </a>
+
+  <div class="promo-box">
+
+    <span style="
+    color:#666;
+    font-size:12px;">
+
+      ZONE VIP
+
+    </span>
+
+    <a href="debloquer.html"
+    class="activate-btn">
+
+      Activer un code
+
+    </a>
+
+  </div>
+
+  <button id="logoutBtn"
+  style="
+  margin-top:auto;
+  color:#e50914;">
+
+    Déconnexion
+
+  </button>
+
+</div>
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero-container">
+
+  <!-- LE CLOWN -->
+
+  <div class="hero-slide active"
+
+  style="
+  background-image:url(
+  'https://media.senscritique.com/media/000006485088/0/le_clown.jpg'
+  );">
+
+    <div class="hero-content">
+
+      <h1>Le Clown</h1>
+
+      <p>
+      Le justicier au masque de cuir
+      revient pour faire régner
+      la justice.
+      </p>
+
+      <br>
+
+      <a id="heroClownBtn"
+
+      href="le clown.html"
+
+      class="play-btn">
+
+        ▶ Lecture
+
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- MEDICOPTER -->
+
+  <div class="hero-slide"
+
+  style="
+  background-image:url(
+  's-l1200.jpg'
+  );">
+
+    <div class="hero-content">
+
+      <h1>Medicopter 117</h1>
+
+      <p>
+      Des vies en jeu,
+      une équipe d'élite prête à tout.
+      </p>
+
+      <br>
+
+      <a id="heroMedicBtn"
+
+      href="medicopter.html"
+
+      class="play-btn">
+
+        ▶ Lecture
+
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- =========================
+     CONTINUE WATCHING
+========================= -->
+
+<section id="continue-watching"
+class="continue-section">
+
+  <h3>Reprendre la lecture</h3>
+
+  <div id="continue-container"
+  class="continue-grid"></div>
+
+</section>
+
+<!-- =========================
+     SERIES
+========================= -->
+
+<h3 class="movies-label">
+  Nos Séries
+</h3>
+
+<section class="movies">
+
+  <a id="cardClown"
+
+  href="le clown.html"
+
+  class="movie"
+
+  style="
+  background-image:url(
+  'https://media.senscritique.com/media/000016277047/0/le_clown.jpg'
+  );">
+
+    Le Clown
+
+  </a>
+
+  <a id="cardMedic"
+
+  href="medicopter.html"
+
+  class="movie"
+
+  style="
+  background-image:url(
+  's-l1200.jpg'
+  );">
+
+    Medicopter 117
+
+  </a>
+
+</section>
+
+<!-- =========================
+     FILMS
+========================= -->
+
+<h3 class="movies-label">
+  Film
+</h3>
+
+<section class="movies">
+
+  <a id="cardsupercross"
+
+  href="supercross.html"
+
+  class="movie"
+
+  style="
+  background-image:url(
+  'https://media.themoviedb.org/t/p/w440_and_h660_face/sHgPR5jrN09KoHKltAnLp8cfgg3.jpg'
+  );">
+
+    Supercross
+
+  </a>
+
+</section>
+
+<!-- =========================
+     FIREBASE
+========================= -->
+
 <script type="module">
 
+/* =========================
+   IMPORT FIREBASE
+========================= */
+
 import { initializeApp }
+
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
+
   getAuth,
   onAuthStateChanged,
   signOut
+
 }
+
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
+
   getFirestore,
   doc,
   getDoc,
   setDoc
+
 }
+
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* =========================
-   🔥 FIREBASE CONFIG
+   FIREBASE CONFIG
 ========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-  authDomain: "yamonfilm-fead8.firebaseapp.com",
-  projectId: "yamonfilm-fead8"
+
+  apiKey:
+  "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+
+  authDomain:
+  "yamonfilm-fead8.firebaseapp.com",
+
+  projectId:
+  "yamonfilm-fead8"
+
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth =
+getAuth(app);
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
 
 /* =========================
-   🔥 MENU
+   MENU
 ========================= */
 
 window.toggleMenu = () => {
@@ -49,7 +695,7 @@ window.toggleMenu = () => {
 };
 
 /* =========================
-   🔥 LOGOUT
+   LOGOUT
 ========================= */
 
 document.getElementById("logoutBtn")
@@ -59,12 +705,13 @@ document.getElementById("logoutBtn")
 
   await signOut(auth);
 
-  window.location.href = "login.html";
+  window.location.href =
+  "login.html";
 
 };
 
 /* =========================
-   🔥 HERO SLIDER
+   HERO SLIDER
 ========================= */
 
 let currentSlide = 0;
@@ -78,7 +725,8 @@ setInterval(() => {
   .classList.remove("active");
 
   currentSlide =
-  (currentSlide + 1) % slides.length;
+  (currentSlide + 1)
+  % slides.length;
 
   slides[currentSlide]
   .classList.add("active");
@@ -86,10 +734,11 @@ setInterval(() => {
 }, 6000);
 
 /* =========================
-   🔥 AUTH SAFE
+   AUTH
 ========================= */
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth,
+async (user) => {
 
   console.log("AUTH:", user);
 
@@ -120,8 +769,11 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  /* connecté */
-  localStorage.setItem("logged", "true");
+  /* CONNECTÉ */
+  localStorage.setItem(
+    "logged",
+    "true"
+  );
 
   try {
 
@@ -131,7 +783,7 @@ onAuthStateChanged(auth, async (user) => {
     let snap =
     await getDoc(ref);
 
-    /* créer user auto */
+    /* créer user */
     if (!snap.exists()) {
 
       await setDoc(ref, {
@@ -141,70 +793,93 @@ onAuthStateChanged(auth, async (user) => {
 
       });
 
-      snap = await getDoc(ref);
+      snap =
+      await getDoc(ref);
 
     }
 
-    const data = snap.data();
+    const data =
+    snap.data();
 
     const unlocked =
     data.seriesUnlocked || [];
 
     /* =====================
-       🔥 LE CLOWN VIP
+       LE CLOWN VIP
     ===================== */
 
     if (
-      unlocked.includes("LECLOWN") ||
+
+      unlocked.includes("LECLOWN")
+
+      ||
+
       data.vipMode === true
+
     ) {
 
-      document.getElementById("heroClownBtn")
-      .href = "vipleclown.html";
+      document.getElementById(
+      "heroClownBtn")
 
-      const cardClown =
-      document.getElementById("cardClown");
-
-      cardClown.href =
+      .href =
       "vipleclown.html";
 
-      cardClown.innerText =
+      const clown =
+      document.getElementById(
+      "cardClown");
+
+      clown.href =
+      "vipleclown.html";
+
+      clown.innerText =
       "Le Clown VIP 🔥";
 
-      cardClown.classList.add("vip");
+      clown.classList.add("vip");
 
     }
 
     /* =====================
-       🔥 MEDICOPTER VIP
+       MEDICOPTER VIP
     ===================== */
 
     if (
-      unlocked.includes("MEDICOPTER") ||
+
+      unlocked.includes(
+      "MEDICOPTER")
+
+      ||
+
       data.vipMode === true
+
     ) {
 
-      document.getElementById("heroMedicBtn")
-      .href = "vipmedicopter.html";
+      document.getElementById(
+      "heroMedicBtn")
 
-      const cardMedic =
-      document.getElementById("cardMedic");
-
-      cardMedic.href =
+      .href =
       "vipmedicopter.html";
 
-      cardMedic.innerText =
+      const medic =
+      document.getElementById(
+      "cardMedic");
+
+      medic.href =
+      "vipmedicopter.html";
+
+      medic.innerText =
       "Medicopter VIP 🔥";
 
-      cardMedic.classList.add("vip");
+      medic.classList.add("vip");
 
     }
 
     /* =====================
-       🔥 CONTINUE WATCHING
+       CONTINUE WATCHING
     ===================== */
 
-    if (data.progress?.lastBySerie) {
+    if (
+      data.progress?.lastBySerie
+    ) {
 
       displayContinue(
         data.progress.lastBySerie,
@@ -222,7 +897,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 /* =========================
-   🔥 CONTINUE WATCHING
+   CONTINUE WATCHING
 ========================= */
 
 function displayContinue(
@@ -232,20 +907,18 @@ function displayContinue(
 
   const container =
   document.getElementById(
-    "continue-container"
-  );
+  "continue-container");
 
   const section =
   document.getElementById(
-    "continue-watching"
-  );
+  "continue-watching");
 
   container.innerHTML = "";
 
   const items =
   Object.values(lastBySerie)
   .sort((a,b)=>
-    b.timestamp - a.timestamp
+    b.timestamp-a.timestamp
   );
 
   if(items.length > 0){
@@ -258,19 +931,31 @@ function displayContinue(
   items.forEach(item => {
 
     const imgUrl =
+
     item.img.startsWith("http")
-    ? item.img
-    : `https://image.tmdb.org/t/p/w300${item.img}`;
+
+    ?
+
+    item.img
+
+    :
+
+    `https://image.tmdb.org/t/p/w300${item.img}`;
 
     let finalLink =
     item.link;
 
-    /* VIP clown */
+    /* clown vip */
     if(
-      item.serieName ===
-      "Le Clown" &&
 
-      unlocked.includes("LECLOWN")
+      item.serieName ===
+      "Le Clown"
+
+      &&
+
+      unlocked.includes(
+      "LECLOWN")
+
     ){
 
       finalLink =
@@ -278,12 +963,17 @@ function displayContinue(
 
     }
 
-    /* VIP medicopter */
+    /* medic vip */
     if(
-      item.serieName ===
-      "Medicopter 117" &&
 
-      unlocked.includes("MEDICOPTER")
+      item.serieName ===
+      "Medicopter 117"
+
+      &&
+
+      unlocked.includes(
+      "MEDICOPTER")
+
     ){
 
       finalLink =
@@ -301,24 +991,35 @@ function displayContinue(
     "continue-card";
 
     card.innerHTML = `
+
       <div class="img-container">
+
         <img src="${imgUrl}">
+
         <div class="progress-bar"></div>
+
       </div>
 
       <div style="margin-top:10px;">
-        <b>${item.serieName}</b><br>
+
+        <b>${item.serieName}</b>
+
+        <br>
 
         <span style="
         font-size:12px;
         color:#aaa;">
 
-        S${item.s} :
+        S${item.s}
+        :
         E${item.e}
-        - ${item.title}
+        -
+        ${item.title}
 
         </span>
+
       </div>
+
     `;
 
     container.appendChild(card);
@@ -328,3 +1029,6 @@ function displayContinue(
 }
 
 </script>
+
+</body>
+</html>
