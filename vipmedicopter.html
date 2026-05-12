@@ -87,15 +87,15 @@ const db = getFirestore(app);
 let currentUser = null;
 const serieId = "MEDICOPTER";
 
-/* ---------------- AUTH GLOBAL ---------------- */
+/* ---------------- AUTH ---------------- */
 
 onAuthStateChanged(auth, async (user) => {
 
 currentUser = user;
 
-/* 🔴 SI PAS CONNECTÉ → REDIRECT LOGIN */
+/* 🔴 SI PAS CONNECTÉ → LOGIN */
 if (!user) {
-window.location.href = "connexion.html";
+window.location.href = "login.html";
 return;
 }
 
@@ -107,7 +107,7 @@ const snap = await getDoc(ref);
 if (snap.exists()) {
 const data = snap.data();
 
-/* cacher popup si déjà VIP */
+/* cacher popup si VIP */
 if (data.vipMode === true || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
@@ -122,7 +122,7 @@ const user = auth.currentUser;
 
 /* 🔴 sécurité */
 if (!user) {
-window.location.href = "connexion.html";
+window.location.href = "login.html";
 return;
 }
 
