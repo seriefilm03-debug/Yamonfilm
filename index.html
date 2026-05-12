@@ -104,7 +104,8 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <div class="container">
     <h1>🎬 Nos séries</h1>
 
-    <a id="medicCard" href="medicopter.html" class="card">Medicopter 117</a>
+    <!-- liens protégés -->
+    <a id="medicCard" href="#" class="card">Medicopter 117</a>
     <a id="clownCard" href="le clown.html" class="card">Le Clown</a>
 </div>
 
@@ -146,24 +147,27 @@ onAuthStateChanged(auth, async (user) => {
   if (!snap.exists()) return;
 
   const unlocked = snap.data().seriesUnlocked || [];
-  const path = window.location.pathname;
 
-  /* 🔥 MEDICOPTER */
+  const currentPage = window.location.pathname.split("/").pop();
+
+  /* 🔥 MEDICOPTER VIP */
   if (unlocked.includes("MEDICOPTER")) {
 
     document.getElementById("medicCard").href = "vipmedicopter.html";
 
-    if (path.includes("medicopter.html")) {
+    if (currentPage === "medicopter.html") {
       window.location.replace("vipmedicopter.html");
     }
+  } else {
+    document.getElementById("medicCard").href = "medicopter.html";
   }
 
-  /* 🔥 CLOWN */
+  /* 🔥 CLOWN VIP */
   if (unlocked.includes("LECLOWN")) {
 
     document.getElementById("clownCard").href = "vipleclown.html";
 
-    if (path.includes("le clown.html")) {
+    if (currentPage === "le clown.html") {
       window.location.replace("vipleclown.html");
     }
   }
