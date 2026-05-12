@@ -81,13 +81,20 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const serieId = "MEDICOPTER";
 
-/* 🔐 PROTECTION PAGE */
+/* =========================
+   🔐 AUTH PROPRE ET FIABLE
+========================= */
+
+let currentUser = null;
+
 onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
 window.location.href = "login.html";
 return;
 }
+
+currentUser = user;
 
 console.log("CONNECTÉ :", user.uid);
 
@@ -97,27 +104,34 @@ const snap = await getDoc(ref);
 if (snap.exists()) {
 const data = snap.data();
 
+/* cacher popup si déjà débloqué */
 if (data.vipMode || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
 });
 
-/* 🔓 DEBLOCAGE VIP */
+/* =========================
+   🔓 BOUTON DEBLOCAGE FIX
+========================= */
+
 document.getElementById("unlockBtn").onclick = async () => {
 
-const user = auth.currentUser;
-
-if (!user) {
+if (!currentUser) {
 window.location.href = "login.html";
 return;
 }
 
-const ref = doc(db, "users", user.uid);
+const ref = doc(db, "users", currentUser.uid);
 const snap = await getDoc(ref);
 
-let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+let unlocked = [];
 
+if (snap.exists()) {
+unlocked = snap.data().seriesUnlocked || [];
+}
+
+/* ajout série */
 if (!unlocked.includes(serieId)) {
 unlocked.push(serieId);
 }
@@ -132,7 +146,10 @@ document.getElementById("vipPopup").style.display = "none";
 alert("🎉 VIP débloqué !");
 };
 
-/* 🎬 EPISODES TEST */
+/* =========================
+   🎬 EPISODES TEST
+========================= */
+
 function loadEpisodes(){
 const container = document.getElementById("episodes");
 
