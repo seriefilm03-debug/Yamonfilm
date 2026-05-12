@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>DEBUG AUTH</title>
+<style>
+body{background:#111;color:white;font-family:Arial;padding:20px;}
+.ok{color:lime;}
+.bad{color:red;}
+.box{background:#222;padding:20px;border-radius:10px;}
+</style>
+</head>
+<body>
+
+<h1>🔥 DEBUG FIREBASE AUTH</h1>
+
+<div class="box">
+<p id="step1">Chargement...</p>
+<p id="step2"></p>
+<p id="step3"></p>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+authDomain: "yamonfilm-fead8.firebaseapp.com",
+projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+document.getElementById("step1").innerText = "Firebase chargé ✔";
+
+onAuthStateChanged(auth, (user) => {
+
+console.log("AUTH DEBUG:", user);
+
+if (user) {
+document.getElementById("step2").innerHTML =
+"✅ CONNECTÉ : " + user.uid;
+document.getElementById("step2").className = "ok";
+
+document.getElementById("step3").innerText =
+"Email: " + user.email;
+
+} else {
+document.getElementById("step2").innerHTML =
+"❌ PAS CONNECTÉ (session inexistante)";
+document.getElementById("step2").className = "bad";
+
+document.getElementById("step3").innerText =
+"Firebase ne voit aucune session";
+}
+
+});
+
+</script>
+
+</body>
+</html>
