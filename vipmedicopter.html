@@ -1,86 +1,209 @@
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* =========================
+   🔥 FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+  authDomain: "yamonfilm-fead8.firebaseapp.com",
+  projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+/* =========================
+   🔥 MENU
+========================= */
+
+window.toggleMenu = () => {
+
+  document.getElementById("menu")
+  .classList.toggle("open");
+
+  document.getElementById("overlay")
+  .classList.toggle("show");
+
+};
+
+/* =========================
+   🔥 LOGOUT
+========================= */
+
+document.getElementById("logoutBtn")
+.onclick = async () => {
+
+  localStorage.removeItem("logged");
+
+  await signOut(auth);
+
+  window.location.href = "login.html";
+
+};
+
+/* =========================
+   🔥 HERO SLIDER
+========================= */
+
+let currentSlide = 0;
+
+const slides =
+document.querySelectorAll(".hero-slide");
+
+setInterval(() => {
+
+  slides[currentSlide]
+  .classList.remove("active");
+
+  currentSlide =
+  (currentSlide + 1) % slides.length;
+
+  slides[currentSlide]
+  .classList.add("active");
+
+}, 6000);
+
+/* =========================
+   🔥 AUTH SAFE
+========================= */
+
 onAuthStateChanged(auth, async (user) => {
 
   console.log("AUTH:", user);
 
-  // attendre firebase
+  /* attendre firebase */
   if (user === undefined) return;
 
-  // pas connecté
+  /* PAS CONNECTÉ */
   if (!user) {
 
     setTimeout(() => {
 
       if (!auth.currentUser) {
-        window.location.href = "login.html";
+
+        if (
+          localStorage.getItem("logged")
+          !== "true"
+        ) {
+
+          window.location.href =
+          "login.html";
+
+        }
+
       }
 
-    }, 2000);
+    }, 2500);
 
     return;
   }
 
+  /* connecté */
+  localStorage.setItem("logged", "true");
+
   try {
 
-    const ref = doc(db, "users", user.uid);
+    const ref =
+    doc(db, "users", user.uid);
 
-    let snap = await getDoc(ref);
+    let snap =
+    await getDoc(ref);
 
-    // créer user auto
+    /* créer user auto */
     if (!snap.exists()) {
 
       await setDoc(ref, {
+
         seriesUnlocked: [],
         vipMode: false
+
       });
 
       snap = await getDoc(ref);
+
     }
 
     const data = snap.data();
 
-    const unlocked = data.seriesUnlocked || [];
+    const unlocked =
+    data.seriesUnlocked || [];
 
-    /* LE CLOWN VIP */
+    /* =====================
+       🔥 LE CLOWN VIP
+    ===================== */
+
     if (
       unlocked.includes("LECLOWN") ||
       data.vipMode === true
     ) {
 
-      document.getElementById("heroClownBtn").href =
-      "vipleclown.html";
+      document.getElementById("heroClownBtn")
+      .href = "vipleclown.html";
 
       const cardClown =
       document.getElementById("cardClown");
 
-      cardClown.href = "vipleclown.html";
+      cardClown.href =
+      "vipleclown.html";
 
       cardClown.innerText =
       "Le Clown VIP 🔥";
 
       cardClown.classList.add("vip");
+
     }
 
-    /* MEDICOPTER VIP */
+    /* =====================
+       🔥 MEDICOPTER VIP
+    ===================== */
+
     if (
       unlocked.includes("MEDICOPTER") ||
       data.vipMode === true
     ) {
 
-      document.getElementById("heroMedicBtn").href =
-      "vipmedicopter.html";
+      document.getElementById("heroMedicBtn")
+      .href = "vipmedicopter.html";
 
       const cardMedic =
       document.getElementById("cardMedic");
 
-      cardMedic.href = "vipmedicopter.html";
+      cardMedic.href =
+      "vipmedicopter.html";
 
       cardMedic.innerText =
       "Medicopter VIP 🔥";
 
       cardMedic.classList.add("vip");
+
     }
 
-    /* CONTINUE */
+    /* =====================
+       🔥 CONTINUE WATCHING
+    ===================== */
+
     if (data.progress?.lastBySerie) {
 
       displayContinue(
@@ -97,3 +220,111 @@ onAuthStateChanged(auth, async (user) => {
   }
 
 });
+
+/* =========================
+   🔥 CONTINUE WATCHING
+========================= */
+
+function displayContinue(
+  lastBySerie,
+  unlocked
+){
+
+  const container =
+  document.getElementById(
+    "continue-container"
+  );
+
+  const section =
+  document.getElementById(
+    "continue-watching"
+  );
+
+  container.innerHTML = "";
+
+  const items =
+  Object.values(lastBySerie)
+  .sort((a,b)=>
+    b.timestamp - a.timestamp
+  );
+
+  if(items.length > 0){
+
+    section.style.display =
+    "block";
+
+  }
+
+  items.forEach(item => {
+
+    const imgUrl =
+    item.img.startsWith("http")
+    ? item.img
+    : `https://image.tmdb.org/t/p/w300${item.img}`;
+
+    let finalLink =
+    item.link;
+
+    /* VIP clown */
+    if(
+      item.serieName ===
+      "Le Clown" &&
+
+      unlocked.includes("LECLOWN")
+    ){
+
+      finalLink =
+      "vipleclown.html";
+
+    }
+
+    /* VIP medicopter */
+    if(
+      item.serieName ===
+      "Medicopter 117" &&
+
+      unlocked.includes("MEDICOPTER")
+    ){
+
+      finalLink =
+      "vipmedicopter.html";
+
+    }
+
+    const card =
+    document.createElement("a");
+
+    card.href =
+    finalLink;
+
+    card.className =
+    "continue-card";
+
+    card.innerHTML = `
+      <div class="img-container">
+        <img src="${imgUrl}">
+        <div class="progress-bar"></div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <b>${item.serieName}</b><br>
+
+        <span style="
+        font-size:12px;
+        color:#aaa;">
+
+        S${item.s} :
+        E${item.e}
+        - ${item.title}
+
+        </span>
+      </div>
+    `;
+
+    container.appendChild(card);
+
+  });
+
+}
+
+</script>
