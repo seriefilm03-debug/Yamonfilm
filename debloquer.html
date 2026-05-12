@@ -2,181 +2,69 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Activer VIP - YAMONFILM</title>
-
-<style>
-body { 
-    background: #141414; 
-    color: white; 
-    font-family: Arial, sans-serif; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    height: 100vh; 
-    margin: 0; 
-}
-
-.unlock-card { 
-    background: #111; 
-    padding: 40px; 
-    border-radius: 8px; 
-    border: 1px solid #333; 
-    width: 90%; 
-    max-width: 400px; 
-    text-align: center; 
-}
-
-.logo { 
-    color: #e50914; 
-    font-size: 30px; 
-    font-weight: bold; 
-    text-decoration: none; 
-    display: block; 
-    margin-bottom: 20px; 
-}
-
-h2 { margin-bottom: 10px; }
-
-input { 
-    width: 100%; 
-    padding: 15px; 
-    background: #222; 
-    border: 1px solid #444; 
-    color: white; 
-    border-radius: 4px; 
-    margin-bottom: 20px; 
-    font-size: 16px; 
-    text-align: center; 
-    outline: none; 
-}
-
-input:focus { border-color: #e50914; }
-
-button { 
-    width: 100%; 
-    padding: 15px; 
-    background: #e50914; 
-    border: none; 
-    color: white; 
-    font-weight: bold; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-size: 16px; 
-}
-
-button:hover { background: #b20710; }
-
-#msg { 
-    margin-top: 15px; 
-    font-size: 14px; 
-    font-weight: bold; 
-    min-height: 20px; 
-}
-
-.back-link { 
-    display: block; 
-    margin-top: 20px; 
-    color: #aaa; 
-    text-decoration: none; 
-    font-size: 13px; 
-}
-.back-link:hover { color: white; }
-</style>
+<title>Débloquer VIP</title>
 </head>
+<body style="background:#141414;color:white;font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh;">
 
-<body>
+<div style="text-align:center;width:300px;">
+<h2>Activation VIP</h2>
 
-<div class="unlock-card">
-    <a href="index.html" class="logo">YAMONFILM</a>
-    <h2>Activation VIP</h2>
-    <p style="color:#888;margin-bottom:20px;">
-        Entrez votre code pour débloquer le contenu.
-    </p>
+<input id="code" placeholder="CODE" style="width:100%;padding:10px;margin-top:10px;">
+<button id="btn" style="width:100%;padding:10px;margin-top:10px;background:red;color:white;">Activer</button>
 
-    <input type="text" id="code" placeholder="VOTRE CODE ICI">
-    <button id="btn">Activer la série</button>
-    <p id="msg"></p>
-
-    <a href="index.html" class="back-link">← Retour à l'accueil</a>
+<p id="msg"></p>
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = { 
-    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
-    authDomain: "yamonfilm-fead8.firebaseapp.com", 
-    projectId: "yamonfilm-fead8" 
+const CODES = {
+MEDICVIP: "MEDICOPTER",
+CLOWNVIP: "LECLOWN"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+let userRef = null;
 
-let currentUser = null;
-
-/* 🔐 AUTH */
 onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-    currentUser = user;
+if (!user) return window.location.href = "login.html";
+userRef = doc(db, "users", user.uid);
 });
 
-/* 🔥 CODES VIP */
-const CODES_DATABASE = {
-    "MEDICVIP": { id: "MEDICOPTER", name: "Medicopter 117", target: "vipmedicopter.html" },
-    "CLOWNVIP": { id: "LECLOWN", name: "Le Clown", target: "vipleclown.html" }
-};
-
-/* 🔓 ACTIVER CODE */
 document.getElementById("btn").onclick = async () => {
 
-    const code = document.getElementById("code").value.trim().toUpperCase();
-    const msg = document.getElementById("msg");
+const code = document.getElementById("code").value.trim().toUpperCase();
+const msg = document.getElementById("msg");
 
-    if (!currentUser) {
-        msg.style.color = "yellow";
-        msg.innerText = "Veuillez vous connecter.";
-        return;
-    }
+const serieId = CODES[code];
 
-    const serie = CODES_DATABASE[code];
+if (!serieId) {
+msg.innerText = "Code invalide";
+msg.style.color = "red";
+return;
+}
 
-    if (!serie) {
-        msg.style.color = "#e50914";
-        msg.innerText = "Code invalide.";
-        return;
-    }
+const snap = await getDoc(userRef);
+let unlocked = snap.exists() ? snap.data().seriesUnlocked || [] : [];
 
-    const ref = doc(db, "users", currentUser.uid);
-    const snap = await getDoc(ref);
+if (!unlocked.includes(serieId)) {
+unlocked.push(serieId);
 
-    let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+await setDoc(userRef, {
+seriesUnlocked: unlocked
+}, { merge: true });
 
-    if (!unlocked.includes(serie.id)) {
-        unlocked.push(serie.id);
+msg.innerText = "✔ Débloqué !";
+msg.style.color = "lime";
+} else {
+msg.innerText = "Déjà débloqué";
+}
 
-        await setDoc(ref, {
-            seriesUnlocked: unlocked
-        }, { merge: true });
-
-        msg.style.color = "lime";
-        msg.innerText = "✔ Série débloquée !";
-    } else {
-        msg.style.color = "orange";
-        msg.innerText = "Déjà débloqué.";
-    }
-
-    // 🔥 redirection VIP
-    setTimeout(() => {
-        window.location.href = serie.target;
-    }, 1200);
+setTimeout(() => {
+window.location.href = "index.html";
+}, 1000);
 };
 
 </script>
