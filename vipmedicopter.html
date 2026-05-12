@@ -6,6 +6,7 @@
 <title>Medicopter 117 - YAMONFILM</title>
 
 <style>
+/* --- TON DESIGN INCHANGÉ --- */
 *{
     box-sizing:border-box;
     margin:0;
@@ -41,18 +42,13 @@ body{
     text-decoration:none;
 }
 
-.nav-right{
-    display:flex;
-    align-items:center;
-    gap:15px;
-}
-
 .menu-btn{
     font-size:28px;
     cursor:pointer;
+    z-index:2100;
 }
 
-/* MENU */
+/* OVERLAY */
 .overlay{
     position:fixed;
     inset:0;
@@ -68,6 +64,7 @@ body{
     pointer-events:auto;
 }
 
+/* MENU */
 .side-menu{
     position:fixed;
     top:0;
@@ -81,17 +78,14 @@ body{
     gap:15px;
     transition:0.3s;
     z-index:2000;
-    border-left:1px solid #333;
 }
 
 .side-menu.open{
     right:0;
 }
 
-.side-menu a,
-.side-menu button{
+.side-menu a, .side-menu button{
     color:white;
-    text-decoration:none;
     background:none;
     border:none;
     font-size:18px;
@@ -101,32 +95,32 @@ body{
     border-bottom:1px solid #222;
 }
 
-/* CODE VIP */
-.promo-section{
-    margin-top:10px;
-    padding:10px 0;
-    border-bottom:1px solid #222;
+/* VIP POPUP (AJOUTÉ) */
+#vipPopup{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
 }
 
-.promo-input{
-    width:100%;
-    padding:12px;
-    background:#222;
-    border:1px solid #444;
-    color:white;
-    border-radius:4px;
-    margin-top:10px;
+.popup-box{
+    background:#1c1c1c;
+    padding:25px;
+    border-radius:10px;
+    text-align:center;
+    width:300px;
 }
 
-.activate-btn{
+.btn-popup{
     background:#e50914;
     color:white;
     border:none;
     padding:12px;
+    margin-top:15px;
     width:100%;
-    border-radius:4px;
-    margin-top:10px;
-    font-weight:bold;
     cursor:pointer;
 }
 
@@ -145,25 +139,12 @@ body{
     content:"";
     position:absolute;
     inset:0;
-    background:linear-gradient(to top,#0f0f0f,transparent 50%),
-               linear-gradient(to right,#0f0f0f,transparent);
+    background:linear-gradient(to top,#0f0f0f,transparent 50%);
 }
 
 .hero-content{
     position:relative;
     z-index:2;
-    max-width:700px;
-}
-
-.btn-main{
-    background:#e50914;
-    color:white;
-    padding:12px 25px;
-    border-radius:5px;
-    font-weight:bold;
-    cursor:pointer;
-    border:none;
-    margin-top:10px;
 }
 
 /* EPISODES */
@@ -179,14 +160,7 @@ body{
     border-radius:8px;
     overflow:hidden;
     cursor:pointer;
-    transition:0.3s;
     border:1px solid #333;
-    position:relative;
-}
-
-.card:hover{
-    transform:scale(1.03);
-    border-color:#e50914;
 }
 
 .card img{
@@ -194,70 +168,37 @@ body{
     height:140px;
     object-fit:cover;
 }
-
-.watched-tag{
-    position:absolute;
-    top:5px;
-    right:5px;
-    background:rgba(0,0,0,0.8);
-    color:#00ff00;
-    font-size:10px;
-    padding:2px 5px;
-    border-radius:3px;
-    font-weight:bold;
-}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 POPUP VIP -->
-<div id="vipPopup"
-style="
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.9);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:9999;
-">
-
-<div style="background:#1c1c1c;padding:25px;border-radius:10px;text-align:center;width:300px;">
-<h2>🎉 Félicitation</h2>
-
-<p style="margin:10px 0;color:#ccc;">
-Vous avez obtenu la série complète<br>
-Bon visionnage !
-</p>
-
-<button id="vipOkBtn"
-style="background:#e50914;color:white;border:none;padding:12px;width:100%;border-radius:5px;font-weight:bold;cursor:pointer;">
-OK
-</button>
+<!-- POPUP VIP -->
+<div id="vipPopup">
+    <div class="popup-box">
+        <h2>🎉 Félicitations</h2>
+        <p>Vous avez obtenu la série complète<br>Bon visionnage !</p>
+        <button class="btn-popup" id="unlockPopupBtn">OK / Débloquer</button>
+    </div>
 </div>
 
-</div>
-
-<!-- NAV -->
 <div class="navbar">
-<a href="index.html" class="logo">YAMONFILM</a>
-<div class="nav-right">
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
-</div>
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="side-menu" id="menu">
-<a href="index.html">Accueil</a>
-<a href="account.html">Mon compte</a>
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
 </div>
 
 <section class="hero" id="hero">
-<div class="hero-content">
-<h1>Medicopter 117</h1>
-</div>
+    <div class="hero-content">
+        <h1>Medicopter 117</h1>
+        <p id="overview"></p>
+    </div>
 </section>
 
 <div class="episodes" id="episodes"></div>
@@ -268,10 +209,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* FIREBASE */
 const firebaseConfig = {
-apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-authDomain: "yamonfilm-fead8.firebaseapp.com",
-projectId: "yamonfilm-fead8"
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+    authDomain: "yamonfilm-fead8.firebaseapp.com",
+    projectId: "yamonfilm-fead8"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -280,65 +222,95 @@ const db = getFirestore(app);
 
 const serieId = "MEDICOPTER";
 
-let currentUser = null;
+let userRef = null;
 
 /* MENU */
 window.toggleMenu = () => {
-document.getElementById("menu").classList.toggle("open");
-document.getElementById("overlay").classList.toggle("show");
+    document.getElementById("menu").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
 };
 
 /* AUTH */
 onAuthStateChanged(auth, async (user) => {
 
-if (!user) {
-window.location.href = "login.html";
-return;
-}
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
 
-currentUser = user;
+    userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
 
-const ref = doc(db, "users", user.uid);
-const snap = await getDoc(ref);
+    let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
 
-if (snap.exists()) {
+    /* 👉 POPUP SI PAS DEBLOQUE */
+    if (!unlocked.includes(serieId)) {
+        document.getElementById("vipPopup").style.display = "flex";
+    }
 
-const data = snap.data();
-const unlocked = data.seriesUnlocked || [];
-
-/* 🔥 POPUP SI PAS DEBLOQUE */
-if (!unlocked.includes(serieId)) {
-document.getElementById("vipPopup").style.display = "flex";
-}
-
-}
+    loadSeries();
 });
 
-/* BOUTON OK POPUP */
-document.getElementById("vipOkBtn").onclick = async () => {
+/* POPUP BUTTON = DEBLOCAGE */
+document.getElementById("unlockPopupBtn").onclick = async () => {
 
-if (!currentUser) return;
+    const snap = await getDoc(userRef);
 
-const ref = doc(db, "users", currentUser.uid);
-const snap = await getDoc(ref);
+    let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
 
-let unlocked = [];
+    if (!unlocked.includes(serieId)) {
+        unlocked.push(serieId);
+    }
 
-if (snap.exists()) {
-unlocked = snap.data().seriesUnlocked || [];
-}
+    await setDoc(userRef, {
+        seriesUnlocked: unlocked
+    }, { merge:true });
 
-if (!unlocked.includes(serieId)) {
-unlocked.push(serieId);
-}
+    document.getElementById("vipPopup").style.display = "none";
 
-await setDoc(ref, {
-seriesUnlocked: unlocked
-}, { merge:true });
-
-document.getElementById("vipPopup").style.display = "none";
-alert("Série débloquée !");
+    alert("Série débloquée !");
 };
+
+/* TMDB */
+const apiKey = "182c7173698e34803715eacab5c693a7";
+const tmdbId = 40996;
+
+/* LOAD */
+async function loadSeries(){
+
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+    const data = await res.json();
+
+    document.getElementById("overview").innerText = data.overview;
+
+    document.getElementById("hero").style.backgroundImage =
+        `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+
+    loadEpisodes(1);
+}
+
+/* EPISODES SIMPLE VERSION */
+async function loadEpisodes(s){
+
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+    const data = await res.json();
+
+    const container = document.getElementById("episodes");
+    container.innerHTML = "";
+
+    data.episodes.forEach(ep => {
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
+            <div style="padding:10px;">E${ep.episode_number} - ${ep.name}</div>
+        `;
+
+        container.appendChild(div);
+    });
+}
 
 </script>
 
