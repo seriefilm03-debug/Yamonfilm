@@ -104,7 +104,6 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <div class="container">
     <h1>🎬 Nos séries</h1>
 
-    <!-- liens protégés -->
     <a id="medicCard" href="#" class="card">Medicopter 117</a>
     <a id="clownCard" href="le clown.html" class="card">Le Clown</a>
 </div>
@@ -112,7 +111,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -135,7 +134,13 @@ document.getElementById("logoutBtn").onclick = () => {
   signOut(auth).then(() => window.location.href = "login.html");
 };
 
-/* LOGIN CHECK + VIP */
+/* 🔥 récup code URL */
+function getCodeFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("code");
+}
+
+/* SYSTEM */
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -143,16 +148,34 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const snap = await getDoc(doc(db, "users", user.uid));
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
+
   if (!snap.exists()) return;
 
   const unlocked = snap.data().seriesUnlocked || [];
 
+  const code = getCodeFromURL();
+
+  /* 🔥 CODE VIP */
+  if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
+    await updateDoc(userRef, {
+      seriesUnlocked: arrayUnion("MEDICOPTER")
+    });
+    alert("🎉 Medicopter débloqué !");
+  }
+
+  if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
+    await updateDoc(userRef, {
+      seriesUnlocked: arrayUnion("LECLOWN")
+    });
+    alert("🎉 Le Clown débloqué !");
+  }
+
   const currentPage = window.location.pathname.split("/").pop();
 
-  /* 🔥 MEDICOPTER VIP */
+  /* 🔥 MEDICOPTER */
   if (unlocked.includes("MEDICOPTER")) {
-
     document.getElementById("medicCard").href = "vipmedicopter.html";
 
     if (currentPage === "medicopter.html") {
@@ -162,9 +185,8 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("medicCard").href = "medicopter.html";
   }
 
-  /* 🔥 CLOWN VIP */
+  /* 🔥 CLOWN */
   if (unlocked.includes("LECLOWN")) {
-
     document.getElementById("clownCard").href = "vipleclown.html";
 
     if (currentPage === "le clown.html") {
