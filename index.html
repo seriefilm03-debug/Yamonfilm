@@ -25,8 +25,8 @@ body{ background:#141414; color:white; }
   border:1px solid #444;
   color:white;
   border-radius:6px;
+  width:160px;
   outline:none;
-  width:150px;
 }
 
 #vipBtn{
@@ -38,7 +38,7 @@ body{ background:#141414; color:white; }
   cursor:pointer;
 }
 
-/* CARD */
+/* SERIES */
 .card{
   display:inline-block;
   width:200px;
@@ -50,6 +50,7 @@ body{ background:#141414; color:white; }
   padding:10px;
   border-radius:8px;
   border:2px solid transparent;
+  transition:0.2s;
 }
 
 .card.vip{
@@ -71,25 +72,31 @@ body{ background:#141414; color:white; }
 <a id="medicCard" href="medicopter.html" class="card">Medicopter 117</a>
 <a id="clownCard" href="le clown.html" class="card">Le Clown</a>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- 🔥 FIREBASE COMPAT (IMPORTANT) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+console.log("SCRIPT OK");
 
 const firebaseConfig = {
-apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-authDomain: "yamonfilm-fead8.firebaseapp.com",
-projectId: "yamonfilm-fead8"
+  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+  authDomain: "yamonfilm-fead8.firebaseapp.com",
+  projectId: "yamonfilm-fead8"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 let userRef;
 let unlocked = [];
 
+/* 🔥 UPDATE UI */
 function updateUI(){
+
   if (unlocked.includes("MEDICOPTER")) {
     document.getElementById("medicCard").classList.add("vip");
     document.getElementById("medicCard").href = "vipmedicopter.html";
@@ -101,65 +108,68 @@ function updateUI(){
   }
 }
 
-onAuthStateChanged(auth, async (user) => {
+/* 🔥 LOGIN */
+auth.onAuthStateChanged(async (user) => {
 
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
-  userRef = doc(db, "users", user.uid);
+  userRef = db.collection("users").doc(user.uid);
 
-  const snap = await getDoc(userRef);
-  if (!snap.exists()) return;
+  const snap = await userRef.get();
+
+  if (!snap.exists) return;
 
   unlocked = snap.data().seriesUnlocked || [];
 
   updateUI();
 });
 
-/* 🔥 FONCTION CODE */
+/* 🔥 CHECK CODE */
 async function checkCode(){
+
+  console.log("CLICK OK");
 
   const code = document.getElementById("vipInput").value.trim().toUpperCase();
 
-  if (!userRef) return alert("Utilisateur pas chargé");
-
-  const snap = await getDoc(userRef);
+  const snap = await userRef.get();
   unlocked = snap.data().seriesUnlocked || [];
 
   if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
 
-    await updateDoc(userRef, {
-      seriesUnlocked: arrayUnion("MEDICOPTER")
+    await userRef.update({
+      seriesUnlocked: firebase.firestore.FieldValue.arrayUnion("MEDICOPTER")
     });
 
     unlocked.push("MEDICOPTER");
+
     alert("🎉 MEDICOPTER débloqué !");
   }
 
   else if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
 
-    await updateDoc(userRef, {
-      seriesUnlocked: arrayUnion("LECLOWN")
+    await userRef.update({
+      seriesUnlocked: firebase.firestore.FieldValue.arrayUnion("LECLOWN")
     });
 
     unlocked.push("LECLOWN");
+
     alert("🎉 LE CLOWN débloqué !");
   }
 
   else {
-    alert("❌ Mauvais code ou déjà utilisé");
+    alert("❌ Code invalide ou déjà utilisé");
   }
 
   document.getElementById("vipInput").value = "";
   updateUI();
 }
 
-/* BUTTON */
+/* BUTTON + ENTER */
 document.getElementById("vipBtn").addEventListener("click", checkCode);
 
-/* ENTER */
 document.getElementById("vipInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") checkCode();
 });
