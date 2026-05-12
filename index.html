@@ -6,25 +6,82 @@
 <title>YAMONFILM</title>
 
 <style>
-/* --- STYLE DE BASE --- */
 *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
 body{ background:#141414; color:white; overflow-x:hidden; }
 
-/* NAV & MENU LATÉRAL */
+/* NAV */
 .navbar{
   position:fixed; top:0; left:0; width:100%; height:60px;
   display:flex; justify-content:space-between; align-items:center;
-  padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  padding:0 20px;
+  background:rgba(0,0,0,0.8);
   z-index:1000;
 }
-.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
-.menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
 
-.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+.logo{
+  color:#e50914;
+  font-size:28px;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+.menu-btn{ font-size:28px; cursor:pointer; }
+
+/* MENU */
+.overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  opacity:0; pointer-events:none;
+  transition:0.3s;
+  z-index:1500;
+}
+
 .overlay.show{ opacity:1; pointer-events:auto; }
-.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+
+.side-menu{
+  position:fixed;
+  top:0; right:-100%;
+  width:280px; height:100%;
+  background:#111;
+  padding:80px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  transition:0.3s;
+  z-index:2000;
+}
+
 .side-menu.open{ right:0; }
-.side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+
+.side-menu a, .side-menu button{
+  color:white;
+  text-decoration:none;
+  background:none;
+  border:none;
+  font-size:18px;
+  padding:10px 0;
+  cursor:pointer;
+  text-align:left;
+  border-bottom:1px solid #222;
+}
+
+/* CONTENU */
+.container{
+  padding:100px 20px;
+}
+
+.card{
+  display:inline-block;
+  width:200px;
+  height:120px;
+  margin:10px;
+  border-radius:8px;
+  background:#222;
+  padding:10px;
+  text-decoration:none;
+  color:white;
+}
+.card:hover{ background:#333; }
 </style>
 </head>
 
@@ -36,18 +93,20 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
 <div class="side-menu" id="menu">
     <a href="account.html">Mon compte</a>
     <a href="series.html">Mes séries</a>
-
     <a href="debloquer.html">Activer un code</a>
-
     <button id="logoutBtn">Déconnexion</button>
 </div>
 
-<section style="padding:100px">
-    <h1>Accueil YAMONFILM</h1>
-</section>
+<div class="container">
+    <h1>🎬 Nos séries</h1>
+
+    <a id="medicCard" href="medicopter.html" class="card">Medicopter 117</a>
+    <a id="clownCard" href="le clown.html" class="card">Le Clown</a>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -66,47 +125,48 @@ const db = getFirestore(app);
 
 /* MENU */
 window.toggleMenu = () => {
-    document.getElementById("menu").classList.toggle("open");
-    document.getElementById("overlay").classList.toggle("show");
+  document.getElementById("menu").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
 };
 
 /* LOGOUT */
 document.getElementById("logoutBtn").onclick = () => {
-    signOut(auth).then(() => window.location.href = "login.html");
+  signOut(auth).then(() => window.location.href = "login.html");
 };
 
-/* 🔥 LOGIQUE GLOBALE VIP (IMPORTANT) */
+/* LOGIN CHECK + VIP */
 onAuthStateChanged(auth, async (user) => {
 
-    if (!user) {
-        window.location.href = "login.html";
-        return;
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) return;
+
+  const unlocked = snap.data().seriesUnlocked || [];
+  const path = window.location.pathname;
+
+  /* 🔥 MEDICOPTER */
+  if (unlocked.includes("MEDICOPTER")) {
+
+    document.getElementById("medicCard").href = "vipmedicopter.html";
+
+    if (path.includes("medicopter.html")) {
+      window.location.replace("vipmedicopter.html");
     }
+  }
 
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (!snap.exists()) return;
+  /* 🔥 CLOWN */
+  if (unlocked.includes("LECLOWN")) {
 
-    const data = snap.data();
-    const unlocked = data.seriesUnlocked || [];
+    document.getElementById("clownCard").href = "vipleclown.html";
 
-    /* =========================
-       🔥 REDIRECTION GLOBALE VIP
-    ========================= */
-
-    // si utilisateur essaie d'aller sur medicopter normal
-    if (unlocked.includes("MEDICOPTER")) {
-
-        if (window.location.href.includes("medicopter.html")) {
-            window.location.href = "vipmedicopter.html";
-        }
+    if (path.includes("le clown.html")) {
+      window.location.replace("vipleclown.html");
     }
-
-    // option future clown
-    if (unlocked.includes("LECLOWN")) {
-        if (window.location.href.includes("le clown.html")) {
-            window.location.href = "vipleclown.html";
-        }
-    }
+  }
 
 });
 </script>
