@@ -3,49 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medicopter 117 - YAMONFILM</title>
+<title>Medicopter VIP</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial;}
-body{background:#0f0f0f;color:white;overflow-x:hidden;}
-
-.navbar{
-position:fixed;top:0;left:0;width:100%;height:60px;
-display:flex;justify-content:space-between;align-items:center;
-padding:0 20px;background:rgba(0,0,0,0.8);z-index:1000;
-}
-
-.logo{color:#e50914;font-size:24px;font-weight:bold;text-decoration:none;}
+body{margin:0;font-family:Arial;background:#0f0f0f;color:white;}
 
 .btn-main{
-background:#e50914;color:white;padding:10px 20px;
-border:none;border-radius:5px;cursor:pointer;
+background:#e50914;color:white;border:none;
+padding:12px 20px;border-radius:5px;cursor:pointer;
 }
 
-.hero{
-height:65vh;background-size:cover;background-position:center;
-display:flex;align-items:flex-end;padding:40px 5%;
-}
-
-.hero::after{
-content:"";position:absolute;inset:0;
-background:linear-gradient(to top,#0f0f0f,transparent);
-}
-
-.hero-content{position:relative;z-index:2;}
-
-.episodes{
-display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;padding:20px 5%;
-}
-
-.card{background:#1c1c1c;border-radius:8px;overflow:hidden;cursor:pointer;}
-
-.card img{width:100%;height:140px;object-fit:cover;}
-
-/* POPUP VIP */
+/* POPUP */
 #vipPopup{
-position:fixed;inset:0;
+position:fixed;
+inset:0;
 background:rgba(0,0,0,0.85);
 display:flex;
 justify-content:center;
@@ -54,8 +25,26 @@ z-index:9999;
 }
 
 .popup-box{
-background:#1c1c1c;padding:25px;border-radius:10px;
-text-align:center;max-width:350px;
+background:#1c1c1c;
+padding:25px;
+border-radius:10px;
+text-align:center;
+max-width:350px;
+}
+
+/* EPISODES */
+.episodes{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#1c1c1c;
+padding:10px;
+border-radius:8px;
+cursor:pointer;
 }
 </style>
 </head>
@@ -66,25 +55,12 @@ text-align:center;max-width:350px;
 <div id="vipPopup">
   <div class="popup-box">
     <h2>🎉 Félicitation !</h2>
-    <p style="margin:15px 0;">
-      Débloquez la série complète VIP maintenant.
-    </p>
+    <p>Débloquez la série VIP complète</p>
     <button id="unlockPopupBtn" class="btn-main">🔓 Débloquer</button>
   </div>
 </div>
 
-<!-- NAV -->
-<div class="navbar">
-<a href="index.html" class="logo">YAMONFILM</a>
-</div>
-
-<!-- HERO -->
-<section class="hero" id="hero">
-<div class="hero-content">
-<h1>Medicopter 117 VIP</h1>
-<p id="overview"></p>
-</div>
-</section>
+<h1 style="padding:20px;">Medicopter 117 VIP</h1>
 
 <div class="episodes" id="episodes"></div>
 
@@ -93,6 +69,8 @@ text-align:center;max-width:350px;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ---------------- FIREBASE ---------------- */
 
 const firebaseConfig = {
 apiKey: "AIzaSyA...",
@@ -104,34 +82,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* ---------------- VARIABLES ---------------- */
+
+let currentUser = null;
 const serieId = "MEDICOPTER";
-
-/* ---------------- POPUP UNLOCK ---------------- */
-
-document.getElementById("unlockPopupBtn").onclick = async () => {
-const user = auth.currentUser;
-if (!user) return;
-
-const ref = doc(db, "users", user.uid);
-const snap = await getDoc(ref);
-
-let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
-
-if (!unlocked.includes(serieId)) {
-unlocked.push(serieId);
-
-await setDoc(ref, {
-seriesUnlocked: unlocked,
-vipMode: true
-}, { merge:true });
-}
-
-document.getElementById("vipPopup").style.display = "none";
-};
 
 /* ---------------- AUTH ---------------- */
 
 onAuthStateChanged(auth, async (user) => {
+
+currentUser = user;
+
 if (!user) return;
 
 const ref = doc(db, "users", user.uid);
@@ -142,20 +103,46 @@ if (snap.exists()) {
 const data = snap.data();
 
 /* cacher popup si déjà VIP */
-if (data.vipMode) {
+if (data.vipMode === true) {
 document.getElementById("vipPopup").style.display = "none";
 }
 
-/* si série déjà débloquée */
+/* cacher si série déjà débloquée */
 if (data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
-
-loadEpisodes();
 });
 
-/* ---------------- EPISODES (TEST SIMPLE) ---------------- */
+/* ---------------- BOUTON POPUP ---------------- */
+
+document.getElementById("unlockPopupBtn").onclick = async () => {
+
+if (!currentUser) {
+alert("Vous devez être connecté !");
+return;
+}
+
+const ref = doc(db, "users", currentUser.uid);
+const snap = await getDoc(ref);
+
+let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+
+if (!unlocked.includes(serieId)) {
+unlocked.push(serieId);
+}
+
+await setDoc(ref, {
+seriesUnlocked: unlocked,
+vipMode: true
+}, { merge: true });
+
+document.getElementById("vipPopup").style.display = "none";
+
+alert("🎉 VIP débloqué !");
+};
+
+/* ---------------- EPISODES TEST ---------------- */
 
 function loadEpisodes(){
 const container = document.getElementById("episodes");
@@ -163,15 +150,12 @@ const container = document.getElementById("episodes");
 for(let i=1;i<=10;i++){
 const div = document.createElement("div");
 div.className="card";
-
-div.innerHTML = `
-<img src="https://via.placeholder.com/300x150">
-<div style="padding:10px">Episode ${i}</div>
-`;
-
+div.innerHTML = "Episode " + i;
 container.appendChild(div);
 }
 }
+
+loadEpisodes();
 
 </script>
 
