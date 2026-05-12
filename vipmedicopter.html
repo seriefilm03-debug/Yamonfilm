@@ -1,146 +1,31 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medicopter VIP</title>
-
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:#0f0f0f;
-color:white;
-}
-
-#vipPopup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.85);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.popup-box{
-background:#1c1c1c;
-padding:25px;
-border-radius:10px;
-text-align:center;
-width:300px;
-}
-
-.btn{
-background:#e50914;
-color:white;
-border:none;
-padding:12px;
-border-radius:5px;
-cursor:pointer;
-margin-top:10px;
-}
-
-.episodes{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-gap:15px;
-padding:20px;
-}
-
-.card{
-background:#1c1c1c;
-padding:10px;
-border-radius:8px;
-cursor:pointer;
-transition:0.2s;
-}
-
-.card:hover{
-background:#2a2a2a;
-}
-</style>
-</head>
-
-<body>
-
-<!-- POPUP -->
-<div id="vipPopup">
-  <div class="popup-box">
-    <h2>🎉 Félicitation</h2>
-    <p>Débloquez la série VIP complète</p>
-    <button id="unlockBtn" class="btn">🔓 Débloquer</button>
-  </div>
-</div>
-
-<h1 style="padding:20px;">Medicopter VIP</h1>
-
-<div class="episodes" id="episodes"></div>
-
-<script type="module">
-
-/* =========================
-   🔥 FIREBASE MODERNE
-========================= */
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* =========================
-   🔥 CONFIG FIREBASE
-========================= */
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-  authDomain: "yamonfilm-fead8.firebaseapp.com",
-  projectId: "yamonfilm-fead8"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* =========================
-   🔥 VARIABLES
-========================= */
-
-const serieId = "MEDICOPTER";
-
-let currentUser = null;
-
-/* =========================
-   🔐 AUTH SAFE
-========================= */
-
 onAuthStateChanged(auth, async (user) => {
 
+  console.log("AUTH:", user);
+
+  // attendre firebase
+  if (user === undefined) return;
+
+  // pas connecté
   if (!user) {
-    window.location.replace("login.html");
+
+    setTimeout(() => {
+
+      if (!auth.currentUser) {
+        window.location.href = "login.html";
+      }
+
+    }, 2000);
+
     return;
   }
-
-  currentUser = user;
-
-  console.log("CONNECTÉ :", user.uid);
 
   try {
 
     const ref = doc(db, "users", user.uid);
 
-    const snap = await getDoc(ref);
+    let snap = await getDoc(ref);
 
-    /* créer user si inexistant */
+    // créer user auto
     if (!snap.exists()) {
 
       await setDoc(ref, {
@@ -148,109 +33,67 @@ onAuthStateChanged(auth, async (user) => {
         vipMode: false
       });
 
+      snap = await getDoc(ref);
     }
 
-    const newSnap = await getDoc(ref);
+    const data = snap.data();
 
-    const data = newSnap.data();
+    const unlocked = data.seriesUnlocked || [];
 
-    /* cacher popup si déjà VIP */
+    /* LE CLOWN VIP */
     if (
-      data.vipMode === true ||
-      data.seriesUnlocked?.includes(serieId)
+      unlocked.includes("LECLOWN") ||
+      data.vipMode === true
     ) {
 
-      document.getElementById("vipPopup").style.display = "none";
+      document.getElementById("heroClownBtn").href =
+      "vipleclown.html";
+
+      const cardClown =
+      document.getElementById("cardClown");
+
+      cardClown.href = "vipleclown.html";
+
+      cardClown.innerText =
+      "Le Clown VIP 🔥";
+
+      cardClown.classList.add("vip");
+    }
+
+    /* MEDICOPTER VIP */
+    if (
+      unlocked.includes("MEDICOPTER") ||
+      data.vipMode === true
+    ) {
+
+      document.getElementById("heroMedicBtn").href =
+      "vipmedicopter.html";
+
+      const cardMedic =
+      document.getElementById("cardMedic");
+
+      cardMedic.href = "vipmedicopter.html";
+
+      cardMedic.innerText =
+      "Medicopter VIP 🔥";
+
+      cardMedic.classList.add("vip");
+    }
+
+    /* CONTINUE */
+    if (data.progress?.lastBySerie) {
+
+      displayContinue(
+        data.progress.lastBySerie,
+        unlocked
+      );
 
     }
 
   } catch(err) {
 
     console.error(err);
-    alert("Erreur Firebase");
 
   }
 
 });
-
-/* =========================
-   🔓 DEBLOCAGE VIP
-========================= */
-
-document.getElementById("unlockBtn").addEventListener("click", async () => {
-
-  if (!currentUser) {
-    alert("Utilisateur non connecté");
-    return;
-  }
-
-  try {
-
-    const ref = doc(db, "users", currentUser.uid);
-
-    const snap = await getDoc(ref);
-
-    let unlocked = [];
-
-    if (snap.exists()) {
-      unlocked = snap.data().seriesUnlocked || [];
-    }
-
-    /* ajouter série */
-    if (!unlocked.includes(serieId)) {
-      unlocked.push(serieId);
-    }
-
-    await setDoc(ref, {
-      seriesUnlocked: unlocked,
-      vipMode: true
-    }, { merge: true });
-
-    document.getElementById("vipPopup").style.display = "none";
-
-    alert("🎉 Medicopter VIP débloqué !");
-
-    /* recharge propre */
-    window.location.reload();
-
-  } catch(err) {
-
-    console.error(err);
-
-    alert("Erreur de déblocage");
-
-  }
-
-});
-
-/* =========================
-   🎬 EPISODES
-========================= */
-
-function loadEpisodes(){
-
-  const container = document.getElementById("episodes");
-
-  for(let i = 1; i <= 10; i++){
-
-    const div = document.createElement("div");
-
-    div.className = "card";
-
-    div.innerHTML = `
-      <h3>Episode ${i}</h3>
-      <p>Medicopter 117</p>
-    `;
-
-    container.appendChild(div);
-
-  }
-
-}
-
-loadEpisodes();
-
-</script>
-
-</body>
-</html>
