@@ -13,15 +13,6 @@ background:#0f0f0f;
 color:white;
 }
 
-.btn-main{
-background:#e50914;
-color:white;
-border:none;
-padding:12px 20px;
-border-radius:5px;
-cursor:pointer;
-}
-
 #vipPopup{
 position:fixed;
 inset:0;
@@ -37,12 +28,22 @@ background:#1c1c1c;
 padding:25px;
 border-radius:10px;
 text-align:center;
-max-width:350px;
+width:300px;
+}
+
+.btn{
+background:#e50914;
+color:white;
+border:none;
+padding:12px;
+border-radius:5px;
+cursor:pointer;
+margin-top:10px;
 }
 
 .episodes{
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
 gap:15px;
 padding:20px;
 }
@@ -58,34 +59,37 @@ cursor:pointer;
 
 <body>
 
-<!-- POPUP VIP -->
+<!-- POPUP -->
 <div id="vipPopup">
   <div class="popup-box">
-    <h2>🎉 Félicitation !</h2>
+    <h2>🎉 Félicitation</h2>
     <p>Débloquez la série VIP complète</p>
-    <button id="unlockPopupBtn" class="btn-main">🔓 Débloquer</button>
+    <button id="unlockBtn" class="btn">🔓 Débloquer</button>
   </div>
 </div>
 
-<h1 style="padding:20px;">Medicopter 117 VIP</h1>
+<h1 style="padding:20px;">Medicopter VIP</h1>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
 
-/* 🔥 IMPORT GLOBAL (TON SYSTÈME) */
-import { auth, requireAuth } from "./auth.js";
-import { getFirestore, doc, setDoc, getDoc } 
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const db = getFirestore();
 
 const serieId = "MEDICOPTER";
 
-/* 🔐 PROTECTION DE PAGE */
-requireAuth(async (user) => {
+/* 🔐 PROTECTION PAGE */
+onAuthStateChanged(auth, async (user) => {
 
-console.log("✅ CONNECTÉ :", user.uid);
+if (!user) {
+window.location.href = "login.html";
+return;
+}
+
+console.log("CONNECTÉ :", user.uid);
 
 const ref = doc(db, "users", user.uid);
 const snap = await getDoc(ref);
@@ -93,16 +97,14 @@ const snap = await getDoc(ref);
 if (snap.exists()) {
 const data = snap.data();
 
-/* cacher popup si déjà débloqué */
 if (data.vipMode || data.seriesUnlocked?.includes(serieId)) {
 document.getElementById("vipPopup").style.display = "none";
 }
 }
-
 });
 
 /* 🔓 DEBLOCAGE VIP */
-document.getElementById("unlockPopupBtn").onclick = async () => {
+document.getElementById("unlockBtn").onclick = async () => {
 
 const user = auth.currentUser;
 
@@ -136,7 +138,7 @@ const container = document.getElementById("episodes");
 
 for(let i=1;i<=10;i++){
 const div = document.createElement("div");
-div.className="card";
+div.className = "card";
 div.innerHTML = "Episode " + i;
 container.appendChild(div);
 }
