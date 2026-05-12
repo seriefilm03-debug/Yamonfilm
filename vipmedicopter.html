@@ -1,1032 +1,714 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>YAMONFILM</title>
+<title>Medicopter 117 - YAMONFILM</title>
 
 <style>
-
-/* =========================
-   BASE
-========================= */
-
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial,sans-serif;
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
 }
 
 body{
-  background:#141414;
-  color:white;
-  overflow-x:hidden;
+    background:#0f0f0f;
+    color:white;
+    overflow-x:hidden;
 }
 
-/* =========================
-   NAVBAR
-========================= */
-
+/* NAVBAR */
 .navbar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:60px;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding:0 20px;
-
-  background:
-  linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.9),
-    transparent
-  );
-
-  z-index:1000;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    z-index:1000;
 }
 
 .logo{
-  color:#e50914;
-  font-size:28px;
-  font-weight:bold;
-  text-decoration:none;
+    color:#e50914;
+    font-size:28px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.nav-right{
+    display:flex;
+    align-items:center;
+    gap:15px;
 }
 
 .menu-btn{
-  font-size:28px;
-  cursor:pointer;
-  z-index:2100;
+    font-size:28px;
+    cursor:pointer;
 }
 
-/* =========================
-   MENU
-========================= */
-
+/* MENU */
 .overlay{
-  position:fixed;
-  inset:0;
-
-  background:rgba(0,0,0,0.6);
-
-  backdrop-filter:blur(6px);
-
-  opacity:0;
-  pointer-events:none;
-
-  transition:0.3s;
-
-  z-index:1500;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    opacity:0;
+    pointer-events:none;
+    transition:0.3s;
+    z-index:1500;
 }
 
 .overlay.show{
-  opacity:1;
-  pointer-events:auto;
+    opacity:1;
+    pointer-events:auto;
 }
 
 .side-menu{
-  position:fixed;
-
-  top:0;
-  right:-100%;
-
-  width:300px;
-  height:100%;
-
-  background:#111;
-
-  padding:80px 20px 20px;
-
-  display:flex;
-  flex-direction:column;
-
-  gap:15px;
-
-  transition:0.3s;
-
-  z-index:2000;
-
-  border-left:1px solid #333;
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:300px;
+    height:100%;
+    background:#111;
+    padding:80px 20px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    transition:0.3s;
+    z-index:2000;
+    border-left:1px solid #333;
 }
 
 .side-menu.open{
-  right:0;
+    right:0;
 }
 
 .side-menu a,
 .side-menu button{
-
-  color:white;
-
-  text-decoration:none;
-
-  background:none;
-  border:none;
-
-  font-size:18px;
-
-  padding:10px 0;
-
-  cursor:pointer;
-
-  text-align:left;
-
-  border-bottom:1px solid #222;
+    color:white;
+    text-decoration:none;
+    background:none;
+    border:none;
+    font-size:18px;
+    padding:10px 0;
+    cursor:pointer;
+    text-align:left;
+    border-bottom:1px solid #222;
 }
 
-/* =========================
-   VIP BOX
-========================= */
+/* CODE VIP */
+.promo-section{
+    margin-top:10px;
+    padding:10px 0;
+    border-bottom:1px solid #222;
+}
 
-.promo-box{
-  padding:10px 0;
-  border-bottom:1px solid #222;
+.promo-input{
+    width:100%;
+    padding:12px;
+    background:#222;
+    border:1px solid #444;
+    color:white;
+    border-radius:4px;
+    margin-top:10px;
 }
 
 .activate-btn{
-
-  background:#e50914;
-
-  color:white;
-
-  width:100%;
-
-  padding:10px;
-
-  border-radius:4px;
-
-  border:none;
-
-  font-weight:bold;
-
-  margin-top:10px;
-
-  cursor:pointer;
-
-  text-align:center;
-
-  text-decoration:none;
-
-  display:block;
+    background:#e50914;
+    color:white;
+    border:none;
+    padding:12px;
+    width:100%;
+    border-radius:4px;
+    margin-top:10px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-/* =========================
-   HERO
-========================= */
-
-.hero-container{
-  position:relative;
-  width:100%;
-  height:80vh;
-  overflow:hidden;
+/* HERO */
+.hero{
+    height:65vh;
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:flex-end;
+    padding:40px 5%;
+    position:relative;
 }
 
-.hero-slide{
-  position:absolute;
-  inset:0;
-
-  opacity:0;
-
-  transition:opacity 1.5s ease-in-out;
-
-  background-size:cover;
-  background-position:center;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-
-  padding:0 5%;
-}
-
-.hero-slide.active{
-  opacity:1;
-}
-
-.hero-slide::after{
-  content:"";
-
-  position:absolute;
-  inset:0;
-
-  background:
-  linear-gradient(
-    to right,
-    rgba(0,0,0,0.8),
-    transparent 60%
-  ),
-
-  linear-gradient(
-    to top,
-    #141414,
-    transparent 40%
-  );
+.hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top,#0f0f0f,transparent 50%),
+               linear-gradient(to right,#0f0f0f,transparent);
 }
 
 .hero-content{
-  position:relative;
-  z-index:10;
-  max-width:600px;
+    position:relative;
+    z-index:2;
+    max-width:700px;
 }
 
-.hero-content h1{
-  font-size:clamp(35px,6vw,70px);
-  margin-bottom:10px;
+.btn-main{
+    background:#e50914;
+    color:white;
+    padding:12px 25px;
+    border-radius:5px;
+    font-weight:bold;
+    cursor:pointer;
+    border:none;
+    margin-top:10px;
 }
 
-.play-btn{
-
-  padding:12px 35px;
-
-  background:white;
-
-  color:black;
-
-  text-decoration:none;
-
-  font-weight:bold;
-
-  border-radius:4px;
-
-  display:inline-flex;
-
-  transition:0.3s;
+/* EPISODES */
+.episodes{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px;
+    padding:20px 5%;
 }
 
-.play-btn:hover{
-  background:#e50914;
-  color:white;
+.card{
+    background:#1c1c1c;
+    border-radius:8px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.3s;
+    border:1px solid #333;
+    position:relative;
 }
 
-/* =========================
-   CONTINUE
-========================= */
-
-.continue-section{
-  padding:40px 5% 10px;
-  display:none;
+.card:hover{
+    transform:scale(1.03);
+    border-color:#e50914;
 }
 
-.continue-grid{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-  padding:10px 0;
-  scrollbar-width:none;
-}
-
-.continue-card{
-  min-width:260px;
-  text-decoration:none;
-  color:white;
-  transition:0.3s;
-}
-
-.continue-card:hover{
-  transform:scale(1.05);
-}
-
-.img-container{
-  position:relative;
-  width:100%;
-  height:145px;
-  border-radius:4px;
-  overflow:hidden;
-  background:#222;
-}
-
-.img-container img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+.card img{
+    width:100%;
+    height:140px;
+    object-fit:cover;
 }
 
 .progress-bar{
-  position:absolute;
-  bottom:0;
-  left:0;
-
-  height:4px;
-
-  background:#e50914;
-
-  width:100%;
+    position:absolute;
+    bottom:0;
+    left:0;
+    height:4px;
+    background:#e50914;
 }
 
-/* =========================
-   MOVIES
-========================= */
-
-.movies-label{
-  padding:30px 5% 0;
-  font-size:22px;
-  font-weight:bold;
+.watched-tag{
+    position:absolute;
+    top:5px;
+    right:5px;
+    background:rgba(0,0,0,0.8);
+    color:#00ff00;
+    font-size:10px;
+    padding:2px 5px;
+    border-radius:3px;
+    font-weight:bold;
 }
 
-.movies{
-
-  padding:20px 5%;
-
-  display:grid;
-
-  grid-template-columns:
-  repeat(auto-fill,minmax(200px,1fr));
-
-  gap:15px;
+/* VIDEO */
+#video-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:black;
+    z-index:3000;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
 }
 
-.movie{
-
-  height:300px;
-
-  background-size:cover;
-  background-position:center;
-
-  border-radius:4px;
-
-  display:flex;
-  align-items:flex-end;
-
-  padding:15px;
-
-  text-decoration:none;
-
-  color:white;
-
-  font-weight:bold;
-
-  transition:0.3s;
-
-  border:2px solid transparent;
+#video-overlay iframe{
+    width:100%;
+    height:90%;
+    border:none;
 }
 
-.movie:hover{
-  transform:scale(1.05);
+.close-video{
+    position:absolute;
+    top:15px;
+    right:25px;
+    font-size:35px;
+    cursor:pointer;
 }
 
-.movie.vip{
-  border:2px solid #e50914;
+/* SAISONS */
+.season-menu{
+    background:#1c1c1c;
+    border:1px solid #333;
+    position:absolute;
+    display:none;
+    z-index:10;
+    border-radius:5px;
 }
 
-/* =========================
-   VIP ROUGE
-========================= */
-
-.vip{
-  border:2px solid #e50914 !important;
+.season-menu div{
+    padding:12px 20px;
+    cursor:pointer;
+    border-bottom:1px solid #222;
 }
 
+.show{
+    display:block;
+}
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     NAVBAR
-========================= -->
-
 <div class="navbar">
+    <a href="index.html" class="logo">YAMONFILM</a>
 
-  <a href="index.html" class="logo">
-    YAMONFILM
-  </a>
-
-  <div class="menu-btn"
-  onclick="toggleMenu()">
-
-    ☰
-
-  </div>
-
+    <div class="nav-right">
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </div>
 </div>
 
-<!-- =========================
-     OVERLAY
-========================= -->
-
-<div class="overlay"
-id="overlay"
-onclick="toggleMenu()"></div>
-
-<!-- =========================
-     MENU
-========================= -->
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="side-menu" id="menu">
 
-  <a href="account.html">
-    Mon compte
-  </a>
+    <a href="index.html">Accueil</a>
+    <a href="account.html">Mon compte</a>
 
-  <a href="series.html">
-    Mes séries
-  </a>
+    <div class="promo-section">
+        <span style="color:#666;font-size:12px;">ACTIVER UN CODE</span>
 
-  <div class="promo-box">
+        <input
+            type="text"
+            id="promoCode"
+            class="promo-input"
+            placeholder="Entrer le code VIP"
+        >
 
-    <span style="
-    color:#666;
-    font-size:12px;">
+        <button id="activateBtnMenu" class="activate-btn">
+            Activer
+        </button>
 
-      ZONE VIP
+        <p id="promoMsgMenu"
+           style="font-size:12px;margin-top:8px;text-align:center;">
+        </p>
+    </div>
 
-    </span>
-
-    <a href="debloquer.html"
-    class="activate-btn">
-
-      Activer un code
-
-    </a>
-
-  </div>
-
-  <button id="logoutBtn"
-  style="
-  margin-top:auto;
-  color:#e50914;">
-
-    Déconnexion
-
-  </button>
+    <button id="logoutBtn"
+            style="margin-top:auto;color:#e50914;">
+        Déconnexion
+    </button>
 
 </div>
 
-<!-- =========================
-     HERO
-========================= -->
+<!-- VIDEO -->
+<div id="video-overlay">
+    <span class="close-video" onclick="closeVideo()">&times;</span>
 
-<section class="hero-container">
+    <iframe id="video-iframe"
+            src=""
+            allowfullscreen>
+    </iframe>
+</div>
 
-  <!-- LE CLOWN -->
-
-  <div class="hero-slide active"
-
-  style="
-  background-image:url(
-  'https://media.senscritique.com/media/000006485088/0/le_clown.jpg'
-  );">
+<!-- HERO -->
+<section class="hero" id="hero">
 
     <div class="hero-content">
 
-      <h1>Le Clown</h1>
+        <h1 style="font-size:3rem;">
+            Medicopter 117
+        </h1>
 
-      <p>
-      Le justicier au masque de cuir
-      revient pour faire régner
-      la justice.
-      </p>
+        <p id="overview"
+           style="margin-top:15px;color:#ccc;">
+        </p>
 
-      <br>
-
-      <a id="heroClownBtn"
-
-      href="le clown.html"
-
-      class="play-btn">
-
-        ▶ Lecture
-
-      </a>
+        <button id="resumeBtn"
+                class="btn-main"
+                style="display:none;background:white;color:black;">
+            ▶ Reprendre
+        </button>
 
     </div>
 
-  </div>
-
-  <!-- MEDICOPTER -->
-
-  <div class="hero-slide"
-
-  style="
-  background-image:url(
-  's-l1200.jpg'
-  );">
-
-    <div class="hero-content">
-
-      <h1>Medicopter 117</h1>
-
-      <p>
-      Des vies en jeu,
-      une équipe d'élite prête à tout.
-      </p>
-
-      <br>
-
-      <a id="heroMedicBtn"
-
-      href="medicopter.html"
-
-      class="play-btn">
-
-        ▶ Lecture
-
-      </a>
-
-    </div>
-
-  </div>
-
 </section>
 
-<!-- =========================
-     CONTINUE WATCHING
-========================= -->
+<!-- SAISONS -->
+<div style="padding:20px 5%;position:relative;">
 
-<section id="continue-watching"
-class="continue-section">
+    <button class="btn-main" id="seasonBtn">
+        Saison 1 ▼
+    </button>
 
-  <h3>Reprendre la lecture</h3>
+    <div class="season-menu" id="seasonMenu"></div>
 
-  <div id="continue-container"
-  class="continue-grid"></div>
+</div>
 
-</section>
-
-<!-- =========================
-     SERIES
-========================= -->
-
-<h3 class="movies-label">
-  Nos Séries
-</h3>
-
-<section class="movies">
-
-  <a id="cardClown"
-
-  href="le clown.html"
-
-  class="movie"
-
-  style="
-  background-image:url(
-  'https://media.senscritique.com/media/000016277047/0/le_clown.jpg'
-  );">
-
-    Le Clown
-
-  </a>
-
-  <a id="cardMedic"
-
-  href="medicopter.html"
-
-  class="movie"
-
-  style="
-  background-image:url(
-  's-l1200.jpg'
-  );">
-
-    Medicopter 117
-
-  </a>
-
-</section>
-
-<!-- =========================
-     FILMS
-========================= -->
-
-<h3 class="movies-label">
-  Film
-</h3>
-
-<section class="movies">
-
-  <a id="cardsupercross"
-
-  href="supercross.html"
-
-  class="movie"
-
-  style="
-  background-image:url(
-  'https://media.themoviedb.org/t/p/w440_and_h660_face/sHgPR5jrN09KoHKltAnLp8cfgg3.jpg'
-  );">
-
-    Supercross
-
-  </a>
-
-</section>
-
-<!-- =========================
-     FIREBASE
-========================= -->
+<!-- EPISODES -->
+<div class="episodes" id="episodes"></div>
 
 <script type="module">
 
-/* =========================
-   IMPORT FIREBASE
-========================= */
-
 import { initializeApp }
-
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
-
-  getAuth,
-  onAuthStateChanged,
-  signOut
-
+    getAuth,
+    onAuthStateChanged,
+    signOut
 }
-
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
-
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc
 }
-
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* =========================
-   FIREBASE CONFIG
-========================= */
+/* FIREBASE */
 
 const firebaseConfig = {
-
-  apiKey:
-  "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
-
-  authDomain:
-  "yamonfilm-fead8.firebaseapp.com",
-
-  projectId:
-  "yamonfilm-fead8"
-
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+    authDomain: "yamonfilm-fead8.firebaseapp.com",
+    projectId: "yamonfilm-fead8"
 };
 
-const app =
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const auth =
-getAuth(app);
-
-const db =
-getFirestore(app);
-
-/* =========================
-   MENU
-========================= */
+/* MENU */
 
 window.toggleMenu = () => {
-
-  document.getElementById("menu")
-  .classList.toggle("open");
-
-  document.getElementById("overlay")
-  .classList.toggle("show");
-
+    document.getElementById("menu").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
 };
 
-/* =========================
-   LOGOUT
-========================= */
+/* LOGOUT */
 
-document.getElementById("logoutBtn")
-.onclick = async () => {
-
-  localStorage.removeItem("logged");
-
-  await signOut(auth);
-
-  window.location.href =
-  "login.html";
-
+document.getElementById("logoutBtn").onclick = async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
 };
 
-/* =========================
-   HERO SLIDER
-========================= */
+/* VARIABLES */
 
-let currentSlide = 0;
+const serieId = "MEDICOPTER";
 
-const slides =
-document.querySelectorAll(".hero-slide");
+let userProgress = {
+    watched: [],
+    lastBySerie: {}
+};
 
-setInterval(() => {
+let currentEpisodes = [];
+let currentS = 1;
 
-  slides[currentSlide]
-  .classList.remove("active");
+/* AUTH */
 
-  currentSlide =
-  (currentSlide + 1)
-  % slides.length;
+onAuthStateChanged(auth, async (user) => {
 
-  slides[currentSlide]
-  .classList.add("active");
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
 
-}, 6000);
+    const userRef = doc(db, "users", user.uid);
 
-/* =========================
-   AUTH
-========================= */
+    const snap = await getDoc(userRef);
 
-onAuthStateChanged(auth,
-async (user) => {
+    if (snap.exists()) {
 
-  console.log("AUTH:", user);
+        const data = snap.data();
 
-  /* attendre firebase */
-  if (user === undefined) return;
-
-  /* PAS CONNECTÉ */
-  if (!user) {
-
-    setTimeout(() => {
-
-      if (!auth.currentUser) {
-
-        if (
-          localStorage.getItem("logged")
-          !== "true"
-        ) {
-
-          window.location.href =
-          "login.html";
-
+        if (data.progress) {
+            userProgress = data.progress;
         }
 
-      }
-
-    }, 2500);
-
-    return;
-  }
-
-  /* CONNECTÉ */
-  localStorage.setItem(
-    "logged",
-    "true"
-  );
-
-  try {
-
-    const ref =
-    doc(db, "users", user.uid);
-
-    let snap =
-    await getDoc(ref);
-
-    /* créer user */
-    if (!snap.exists()) {
-
-      await setDoc(ref, {
-
-        seriesUnlocked: [],
-        vipMode: false
-
-      });
-
-      snap =
-      await getDoc(ref);
-
+        checkResume();
     }
 
-    const data =
-    snap.data();
-
-    const unlocked =
-    data.seriesUnlocked || [];
-
-    /* =====================
-       LE CLOWN VIP
-    ===================== */
-
-    if (
-
-      unlocked.includes("LECLOWN")
-
-      ||
-
-      data.vipMode === true
-
-    ) {
-
-      document.getElementById(
-      "heroClownBtn")
-
-      .href =
-      "vipleclown.html";
-
-      const clown =
-      document.getElementById(
-      "cardClown");
-
-      clown.href =
-      "vipleclown.html";
-
-      clown.innerText =
-      "Le Clown VIP 🔥";
-
-      clown.classList.add("vip");
-
-    }
-
-    /* =====================
-       MEDICOPTER VIP
-    ===================== */
-
-    if (
-
-      unlocked.includes(
-      "MEDICOPTER")
-
-      ||
-
-      data.vipMode === true
-
-    ) {
-
-      document.getElementById(
-      "heroMedicBtn")
-
-      .href =
-      "vipmedicopter.html";
-
-      const medic =
-      document.getElementById(
-      "cardMedic");
-
-      medic.href =
-      "vipmedicopter.html";
-
-      medic.innerText =
-      "Medicopter VIP 🔥";
-
-      medic.classList.add("vip");
-
-    }
-
-    /* =====================
-       CONTINUE WATCHING
-    ===================== */
-
-    if (
-      data.progress?.lastBySerie
-    ) {
-
-      displayContinue(
-        data.progress.lastBySerie,
-        unlocked
-      );
-
-    }
-
-  } catch(err) {
-
-    console.error(err);
-
-  }
+    loadSeries();
 
 });
 
-/* =========================
-   CONTINUE WATCHING
-========================= */
+/* CODE VIP */
 
-function displayContinue(
-  lastBySerie,
-  unlocked
-){
+document.getElementById("activateBtnMenu").onclick = async () => {
 
-  const container =
-  document.getElementById(
-  "continue-container");
+    const user = auth.currentUser;
 
-  const section =
-  document.getElementById(
-  "continue-watching");
+    if (!user) return;
 
-  container.innerHTML = "";
+    const code = document
+        .getElementById("promoCode")
+        .value
+        .trim()
+        .toUpperCase();
 
-  const items =
-  Object.values(lastBySerie)
-  .sort((a,b)=>
-    b.timestamp-a.timestamp
-  );
+    const msg = document.getElementById("promoMsgMenu");
 
-  if(items.length > 0){
+    if (code !== "MEDICVIP") {
 
-    section.style.display =
-    "block";
+        msg.style.color = "red";
+        msg.innerText = "Code invalide";
 
-  }
-
-  items.forEach(item => {
-
-    const imgUrl =
-
-    item.img.startsWith("http")
-
-    ?
-
-    item.img
-
-    :
-
-    `https://image.tmdb.org/t/p/w300${item.img}`;
-
-    let finalLink =
-    item.link;
-
-    /* clown vip */
-    if(
-
-      item.serieName ===
-      "Le Clown"
-
-      &&
-
-      unlocked.includes(
-      "LECLOWN")
-
-    ){
-
-      finalLink =
-      "vipleclown.html";
-
+        return;
     }
 
-    /* medic vip */
-    if(
+    const ref = doc(db, "users", user.uid);
 
-      item.serieName ===
-      "Medicopter 117"
+    const snap = await getDoc(ref);
 
-      &&
+    let unlocked = [];
 
-      unlocked.includes(
-      "MEDICOPTER")
-
-    ){
-
-      finalLink =
-      "vipmedicopter.html";
-
+    if (snap.exists()) {
+        unlocked = snap.data().seriesUnlocked || [];
     }
 
-    const card =
-    document.createElement("a");
+    if (!unlocked.includes("MEDICOPTER")) {
+        unlocked.push("MEDICOPTER");
+    }
 
-    card.href =
-    finalLink;
+    await setDoc(ref, {
+        seriesUnlocked: unlocked
+    }, { merge:true });
 
-    card.className =
-    "continue-card";
+    msg.style.color = "lime";
+    msg.innerText = "Medicopter VIP débloqué 🔥";
 
-    card.innerHTML = `
+};
 
-      <div class="img-container">
+/* API */
 
-        <img src="${imgUrl}">
+const apiKey = "182c7173698e34803715eacab5c693a7";
+const tmdbId = 40996;
 
-        <div class="progress-bar"></div>
+/* HERO */
 
-      </div>
+async function loadSeries(){
 
-      <div style="margin-top:10px;">
+    const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`
+    );
 
-        <b>${item.serieName}</b>
+    const data = await res.json();
 
-        <br>
+    document.getElementById("overview").innerText =
+        data.overview;
 
-        <span style="
-        font-size:12px;
-        color:#aaa;">
+    document.getElementById("hero").style.backgroundImage =
+        `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
 
-        S${item.s}
-        :
-        E${item.e}
-        -
-        ${item.title}
+    const menu = document.getElementById("seasonMenu");
 
-        </span>
+    for(let i=1;i<=data.number_of_seasons;i++){
 
-      </div>
+        const div = document.createElement("div");
 
-    `;
+        div.innerText = "Saison " + i;
 
-    container.appendChild(card);
+        div.onclick = () => {
 
-  });
+            currentS = i;
+
+            document.getElementById("seasonBtn").innerText =
+                "Saison " + i + " ▼";
+
+            loadEpisodes(i);
+
+            menu.classList.remove("show");
+        };
+
+        menu.appendChild(div);
+    }
+
+    loadEpisodes(1);
+}
+
+/* LOAD EPISODES */
+
+async function loadEpisodes(s){
+
+    const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`
+    );
+
+    const data = await res.json();
+
+    currentEpisodes = data.episodes;
+
+    renderEpisodes();
+}
+
+/* RENDER */
+
+function renderEpisodes(){
+
+    const container = document.getElementById("episodes");
+
+    container.innerHTML = "";
+
+    currentEpisodes.forEach(ep => {
+
+        const epKey =
+            `${serieId}-S${currentS}E${ep.episode_number}`;
+
+        const watched =
+            userProgress.watched.includes(epKey);
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
+
+            ${watched ? `<div class="watched-tag">VU</div>` : ""}
+
+            <div class="progress-bar"
+                 style="width:${watched ? "100%" : "0%"}">
+            </div>
+
+            <div style="padding:10px;">
+                <b>E${ep.episode_number}</b>
+                - ${ep.name}
+            </div>
+        `;
+
+        card.onclick = () => {
+
+            openVideo(
+                currentS,
+                ep.episode_number,
+                ep.name,
+                ep.still_path
+            );
+
+        };
+
+        container.appendChild(card);
+
+    });
 
 }
+
+/* VIDEO */
+
+const videasSources = {
+    1:{
+        1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"
+    }
+};
+
+window.openVideo = async (s,e,title,img) => {
+
+    const url = videasSources[s]?.[e];
+
+    if(!url) return;
+
+    document.getElementById("video-overlay").style.display =
+        "flex";
+
+    document.getElementById("video-iframe").src =
+        url;
+
+    await saveProgress(s,e,title,img);
+
+};
+
+window.closeVideo = () => {
+
+    document.getElementById("video-overlay").style.display =
+        "none";
+
+    document.getElementById("video-iframe").src = "";
+
+};
+
+/* SAVE PROGRESS */
+
+async function saveProgress(s,e,title,img){
+
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    const epKey = `${serieId}-S${s}E${e}`;
+
+    if(!userProgress.watched.includes(epKey)){
+
+        userProgress.watched.push(epKey);
+
+    }
+
+    userProgress.lastBySerie[serieId] = {
+        s,
+        e,
+        title,
+        img,
+        serieName:"Medicopter 117",
+        link:"medicopter.html",
+        timestamp:Date.now()
+    };
+
+    await setDoc(
+        doc(db,"users",user.uid),
+        {
+            progress:userProgress
+        },
+        { merge:true }
+    );
+
+    renderEpisodes();
+
+    checkResume();
+}
+
+/* REPRENDRE */
+
+function checkResume(){
+
+    const last =
+        userProgress.lastBySerie?.[serieId];
+
+    if(!last) return;
+
+    const btn =
+        document.getElementById("resumeBtn");
+
+    btn.style.display = "inline-flex";
+
+    btn.innerText =
+        `▶ Reprendre S${last.s}E${last.e}`;
+
+    btn.onclick = () => {
+
+        openVideo(
+            last.s,
+            last.e,
+            last.title,
+            last.img
+        );
+
+    };
+}
+
+/* MENU SAISON */
+
+document.getElementById("seasonBtn").onclick = () => {
+
+    document.getElementById("seasonMenu")
+        .classList.toggle("show");
+
+};
 
 </script>
 
