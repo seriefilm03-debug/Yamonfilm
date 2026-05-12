@@ -6,85 +6,150 @@
 <title>Medicopter 117 - YAMONFILM</title>
 
 <style>
-*{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif;}
-body{background:#0f0f0f;color:white;overflow-x:hidden;}
+*{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
 .navbar{
-position:fixed;top:0;left:0;width:100%;height:60px;
-display:flex;justify-content:space-between;align-items:center;
+position:fixed; top:0; left:0; width:100%; height:60px;
+display:flex; justify-content:space-between; align-items:center;
 padding:0 20px;
-background:linear-gradient(to bottom,rgba(0,0,0,0.9),transparent);
+background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
 z-index:1000;
 }
-.logo{color:#e50914;font-size:28px;font-weight:bold;text-decoration:none;}
-.menu-btn{font-size:28px;cursor:pointer;z-index:2100;}
 
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
-opacity:0;pointer-events:none;transition:0.3s;z-index:1500;}
-.overlay.show{opacity:1;pointer-events:auto;}
+.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+.menu-btn{ font-size:28px; cursor:pointer; z-index:2100; }
+
+.overlay{
+position:fixed; inset:0;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(6px);
+opacity:0; pointer-events:none;
+transition:0.3s; z-index:1500;
+}
+.overlay.show{ opacity:1; pointer-events:auto; }
 
 .side-menu{
-position:fixed;top:0;right:-100%;width:300px;height:100%;
-background:#111;padding:80px 20px 20px;
-display:flex;flex-direction:column;gap:15px;
-transition:0.3s;z-index:2000;border-left:1px solid #333;
+position:fixed; top:0; right:-100%;
+width:300px; height:100%;
+background:#111;
+padding:80px 20px 20px;
+display:flex; flex-direction:column;
+gap:15px;
+transition:0.3s;
+z-index:2000;
+border-left:1px solid #333;
 }
-.side-menu.open{right:0;}
+.side-menu.open{ right:0; }
 
 .side-menu a,.side-menu button{
-color:white;background:none;border:none;
-font-size:18px;padding:10px 0;cursor:pointer;
-text-align:left;border-bottom:1px solid #222;
+color:white;
+background:none;
+border:none;
+font-size:18px;
+padding:10px 0;
+cursor:pointer;
+text-align:left;
+border-bottom:1px solid #222;
 }
 
-.promo-section{margin-top:10px;padding:10px 0;border-bottom:1px solid #222;}
-.promo-input{width:100%;padding:12px;background:#222;border:1px solid #444;color:white;border-radius:4px;margin-top:10px;}
-.activate-btn{background:#e50914;color:white;border:none;padding:12px;width:100%;border-radius:4px;margin-top:10px;font-weight:bold;cursor:pointer;}
+.promo-section{ margin-top:10px; padding:10px 0; border-bottom:1px solid #222; }
+.promo-input{ width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:4px; margin-top:10px; }
+.activate-btn{ background:#e50914; color:white; border:none; padding:12px; width:100%; border-radius:4px; margin-top:10px; cursor:pointer; }
 
-#video-overlay{display:none;position:fixed;inset:0;background:black;z-index:3000;}
-#video-overlay iframe{width:100%;height:90%;border:none;}
-.close-video{position:absolute;top:15px;right:25px;font-size:35px;cursor:pointer;}
+#video-overlay{
+display:none;
+position:fixed;
+inset:0;
+background:black;
+z-index:3000;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+#video-overlay iframe{ width:100%; height:90%; border:none; }
+.close-video{ position:absolute; top:15px; right:25px; font-size:35px; cursor:pointer; }
 
-.hero{height:65vh;background-size:cover;background-position:center;
-display:flex;align-items:flex-end;padding:40px 5%;position:relative;}
+.hero{
+height:65vh;
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:flex-end;
+padding:40px 5%;
+position:relative;
+}
 
 .hero::after{
-content:"";position:absolute;inset:0;
+content:"";
+position:absolute;
+inset:0;
 background:linear-gradient(to top,#0f0f0f,transparent 50%),
 linear-gradient(to right,#0f0f0f,transparent);
 }
 
-.hero-content{position:relative;z-index:2;max-width:700px;}
+.hero-content{ position:relative; z-index:2; max-width:700px; }
 
 .episodes{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;padding:20px 5%;
+gap:20px;
+padding:20px 5%;
 }
 
 .card{
-background:#1c1c1c;border-radius:8px;overflow:hidden;
-cursor:pointer;position:relative;transition:0.3s;border:1px solid #333;
+background:#1c1c1c;
+border-radius:8px;
+overflow:hidden;
+cursor:pointer;
+position:relative;
+border:1px solid #333;
+transition:0.3s;
 }
-.card:hover{transform:scale(1.05);border-color:#e50914;}
-.card img{width:100%;height:140px;object-fit:cover;}
+.card:hover{ transform:scale(1.05); border-color:#e50914; }
 
-.progress-bar{position:absolute;bottom:0;left:0;height:4px;background:#e50914;width:0%;}
-.watched-tag{position:absolute;top:5px;right:5px;background:black;color:#00ff00;font-size:10px;padding:2px 5px;}
+.card img{ width:100%; height:140px; object-fit:cover; }
 
-.btn-main{background:#e50914;color:white;padding:12px 25px;border:none;border-radius:5px;cursor:pointer;}
-.btn-group{display:flex;gap:15px;flex-wrap:wrap;margin-top:15px;}
+.watched-tag{
+position:absolute;
+top:5px; right:5px;
+background:black;
+color:#00ff00;
+font-size:10px;
+padding:2px 5px;
+}
 
-.season-menu{background:#1c1c1c;border:1px solid #333;position:absolute;display:none;}
-.season-menu div{padding:12px;cursor:pointer;border-bottom:1px solid #222;}
-.show{display:block;}
+.btn-main{
+background:#e50914;
+color:white;
+padding:12px 25px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.btn-group{ display:flex; gap:15px; flex-wrap:wrap; margin-top:15px; }
+
+.season-menu{
+background:#1c1c1c;
+border:1px solid #333;
+position:absolute;
+display:none;
+z-index:10;
+}
+.season-menu div{
+padding:12px;
+cursor:pointer;
+border-bottom:1px solid #222;
+}
+.show{ display:block; }
 </style>
 </head>
 
 <body>
 
 <div class="navbar">
-<a class="logo" href="index.html">YAMONFILM</a>
+<a href="index.html" class="logo">YAMONFILM</a>
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
@@ -95,10 +160,10 @@ cursor:pointer;position:relative;transition:0.3s;border:1px solid #333;
 <a href="series.html">Mes séries</a>
 
 <div class="promo-section">
-<span style="font-size:12px;color:#777;">CODE</span>
+<span style="font-size:12px;color:#666;">CODE</span>
 <input id="promoCode" class="promo-input" placeholder="Code...">
 <button id="activateBtnMenu" class="activate-btn">Activer</button>
-<p id="promoMsgMenu" style="font-size:12px;"></p>
+<p id="promoMsgMenu"></p>
 </div>
 
 <button id="logoutBtn" style="color:#e50914;margin-top:auto;">Déconnexion</button>
@@ -118,6 +183,7 @@ cursor:pointer;position:relative;transition:0.3s;border:1px solid #333;
 <button id="resumeBtn" style="display:none;background:white;color:black;">Reprendre</button>
 <button id="unlockBtn">Débloquer VIP</button>
 </div>
+
 <p id="unlockMsg"></p>
 </div>
 </section>
@@ -144,88 +210,87 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 
 const serieId="MEDICOPTER";
+
 let userProgress={watched:[],lastBySerie:{}};
 let currentEpisodes=[];
-let currentS=1;
+let currentSeason=1;
 
-/* MENU */
 window.toggleMenu=()=>{
 document.getElementById("menu").classList.toggle("open");
 document.getElementById("overlay").classList.toggle("show");
 };
 
-/* AUTH */
 onAuthStateChanged(auth,async(user)=>{
 if(!user) return location.href="login.html";
 
 const snap=await getDoc(doc(db,"users",user.uid));
 if(snap.exists()){
-const d=snap.data();
-userProgress=d.progress||userProgress;
+userProgress=snap.data().progress||userProgress;
 }
 
-loadSeries();
+init();
 });
 
-/* LOAD TMDB */
-async function loadSeries(){
+async function init(){
 const res=await fetch("https://api.themoviedb.org/3/tv/40996?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR");
 const data=await res.json();
 
 document.getElementById("overview").innerText=data.overview;
-document.getElementById("hero").style.backgroundImage=`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+document.getElementById("hero").style.backgroundImage=
+`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
 
 const menu=document.getElementById("seasonMenu");
+menu.innerHTML="";
+
 for(let i=1;i<=data.number_of_seasons;i++){
 const div=document.createElement("div");
 div.innerText="Saison "+i;
-div.onclick=()=>{currentS=i;loadEpisodes(i);menu.classList.remove("show");};
+div.onclick=()=>{currentSeason=i;loadEpisodes(i);menu.classList.remove("show");};
 menu.appendChild(div);
 }
 
 loadEpisodes(1);
 }
 
-/* EPISODES */
 async function loadEpisodes(s){
 const res=await fetch(`https://api.themoviedb.org/3/tv/40996/season/${s}?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR`);
 const data=await res.json();
-currentEpisodes=data.episodes;
+currentEpisodes=data.episodes||[];
 render();
 }
 
-/* RENDER */
 function render(){
 const c=document.getElementById("episodes");
 c.innerHTML="";
 
 currentEpisodes.forEach(ep=>{
-const key=`${serieId}-S${currentS}E${ep.episode_number}`;
+
+const key=`${serieId}-S${currentSeason}E${ep.episode_number}`;
 const watched=userProgress.watched.includes(key);
 
 const div=document.createElement("div");
 div.className="card";
 
 div.innerHTML=`
-<img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
+<img src="https://image.tmdb.org/t/p/w300${ep.still_path||''}">
 ${watched?'<div class="watched-tag">VU</div>':''}
 <div style="padding:10px">E${ep.episode_number} - ${ep.name}</div>
 `;
 
-div.onclick=()=>openVideo(currentS,ep.episode_number,ep.name);
+div.onclick=()=>openVideo(currentSeason,ep.episode_number,ep.name);
+
 c.appendChild(div);
 });
 }
 
-/* VIDEO */
 window.openVideo=(s,e,title)=>{
-const url=videasSources[s]?.[e];
-if(!url) return;
+const url=videasSources?.[s]?.[e];
+if(!url) return alert("Vidéo indisponible");
 
 document.getElementById("video-iframe").src=url;
-document.getElementById("video-overlay").style.display="block";
+document.getElementById("video-overlay").style.display="flex";
 
-save(s,e,title);
+save(s,e);
 };
 
 window.closeVideo=()=>{
@@ -233,8 +298,7 @@ document.getElementById("video-overlay").style.display="none";
 document.getElementById("video-iframe").src="";
 };
 
-/* SAVE */
-async function save(s,e,title){
+async function save(s,e){
 const user=auth.currentUser;
 if(!user) return;
 
@@ -242,12 +306,28 @@ const key=`${serieId}-S${s}E${e}`;
 if(!userProgress.watched.includes(key))
 userProgress.watched.push(key);
 
-await setDoc(doc(db,"users",user.uid),{
-progress:userProgress
-},{merge:true});
+await setDoc(doc(db,"users",user.uid),{progress:userProgress},{merge:true});
 }
 
-/* CODE PROMO */
+document.getElementById("unlockBtn").onclick=async()=>{
+const user=auth.currentUser;
+if(!user) return;
+
+const ref=doc(db,"users",user.uid);
+const snap=await getDoc(ref);
+
+let unlocked=snap.data()?.seriesUnlocked||[];
+
+if(!unlocked.includes(serieId)){
+unlocked.push(serieId);
+
+await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
+
+document.getElementById("unlockMsg").innerText="Série débloquée ✔";
+document.getElementById("unlockBtn").style.display="none";
+}
+};
+
 document.getElementById("activateBtnMenu").onclick=async()=>{
 const code=document.getElementById("promoCode").value;
 
@@ -257,20 +337,22 @@ const ref=doc(db,"users",user.uid);
 const snap=await getDoc(ref);
 
 let unlocked=snap.data()?.seriesUnlocked||[];
+
 if(!unlocked.includes(serieId)){
 unlocked.push(serieId);
 await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
-document.getElementById("promoMsgMenu").innerText="Débloqué";
+document.getElementById("promoMsgMenu").innerText="Débloqué ✔";
 }
 }
 };
 
-/* LOGOUT */
 document.getElementById("logoutBtn").onclick=()=>signOut(auth).then(()=>location.href="login.html");
 
-/* VIDEO SOURCES (inchangé) */
-const videasSources = {
-1:{1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"}
+const videasSources={
+1:{
+1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/",
+2:"https://app.videas.fr/embed/media/7c3cfb1b-2488-4fc6-9a59-5fa244fa30f9/"
+}
 };
 
 document.getElementById("seasonBtn").onclick=()=>{
