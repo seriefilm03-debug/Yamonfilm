@@ -59,7 +59,7 @@ z-index:1000;
 
 .show{ display:block; }
 
-/* ===== POPUP UNLOCK ===== */
+/* ===== POPUP ===== */
 #unlockModal{
 position:fixed;
 inset:0;
@@ -134,9 +134,6 @@ border-radius:5px;
 <div class="hero-content">
 <h1>Medicopter 117</h1>
 <p id="overview"></p>
-
-<button id="resumeBtn" class="btn-main" style="display:none;background:white;color:black;">Reprendre</button>
-<button id="unlockBtn" class="btn-main">Débloquer VIP</button>
 </div>
 </section>
 
@@ -168,18 +165,41 @@ const serieId = "MEDICOPTER";
 let currentEpisodes=[];
 let currentS=1;
 
-const videasSources = { /* TON GROS OBJET RESTE INTACT */ };
+const videasSources = { /* inchangé */ };
 
-window.toggleMenu = ()=>{
+window.toggleMenu=()=>{
 document.getElementById("menu").classList.toggle("open");
 document.getElementById("overlay").classList.toggle("show");
 };
 
 /* ===== POPUP ===== */
-function showUnlockPopup(){
+function showPopup(){
 document.getElementById("unlockModal").style.display="flex";
 }
 
+/* ===== AUTH ===== */
+onAuthStateChanged(auth,async(user)=>{
+if(!user) return location.href="login.html";
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+if(snap.exists()){
+const data=snap.data();
+if(data.progress) userProgress=data.progress;
+
+const unlocked = data.seriesUnlocked || [];
+const isUnlocked = unlocked.includes(serieId);
+
+/* 🔥 POPUP AUTO */
+if(!isUnlocked){
+setTimeout(()=>showPopup(),800);
+}
+}
+
+loadSeries();
+});
+
+/* ===== BUTTON POPUP ===== */
 document.getElementById("watchNow").onclick = async ()=>{
 const user = auth.currentUser;
 const ref = doc(db,"users",user.uid);
@@ -193,42 +213,19 @@ await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
 }
 
 document.getElementById("unlockModal").style.display="none";
-document.getElementById("unlockBtn").style.display="none";
 };
 
-onAuthStateChanged(auth,async(user)=>{
-if(!user) return location.href="login.html";
-
-const snap = await getDoc(doc(db,"users",user.uid));
-
-if(snap.exists()){
-const data=snap.data();
-if(data.progress) userProgress=data.progress;
-
-if(data.seriesUnlocked?.includes(serieId)){
-document.getElementById("unlockBtn").style.display="none";
-}
-}
-
-loadSeries();
-});
-
-document.getElementById("unlockBtn").onclick = ()=>{
-showUnlockPopup();
-};
-
-/* ===== SERIES TMDB ===== */
+/* ===== TMDB ===== */
 const apiKey="182c7173698e34803715eacab5c693a7";
 const tmdbId=40996;
 
 async function loadSeries(){
-const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
-const data = await res.json();
+const res=await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
 
 document.getElementById("overview").innerText=data.overview;
 document.getElementById("hero").style.backgroundImage=`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
 
-/* IMPORTANT FIX SAISON */
 const menu=document.getElementById("seasonMenu");
 menu.innerHTML="";
 
@@ -243,8 +240,8 @@ loadEpisodes(1);
 }
 
 async function loadEpisodes(s){
-const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
-const data = await res.json();
+const res=await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+const data=await res.json();
 currentEpisodes=data.episodes;
 renderEpisodes();
 }
