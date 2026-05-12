@@ -6,199 +6,147 @@
 <title>Medicopter 117 - YAMONFILM</title>
 
 <style>
+/* --- STYLE GLOBAL --- */
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-body{ background:#0f0f0f; color:white; overflow-x:hidden; }
+body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
+/* NAV & MENU */
 .navbar{
-position:fixed; top:0; left:0; width:100%; height:60px;
-display:flex; justify-content:space-between; align-items:center;
-padding:0 20px;
-background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-z-index:1000;
+    position:fixed; top:0; left:0; width:100%; height:60px;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:0 20px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    z-index:1000;
 }
-
 .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
 .menu-btn{ font-size:28px; cursor:pointer; z-index:2100; }
 
-.overlay{
-position:fixed; inset:0;
-background:rgba(0,0,0,0.6);
-backdrop-filter:blur(6px);
-opacity:0; pointer-events:none;
-transition:0.3s; z-index:1500;
-}
+/* OVERLAY & SIDE MENU */
+.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
 .overlay.show{ opacity:1; pointer-events:auto; }
-
-.side-menu{
-position:fixed; top:0; right:-100%;
-width:300px; height:100%;
-background:#111;
-padding:80px 20px 20px;
-display:flex; flex-direction:column;
-gap:15px;
-transition:0.3s;
-z-index:2000;
-border-left:1px solid #333;
-}
+.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
 .side-menu.open{ right:0; }
 
-.side-menu a,.side-menu button{
-color:white;
-background:none;
-border:none;
-font-size:18px;
-padding:10px 0;
-cursor:pointer;
-text-align:left;
-border-bottom:1px solid #222;
-}
-
-.promo-section{ margin-top:10px; padding:10px 0; border-bottom:1px solid #222; }
-.promo-input{ width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:4px; margin-top:10px; }
-.activate-btn{ background:#e50914; color:white; border:none; padding:12px; width:100%; border-radius:4px; margin-top:10px; cursor:pointer; }
-
+/* VIDEO */
 #video-overlay{
-display:none;
-position:fixed;
-inset:0;
-background:black;
-z-index:3000;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+    display:none; position:fixed; inset:0;
+    background:black; z-index:3000;
+    flex-direction:column; justify-content:center; align-items:center;
 }
 #video-overlay iframe{ width:100%; height:90%; border:none; }
 .close-video{ position:absolute; top:15px; right:25px; font-size:35px; cursor:pointer; }
 
+/* HERO */
 .hero{
-height:65vh;
-background-size:cover;
-background-position:center;
-display:flex;
-align-items:flex-end;
-padding:40px 5%;
-position:relative;
+    height:65vh;
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:flex-end;
+    padding:40px 5%;
+    position:relative;
 }
-
 .hero::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(to top,#0f0f0f,transparent 50%),
-linear-gradient(to right,#0f0f0f,transparent);
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(to top,#0f0f0f, transparent 50%);
 }
-
 .hero-content{ position:relative; z-index:2; max-width:700px; }
 
+/* EPISODES */
 .episodes{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;
-padding:20px 5%;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px;
+    padding:20px 5%;
 }
-
 .card{
-background:#1c1c1c;
-border-radius:8px;
-overflow:hidden;
-cursor:pointer;
-position:relative;
-border:1px solid #333;
-transition:0.3s;
+    background:#1c1c1c;
+    border-radius:8px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.3s;
+    border:1px solid #333;
 }
 .card:hover{ transform:scale(1.05); border-color:#e50914; }
-
 .card img{ width:100%; height:140px; object-fit:cover; }
 
-.watched-tag{
-position:absolute;
-top:5px; right:5px;
-background:black;
-color:#00ff00;
-font-size:10px;
-padding:2px 5px;
+/* --- POPUP VIP --- */
+#vipPopup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    z-index:5000;
+    justify-content:center;
+    align-items:center;
 }
-
-.btn-main{
-background:#e50914;
-color:white;
-padding:12px 25px;
-border:none;
-border-radius:5px;
-cursor:pointer;
+.vip-box{
+    background:#111;
+    padding:25px;
+    border-radius:10px;
+    width:90%;
+    max-width:400px;
+    text-align:center;
+    border:1px solid #e50914;
 }
-
-.btn-group{ display:flex; gap:15px; flex-wrap:wrap; margin-top:15px; }
-
-.season-menu{
-background:#1c1c1c;
-border:1px solid #333;
-position:absolute;
-display:none;
-z-index:10;
+.vip-box button{
+    margin-top:15px;
+    width:100%;
+    padding:12px;
+    background:#e50914;
+    border:none;
+    color:white;
+    cursor:pointer;
 }
-.season-menu div{
-padding:12px;
-cursor:pointer;
-border-bottom:1px solid #222;
-}
-.show{ display:block; }
 </style>
 </head>
 
 <body>
 
+<!-- NAV -->
 <div class="navbar">
-<a href="index.html" class="logo">YAMONFILM</a>
+<a class="logo">YAMONFILM</a>
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="side-menu" id="menu">
-<a href="account.html">Mon compte</a>
-<a href="series.html">Mes séries</a>
-
-<div class="promo-section">
-<span style="font-size:12px;color:#666;">CODE</span>
-<input id="promoCode" class="promo-input" placeholder="Code...">
-<button id="activateBtnMenu" class="activate-btn">Activer</button>
-<p id="promoMsgMenu"></p>
+<a href="#">Mon compte</a>
+<a href="#">Mes séries</a>
 </div>
 
-<button id="logoutBtn" style="color:#e50914;margin-top:auto;">Déconnexion</button>
-</div>
-
+<!-- VIDEO -->
 <div id="video-overlay">
-<span class="close-video" onclick="closeVideo()">×</span>
+<span class="close-video" onclick="closeVideo()">&times;</span>
 <iframe id="video-iframe"></iframe>
 </div>
 
+<!-- POPUP VIP -->
+<div id="vipPopup">
+<div class="vip-box">
+<h2>🎉 Félicitations</h2>
+<p>Vous avez obtenu la série complète</p>
+<button onclick="unlockSerie()">Regarder maintenant</button>
+</div>
+</div>
+
+<!-- HERO -->
 <section class="hero" id="hero">
 <div class="hero-content">
 <h1>Medicopter 117</h1>
 <p id="overview"></p>
-
-<div class="btn-group">
-<button id="resumeBtn" style="display:none;background:white;color:black;">Reprendre</button>
-<button id="unlockBtn">Débloquer VIP</button>
-</div>
-
-<p id="unlockMsg"></p>
+<button onclick="checkAccess()" class="btn-main">▶ Regarder</button>
 </div>
 </section>
-
-<div style="padding:20px 5%;">
-<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-<div class="season-menu" id="seasonMenu"></div>
-</div>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth,onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore,doc,setDoc,getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
 apiKey:"AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -206,157 +154,98 @@ authDomain:"yamonfilm-fead8.firebaseapp.com",
 projectId:"yamonfilm-fead8"
 });
 
-const auth=getAuth(app);
-const db=getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const serieId="MEDICOPTER";
+const serieId = "MEDICOPTER";
+let unlocked = false;
 
-let userProgress={watched:[],lastBySerie:{}};
-let currentEpisodes=[];
-let currentSeason=1;
+/* FIREBASE CHECK */
+onAuthStateChanged(auth, async (user)=>{
+if(!user) return (location.href="login.html");
 
-window.toggleMenu=()=>{
-document.getElementById("menu").classList.toggle("open");
-document.getElementById("overlay").classList.toggle("show");
+const snap = await getDoc(doc(db,"users",user.uid));
+
+if(snap.exists()){
+const data = snap.data();
+unlocked = data.seriesUnlocked?.includes(serieId) || false;
+
+/* POPUP SI PAS DÉBLOQUÉ */
+if(!unlocked){
+document.getElementById("vipPopup").style.display="flex";
+}
+}
+
+loadEpisodes();
+});
+
+/* MENU */
+window.toggleMenu = ()=>{
+menu.classList.toggle("open");
+overlay.classList.toggle("show");
 };
 
-onAuthStateChanged(auth,async(user)=>{
-if(!user) return location.href="login.html";
+/* EPISODES */
+function loadEpisodes(){
+const container = document.getElementById("episodes");
+container.innerHTML="";
 
-const snap=await getDoc(doc(db,"users",user.uid));
-if(snap.exists()){
-userProgress=snap.data().progress||userProgress;
-}
+for(let i=1;i<=10;i++){
+let card=document.createElement("div");
+card.className="card";
 
-init();
-});
-
-async function init(){
-const res=await fetch("https://api.themoviedb.org/3/tv/40996?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR");
-const data=await res.json();
-
-document.getElementById("overview").innerText=data.overview;
-document.getElementById("hero").style.backgroundImage=
-`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
-
-const menu=document.getElementById("seasonMenu");
-menu.innerHTML="";
-
-for(let i=1;i<=data.number_of_seasons;i++){
-const div=document.createElement("div");
-div.innerText="Saison "+i;
-div.onclick=()=>{currentSeason=i;loadEpisodes(i);menu.classList.remove("show");};
-menu.appendChild(div);
-}
-
-loadEpisodes(1);
-}
-
-async function loadEpisodes(s){
-const res=await fetch(`https://api.themoviedb.org/3/tv/40996/season/${s}?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR`);
-const data=await res.json();
-currentEpisodes=data.episodes||[];
-render();
-}
-
-function render(){
-const c=document.getElementById("episodes");
-c.innerHTML="";
-
-currentEpisodes.forEach(ep=>{
-
-const key=`${serieId}-S${currentSeason}E${ep.episode_number}`;
-const watched=userProgress.watched.includes(key);
-
-const div=document.createElement("div");
-div.className="card";
-
-div.innerHTML=`
-<img src="https://image.tmdb.org/t/p/w300${ep.still_path||''}">
-${watched?'<div class="watched-tag">VU</div>':''}
-<div style="padding:10px">E${ep.episode_number} - ${ep.name}</div>
+card.innerHTML=`
+<img src="https://via.placeholder.com/300x150">
+<div style="padding:10px">Episode ${i}</div>
 `;
 
-div.onclick=()=>openVideo(currentSeason,ep.episode_number,ep.name);
-
-c.appendChild(div);
-});
+card.onclick=()=>openEpisode(i);
+container.appendChild(card);
+}
 }
 
-window.openVideo=(s,e,title)=>{
-const url=videasSources?.[s]?.[e];
-if(!url) return alert("Vidéo indisponible");
+/* BLOQUAGE GLOBAL */
+window.checkAccess=()=>{
+if(!unlocked){
+document.getElementById("vipPopup").style.display="flex";
+}
+};
 
-document.getElementById("video-iframe").src=url;
+/* DEBLOCAGE GLOBAL FIREBASE */
+window.unlockSerie = async () => {
+const user = auth.currentUser;
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+let list = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+
+if(!list.includes(serieId)){
+list.push(serieId);
+await setDoc(ref,{ seriesUnlocked:list },{ merge:true });
+}
+
+unlocked = true;
+document.getElementById("vipPopup").style.display="none";
+};
+
+/* OPEN EP */
+window.openEpisode=(e)=>{
+if(!unlocked){
+document.getElementById("vipPopup").style.display="flex";
+return;
+}
+
+document.getElementById("video-iframe").src=
+"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
+
 document.getElementById("video-overlay").style.display="flex";
-
-save(s,e);
 };
 
 window.closeVideo=()=>{
 document.getElementById("video-overlay").style.display="none";
 document.getElementById("video-iframe").src="";
-};
-
-async function save(s,e){
-const user=auth.currentUser;
-if(!user) return;
-
-const key=`${serieId}-S${s}E${e}`;
-if(!userProgress.watched.includes(key))
-userProgress.watched.push(key);
-
-await setDoc(doc(db,"users",user.uid),{progress:userProgress},{merge:true});
-}
-
-document.getElementById("unlockBtn").onclick=async()=>{
-const user=auth.currentUser;
-if(!user) return;
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let unlocked=snap.data()?.seriesUnlocked||[];
-
-if(!unlocked.includes(serieId)){
-unlocked.push(serieId);
-
-await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
-
-document.getElementById("unlockMsg").innerText="Série débloquée ✔";
-document.getElementById("unlockBtn").style.display="none";
-}
-};
-
-document.getElementById("activateBtnMenu").onclick=async()=>{
-const code=document.getElementById("promoCode").value;
-
-if(code==="MEDICVIP"){
-const user=auth.currentUser;
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-let unlocked=snap.data()?.seriesUnlocked||[];
-
-if(!unlocked.includes(serieId)){
-unlocked.push(serieId);
-await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
-document.getElementById("promoMsgMenu").innerText="Débloqué ✔";
-}
-}
-};
-
-document.getElementById("logoutBtn").onclick=()=>signOut(auth).then(()=>location.href="login.html");
-
-const videasSources={
-1:{
-1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/",
-2:"https://app.videas.fr/embed/media/7c3cfb1b-2488-4fc6-9a59-5fa244fa30f9/"
-}
-};
-
-document.getElementById("seasonBtn").onclick=()=>{
-document.getElementById("seasonMenu").classList.toggle("show");
 };
 </script>
 
