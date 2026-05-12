@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Test Firebase Auth</title>
+<style>
+body{
+font-family:Arial;
+background:#0f0f0f;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+flex-direction:column;
+}
+
+.box{
+background:#1c1c1c;
+padding:20px;
+border-radius:10px;
+text-align:center;
+width:300px;
+}
+
+.ok{color:#00ff7f;}
+.bad{color:#ff4d4d;}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>🔍 TEST AUTH FIREBASE</h2>
+<p id="status">Chargement...</p>
+<p id="uid"></p>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+/* 🔥 TON CONFIG FIREBASE */
+const firebaseConfig = {
+apiKey: "AIzaSyA...",
+authDomain: "yamonfilm-fead8.firebaseapp.com",
+projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const status = document.getElementById("status");
+const uidText = document.getElementById("uid");
+
+console.log("🔄 test auth start...");
+
+onAuthStateChanged(auth, (user) => {
+
+console.log("AUTH RESULT:", user);
+
+if (user) {
+
+status.innerHTML = "✅ CONNECTÉ";
+status.className = "ok";
+
+uidText.innerHTML = "UID : " + user.uid;
+
+console.log("USER OK :", user.uid);
+
+} else {
+
+status.innerHTML = "❌ PAS CONNECTÉ → redirection login.html";
+status.className = "bad";
+
+setTimeout(() => {
+window.location.href = "login.html";
+}, 2000);
+
+}
+});
+
+</script>
+
+</body>
+</html>
