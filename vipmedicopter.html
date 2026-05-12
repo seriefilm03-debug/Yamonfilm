@@ -184,7 +184,11 @@
         if (!serieToUnlock) { msg.style.color="red"; msg.innerText="Code invalide."; return; }
         const userRef = doc(db, "users", auth.currentUser.uid);
         const snap = await getDoc(userRef);
-        let unlocked = snap.data().seriesUnlocked || [];
+       let unlocked = [];
+
+if (snap.exists()) {
+    unlocked = snap.data().seriesUnlocked || [];
+}
         if (!unlocked.includes(serieToUnlock)) {
             unlocked.push(serieToUnlock);
             await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
