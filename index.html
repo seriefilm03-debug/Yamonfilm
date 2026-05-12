@@ -7,156 +7,73 @@
 
 <style>
 *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-body{ background:#141414; color:white; overflow-x:hidden; }
+body{ background:#141414; color:white; }
 
-/* NAV */
-.navbar{
-  position:fixed; top:0; left:0; width:100%; height:60px;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:0 20px;
-  background:rgba(0,0,0,0.8);
-  z-index:1000;
-}
-
-.logo{
-  color:#e50914;
-  font-size:28px;
-  font-weight:bold;
-  text-decoration:none;
-}
-
-.menu-btn{ font-size:28px; cursor:pointer; }
-
-/* MENU */
-.overlay{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.6);
-  opacity:0; pointer-events:none;
-  transition:0.3s;
-  z-index:1500;
-}
-
-.overlay.show{ opacity:1; pointer-events:auto; }
-
-.side-menu{
+/* BARRE CODE */
+#codeBox{
   position:fixed;
-  top:0; right:-100%;
-  width:280px; height:100%;
-  background:#111;
-  padding:80px 20px;
+  top:15px;
+  right:20px;
   display:flex;
-  flex-direction:column;
-  gap:15px;
-  transition:0.3s;
-  z-index:2000;
+  gap:5px;
+  z-index:9999;
 }
 
-.side-menu.open{ right:0; }
-
-.side-menu a, .side-menu button{
+#vipInput{
+  padding:8px;
+  background:#222;
+  border:1px solid #444;
   color:white;
-  background:none;
+  border-radius:6px;
+  outline:none;
+  width:150px;
+}
+
+#vipBtn{
+  padding:8px 10px;
+  background:red;
   border:none;
-  font-size:18px;
-  padding:10px 0;
+  color:white;
+  border-radius:6px;
   cursor:pointer;
-  text-align:left;
-  border-bottom:1px solid #222;
 }
 
-/* CONTENU */
-.container{
-  padding:100px 20px;
-}
-
-/* CARD SERIES */
+/* CARD */
 .card{
   display:inline-block;
   width:200px;
   height:120px;
   margin:10px;
-  border-radius:8px;
   background:#222;
-  padding:10px;
-  text-decoration:none;
   color:white;
+  text-decoration:none;
+  padding:10px;
+  border-radius:8px;
   border:2px solid transparent;
-  transition:0.2s;
 }
 
-.card:hover{ background:#333; }
-
-/* 🔴 VIP débloqué */
 .card.vip{
   border:2px solid red;
-}
-
-/* 🔥 BARRE CODE VIP */
-#codeBox{
-  position:fixed;
-  top:15px;
-  right:20px;
-  z-index:9999;
-  display:flex;
-  gap:5px;
-}
-
-#vipInput{
-  background:#222;
-  border:1px solid #444;
-  color:white;
-  padding:8px 12px;
-  border-radius:6px;
-  outline:none;
-  width:160px;
-}
-
-#vipBtn{
-  background:#e50914;
-  border:none;
-  color:white;
-  padding:8px 12px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-#vipInput:focus{
-  border-color:#e50914;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 BARRE CODE VIP -->
+<!-- CODE VIP -->
 <div id="codeBox">
-  <input id="vipInput" type="text" placeholder="Code VIP..." />
-  <button id="vipBtn">Valider</button>
+  <input id="vipInput" placeholder="Code VIP">
+  <button id="vipBtn">OK</button>
 </div>
 
-<div class="navbar">
-  <a href="index.html" class="logo">YAMONFILM</a>
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-</div>
+<h1>🎬 Séries</h1>
 
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<div class="side-menu" id="menu">
-    <a href="account.html">Mon compte</a>
-    <a href="series.html">Mes séries</a>
-    <button id="logoutBtn">Déconnexion</button>
-</div>
-
-<div class="container">
-    <h1>🎬 Nos séries</h1>
-
-    <a id="medicCard" href="medicopter.html" class="card">Medicopter 117</a>
-    <a id="clownCard" href="le clown.html" class="card">Le Clown</a>
-</div>
+<a id="medicCard" href="medicopter.html" class="card">Medicopter 117</a>
+<a id="clownCard" href="le clown.html" class="card">Le Clown</a>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -169,31 +86,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* MENU */
-window.toggleMenu = () => {
-  document.getElementById("menu").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
-};
+let userRef;
+let unlocked = [];
 
-/* LOGOUT */
-document.getElementById("logoutBtn").onclick = () => {
-  signOut(auth).then(() => window.location.href = "login.html");
-};
-
-function updateUI(unlocked){
-
+function updateUI(){
   if (unlocked.includes("MEDICOPTER")) {
     document.getElementById("medicCard").classList.add("vip");
     document.getElementById("medicCard").href = "vipmedicopter.html";
-  } else {
-    document.getElementById("medicCard").href = "medicopter.html";
   }
 
   if (unlocked.includes("LECLOWN")) {
     document.getElementById("clownCard").classList.add("vip");
     document.getElementById("clownCard").href = "vipleclown.html";
-  } else {
-    document.getElementById("clownCard").href = "le clown.html";
   }
 }
 
@@ -204,56 +108,60 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
+  userRef = doc(db, "users", user.uid);
 
+  const snap = await getDoc(userRef);
   if (!snap.exists()) return;
 
-  let unlocked = snap.data().seriesUnlocked || [];
+  unlocked = snap.data().seriesUnlocked || [];
 
-  updateUI(unlocked);
+  updateUI();
+});
 
-  const input = document.getElementById("vipInput");
-  const btn = document.getElementById("vipBtn");
+/* 🔥 FONCTION CODE */
+async function checkCode(){
 
-  async function checkCode(){
+  const code = document.getElementById("vipInput").value.trim().toUpperCase();
 
-    const code = input.value.trim().toUpperCase();
-    let changed = false;
+  if (!userRef) return alert("Utilisateur pas chargé");
 
-    if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
-      await updateDoc(userRef, {
-        seriesUnlocked: arrayUnion("MEDICOPTER")
-      });
-      unlocked.push("MEDICOPTER");
-      alert("🎉 MEDICOPTER débloqué !");
-      changed = true;
-    }
+  const snap = await getDoc(userRef);
+  unlocked = snap.data().seriesUnlocked || [];
 
-    else if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
-      await updateDoc(userRef, {
-        seriesUnlocked: arrayUnion("LECLOWN")
-      });
-      unlocked.push("LECLOWN");
-      alert("🎉 LE CLOWN débloqué !");
-      changed = true;
-    }
+  if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
 
-    else {
-      alert("❌ Code invalide ou déjà utilisé");
-    }
+    await updateDoc(userRef, {
+      seriesUnlocked: arrayUnion("MEDICOPTER")
+    });
 
-    input.value = "";
-
-    if (changed) updateUI(unlocked);
+    unlocked.push("MEDICOPTER");
+    alert("🎉 MEDICOPTER débloqué !");
   }
 
-  btn.addEventListener("click", checkCode);
+  else if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
 
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") checkCode();
-  });
+    await updateDoc(userRef, {
+      seriesUnlocked: arrayUnion("LECLOWN")
+    });
 
+    unlocked.push("LECLOWN");
+    alert("🎉 LE CLOWN débloqué !");
+  }
+
+  else {
+    alert("❌ Mauvais code ou déjà utilisé");
+  }
+
+  document.getElementById("vipInput").value = "";
+  updateUI();
+}
+
+/* BUTTON */
+document.getElementById("vipBtn").addEventListener("click", checkCode);
+
+/* ENTER */
+document.getElementById("vipInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkCode();
 });
 </script>
 
