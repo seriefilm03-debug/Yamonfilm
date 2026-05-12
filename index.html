@@ -82,10 +82,37 @@ body{ background:#141414; color:white; overflow-x:hidden; }
   color:white;
 }
 .card:hover{ background:#333; }
+
+/* 🔥 BARRE DE CODE VIP */
+#codeBox{
+  position:fixed;
+  top:15px;
+  right:80px;
+  z-index:9999;
+}
+
+#vipInput{
+  background:#222;
+  border:1px solid #444;
+  color:white;
+  padding:8px 12px;
+  border-radius:6px;
+  outline:none;
+  width:160px;
+}
+
+#vipInput:focus{
+  border-color:#e50914;
+}
 </style>
 </head>
 
 <body>
+
+<!-- 🔥 BARRE CODE VIP -->
+<div id="codeBox">
+  <input id="vipInput" type="text" placeholder="Entrer code VIP..." />
+</div>
 
 <div class="navbar">
   <a href="index.html" class="logo">YAMONFILM</a>
@@ -134,13 +161,6 @@ document.getElementById("logoutBtn").onclick = () => {
   signOut(auth).then(() => window.location.href = "login.html");
 };
 
-/* 🔥 récup code URL */
-function getCodeFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("code");
-}
-
-/* SYSTEM */
 onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
@@ -153,24 +173,38 @@ onAuthStateChanged(auth, async (user) => {
 
   if (!snap.exists()) return;
 
-  const unlocked = snap.data().seriesUnlocked || [];
+  let unlocked = snap.data().seriesUnlocked || [];
 
-  const code = getCodeFromURL();
+  const vipInput = document.getElementById("vipInput");
 
-  /* 🔥 CODE VIP */
-  if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
-    await updateDoc(userRef, {
-      seriesUnlocked: arrayUnion("MEDICOPTER")
-    });
-    alert("🎉 Medicopter débloqué !");
-  }
+  /* 🔥 CODE VIP ENTER */
+  vipInput.addEventListener("keydown", async (e) => {
+    if (e.key !== "Enter") return;
 
-  if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
-    await updateDoc(userRef, {
-      seriesUnlocked: arrayUnion("LECLOWN")
-    });
-    alert("🎉 Le Clown débloqué !");
-  }
+    const code = vipInput.value.trim().toUpperCase();
+
+    if (code === "MEDICOPTER" && !unlocked.includes("MEDICOPTER")) {
+      await updateDoc(userRef, {
+        seriesUnlocked: arrayUnion("MEDICOPTER")
+      });
+      unlocked.push("MEDICOPTER");
+      alert("🎉 MEDICOPTER débloqué !");
+    }
+
+    else if (code === "LECLOWN" && !unlocked.includes("LECLOWN")) {
+      await updateDoc(userRef, {
+        seriesUnlocked: arrayUnion("LECLOWN")
+      });
+      unlocked.push("LECLOWN");
+      alert("🎉 LE CLOWN débloqué !");
+    }
+
+    else {
+      alert("❌ Code invalide");
+    }
+
+    vipInput.value = "";
+  });
 
   const currentPage = window.location.pathname.split("/").pop();
 
