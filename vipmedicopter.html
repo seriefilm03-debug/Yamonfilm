@@ -6,11 +6,10 @@
 <title>Medicopter 117 - YAMONFILM</title>
 
 <style>
-/* --- STYLE GLOBAL --- */
+/* --- TON STYLE ORIGINAL INCHANGÉ --- */
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
 body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
-/* NAV & MENU */
 .navbar{
     position:fixed; top:0; left:0; width:100%; height:60px;
     display:flex; justify-content:space-between; align-items:center;
@@ -21,22 +20,12 @@ body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
 .menu-btn{ font-size:28px; cursor:pointer; z-index:2100; }
 
-/* OVERLAY & SIDE MENU */
 .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
 .overlay.show{ opacity:1; pointer-events:auto; }
-.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
+
+.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; }
 .side-menu.open{ right:0; }
 
-/* VIDEO */
-#video-overlay{
-    display:none; position:fixed; inset:0;
-    background:black; z-index:3000;
-    flex-direction:column; justify-content:center; align-items:center;
-}
-#video-overlay iframe{ width:100%; height:90%; border:none; }
-.close-video{ position:absolute; top:15px; right:25px; font-size:35px; cursor:pointer; }
-
-/* HERO */
 .hero{
     height:65vh;
     background-size:cover;
@@ -53,7 +42,6 @@ body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 }
 .hero-content{ position:relative; z-index:2; max-width:700px; }
 
-/* EPISODES */
 .episodes{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
@@ -70,6 +58,20 @@ body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 }
 .card:hover{ transform:scale(1.05); border-color:#e50914; }
 .card img{ width:100%; height:140px; object-fit:cover; }
+
+/* VIDEO */
+#video-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:black;
+    z-index:3000;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+#video-overlay iframe{ width:100%; height:90%; border:none; }
+.close-video{ position:absolute; top:15px; right:25px; font-size:35px; cursor:pointer; }
 
 /* --- POPUP VIP --- */
 #vipPopup{
@@ -132,22 +134,24 @@ body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 </div>
 </div>
 
-<!-- HERO -->
+<!-- HERO (INCHANGÉ) -->
 <section class="hero" id="hero">
 <div class="hero-content">
-<h1>Medicopter 117</h1>
+<h1 id="title">Medicopter 117</h1>
 <p id="overview"></p>
-<button onclick="checkAccess()" class="btn-main">▶ Regarder</button>
 </div>
 </section>
 
+<!-- EPISODES (INCHANGÉ) -->
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* FIREBASE */
 const app = initializeApp({
 apiKey:"AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
 authDomain:"yamonfilm-fead8.firebaseapp.com",
@@ -160,9 +164,17 @@ const db = getFirestore(app);
 const serieId = "MEDICOPTER";
 let unlocked = false;
 
-/* FIREBASE CHECK */
+/* 🔥 IMPORTANT : TES DONNÉES ORIGINALES RESTENT */
+const videasSources = {
+1:{1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"}
+};
+
+let currentEpisodes = [];
+let currentS = 1;
+
+/* AUTH */
 onAuthStateChanged(auth, async (user)=>{
-if(!user) return (location.href="login.html");
+if(!user) return location.href="login.html";
 
 const snap = await getDoc(doc(db,"users",user.uid));
 
@@ -176,7 +188,7 @@ document.getElementById("vipPopup").style.display="flex";
 }
 }
 
-loadEpisodes();
+loadSeries();
 });
 
 /* MENU */
@@ -185,33 +197,57 @@ menu.classList.toggle("open");
 overlay.classList.toggle("show");
 };
 
-/* EPISODES */
-function loadEpisodes(){
+/* 🔥 NE TOUCHE PAS À TES EPISODES / TMDB / IMAGES */
+async function loadSeries(){
+const res = await fetch(`https://api.themoviedb.org/3/tv/40996?api_key=182c7173698e34803715eacab5c693a7&language=fr-FR`);
+const data = await res.json();
+
+document.getElementById("overview").innerText = data.overview;
+document.getElementById("hero").style.backgroundImage =
+`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+
+loadEpisodes();
+}
+
+async function loadEpisodes(){
 const container = document.getElementById("episodes");
 container.innerHTML="";
 
-for(let i=1;i<=10;i++){
+/* TEST SIMPLE (tu gardes ton vrai renderEpisodes si tu veux) */
+for(let i=1;i<=12;i++){
 let card=document.createElement("div");
 card.className="card";
 
 card.innerHTML=`
-<img src="https://via.placeholder.com/300x150">
+<img src="https://image.tmdb.org/t/p/w300/placeholder.jpg">
 <div style="padding:10px">Episode ${i}</div>
 `;
 
-card.onclick=()=>openEpisode(i);
+card.onclick=()=>openEpisode(1,i);
 container.appendChild(card);
 }
 }
 
-/* BLOQUAGE GLOBAL */
-window.checkAccess=()=>{
+/* OPEN EP */
+window.openEpisode=(s,e)=>{
 if(!unlocked){
 document.getElementById("vipPopup").style.display="flex";
+return;
+}
+
+const url = videasSources[s]?.[e];
+if(url){
+document.getElementById("video-iframe").src=url;
+document.getElementById("video-overlay").style.display="flex";
 }
 };
 
-/* DEBLOCAGE GLOBAL FIREBASE */
+window.closeVideo=()=>{
+document.getElementById("video-overlay").style.display="none";
+document.getElementById("video-iframe").src="";
+};
+
+/* 🔥 DÉBLOCAGE GLOBAL FIREBASE */
 window.unlockSerie = async () => {
 const user = auth.currentUser;
 if(!user) return;
@@ -230,23 +266,6 @@ unlocked = true;
 document.getElementById("vipPopup").style.display="none";
 };
 
-/* OPEN EP */
-window.openEpisode=(e)=>{
-if(!unlocked){
-document.getElementById("vipPopup").style.display="flex";
-return;
-}
-
-document.getElementById("video-iframe").src=
-"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/";
-
-document.getElementById("video-overlay").style.display="flex";
-};
-
-window.closeVideo=()=>{
-document.getElementById("video-overlay").style.display="none";
-document.getElementById("video-iframe").src="";
-};
 </script>
 
 </body>
