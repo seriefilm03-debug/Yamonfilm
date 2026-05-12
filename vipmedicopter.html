@@ -53,6 +53,11 @@ background:#1c1c1c;
 padding:10px;
 border-radius:8px;
 cursor:pointer;
+transition:0.2s;
+}
+
+.card:hover{
+background:#2a2a2a;
 }
 </style>
 </head>
@@ -74,91 +79,173 @@ cursor:pointer;
 
 <script type="module">
 
-import { auth, db } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+/* =========================
+   🔥 FIREBASE MODERNE
+========================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* =========================
+   🔥 CONFIG FIREBASE
+========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
+  authDomain: "yamonfilm-fead8.firebaseapp.com",
+  projectId: "yamonfilm-fead8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* =========================
+   🔥 VARIABLES
+========================= */
 
 const serieId = "MEDICOPTER";
 
-/* =========================
-   🔐 AUTH PROPRE ET FIABLE
-========================= */
-
 let currentUser = null;
+
+/* =========================
+   🔐 AUTH SAFE
+========================= */
 
 onAuthStateChanged(auth, async (user) => {
 
-if (!user) {
-window.location.href = "login.html";
-return;
-}
+  if (!user) {
+    window.location.replace("login.html");
+    return;
+  }
 
-currentUser = user;
+  currentUser = user;
 
-console.log("CONNECTÉ :", user.uid);
+  console.log("CONNECTÉ :", user.uid);
 
-const ref = doc(db, "users", user.uid);
-const snap = await getDoc(ref);
+  try {
 
-if (snap.exists()) {
-const data = snap.data();
+    const ref = doc(db, "users", user.uid);
 
-/* cacher popup si déjà débloqué */
-if (data.vipMode || data.seriesUnlocked?.includes(serieId)) {
-document.getElementById("vipPopup").style.display = "none";
-}
-}
+    const snap = await getDoc(ref);
+
+    /* créer user si inexistant */
+    if (!snap.exists()) {
+
+      await setDoc(ref, {
+        seriesUnlocked: [],
+        vipMode: false
+      });
+
+    }
+
+    const newSnap = await getDoc(ref);
+
+    const data = newSnap.data();
+
+    /* cacher popup si déjà VIP */
+    if (
+      data.vipMode === true ||
+      data.seriesUnlocked?.includes(serieId)
+    ) {
+
+      document.getElementById("vipPopup").style.display = "none";
+
+    }
+
+  } catch(err) {
+
+    console.error(err);
+    alert("Erreur Firebase");
+
+  }
+
 });
 
 /* =========================
-   🔓 BOUTON DEBLOCAGE FIX
+   🔓 DEBLOCAGE VIP
 ========================= */
 
-document.getElementById("unlockBtn").onclick = async () => {
+document.getElementById("unlockBtn").addEventListener("click", async () => {
 
-if (!currentUser) {
-window.location.href = "login.html";
-return;
-}
+  if (!currentUser) {
+    alert("Utilisateur non connecté");
+    return;
+  }
 
-const ref = doc(db, "users", currentUser.uid);
-const snap = await getDoc(ref);
+  try {
 
-let unlocked = [];
+    const ref = doc(db, "users", currentUser.uid);
 
-if (snap.exists()) {
-unlocked = snap.data().seriesUnlocked || [];
-}
+    const snap = await getDoc(ref);
 
-/* ajout série */
-if (!unlocked.includes(serieId)) {
-unlocked.push(serieId);
-}
+    let unlocked = [];
 
-await setDoc(ref, {
-seriesUnlocked: unlocked,
-vipMode: true
-}, { merge: true });
+    if (snap.exists()) {
+      unlocked = snap.data().seriesUnlocked || [];
+    }
 
-document.getElementById("vipPopup").style.display = "none";
+    /* ajouter série */
+    if (!unlocked.includes(serieId)) {
+      unlocked.push(serieId);
+    }
 
-alert("🎉 VIP débloqué !");
-};
+    await setDoc(ref, {
+      seriesUnlocked: unlocked,
+      vipMode: true
+    }, { merge: true });
+
+    document.getElementById("vipPopup").style.display = "none";
+
+    alert("🎉 Medicopter VIP débloqué !");
+
+    /* recharge propre */
+    window.location.reload();
+
+  } catch(err) {
+
+    console.error(err);
+
+    alert("Erreur de déblocage");
+
+  }
+
+});
 
 /* =========================
-   🎬 EPISODES TEST
+   🎬 EPISODES
 ========================= */
 
 function loadEpisodes(){
-const container = document.getElementById("episodes");
 
-for(let i=1;i<=10;i++){
-const div = document.createElement("div");
-div.className = "card";
-div.innerHTML = "Episode " + i;
-container.appendChild(div);
-}
+  const container = document.getElementById("episodes");
+
+  for(let i = 1; i <= 10; i++){
+
+    const div = document.createElement("div");
+
+    div.className = "card";
+
+    div.innerHTML = `
+      <h3>Episode ${i}</h3>
+      <p>Medicopter 117</p>
+    `;
+
+    container.appendChild(div);
+
+  }
+
 }
 
 loadEpisodes();
