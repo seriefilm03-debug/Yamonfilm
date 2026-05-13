@@ -9,6 +9,55 @@
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
 body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
+/* ===== POPUP VIP ===== */
+#vipPopup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.85);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.vip-box{
+background:#1c1c1c;
+padding:25px;
+border-radius:10px;
+width:90%;
+max-width:420px;
+text-align:center;
+border:1px solid #444;
+}
+
+.vip-box h2{
+color:#e50914;
+margin-bottom:10px;
+}
+
+.vip-box p{
+color:#ccc;
+margin-bottom:20px;
+line-height:1.4;
+}
+
+.vip-btn{
+background:#e50914;
+border:none;
+color:white;
+padding:12px 20px;
+border-radius:5px;
+cursor:pointer;
+font-weight:bold;
+margin:5px;
+}
+
+.vip-btn.secondary{
+background:#333;
+}
+
+/* ===== TON CSS ORIGINAL INCHANGÉ ===== */
+
 .navbar{
 position:fixed;
 top:0;
@@ -259,74 +308,27 @@ flex-wrap:wrap;
 align-items:center;
 margin-top:15px;
 }
-
-/* POPUP VIP */
-
-#vipPopup{
-display:none;
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.85);
-z-index:5000;
-justify-content:center;
-align-items:center;
-padding:20px;
-}
-
-.vip-box{
-background:#181818;
-width:100%;
-max-width:430px;
-border-radius:12px;
-padding:30px;
-text-align:center;
-border:1px solid #333;
-animation:pop 0.25s ease;
-}
-
-@keyframes pop{
-from{
-transform:scale(0.8);
-opacity:0;
-}
-to{
-transform:scale(1);
-opacity:1;
-}
-}
-
-.vip-box h2{
-font-size:28px;
-margin-bottom:15px;
-color:#e50914;
-}
-
-.vip-box p{
-color:#ccc;
-line-height:1.6;
-margin-bottom:25px;
-font-size:16px;
-}
-
-.vip-btn{
-background:#e50914;
-border:none;
-color:white;
-padding:14px 25px;
-font-size:17px;
-font-weight:bold;
-border-radius:6px;
-cursor:pointer;
-width:100%;
-}
-
-.vip-btn:hover{
-opacity:0.9;
-}
 </style>
 </head>
 
 <body>
+
+<!-- ===== POPUP VIP ===== -->
+<div id="vipPopup">
+  <div class="vip-box">
+    <h2>🎉 Félicitations</h2>
+    <p>Vous avez obtenu la série complète en VF.<br>
+    Procédez au visionnage sécurisé.</p>
+
+    <button class="vip-btn" onclick="unlockVip()">
+      ▶ Visionnage
+    </button>
+
+    <button class="vip-btn secondary" onclick="closeVip()">
+      Plus tard
+    </button>
+  </div>
+</div>
 
 <div class="navbar">
 <a href="index.html" class="logo">YAMONFILM</a>
@@ -339,19 +341,13 @@ opacity:0.9;
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="side-menu" id="menu">
-
 <a href="account.html">Mon compte</a>
 <a href="series.html">Mes séries</a>
 
 <div class="promo-section">
 <span style="color:#666;font-size:12px;">ACTIVER UN CODE</span>
-
 <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
-
-<button id="activateBtnMenu" class="activate-btn">
-Activer
-</button>
-
+<button id="activateBtnMenu" class="activate-btn">Activer</button>
 <p id="promoMsgMenu" style="font-size:11px;margin-top:5px;text-align:center;"></p>
 </div>
 
@@ -361,86 +357,25 @@ Déconnexion
 
 </div>
 
-<!-- POPUP -->
-
-<div id="vipPopup">
-<div class="vip-box">
-
-<h2>🎉 Félicitations</h2>
-
-<p>
-Vous avez obtenu la série complète en VF.<br><br>
-Pour débloquer Medicopter 117 sur tout le site,
-veuillez procéder au paiement.<br><br>
-
-✅ Paiement sécurisé<br>
-✅ Satisfait ou remboursé
-</p>
-
-<button class="vip-btn" id="vipAccessBtn">
-VISIONNAGE
-</button>
-
-</div>
-</div>
-
 <div id="video-overlay">
 <span class="close-video" onclick="closeVideo()">&times;</span>
-
 <iframe id="video-iframe" src="" allowfullscreen></iframe>
 </div>
 
 <section class="hero" id="hero">
-
 <div class="hero-content">
-
-<h1 id="title" style="font-size:3rem;margin-bottom:10px;">
-Medicopter 117
-</h1>
-
-<p id="overview" style="color:#ccc;margin:10px 0;font-size:1.1rem;line-height:1.5;"></p>
-
-<div class="btn-group">
-
-<button id="resumeBtn" class="btn-main" style="display:none;background:white;color:black;">
-▶ Reprendre l'épisode
-</button>
-
-</div>
-
+<h1 style="font-size:3rem;margin-bottom:10px;">Medicopter 117</h1>
+<p id="overview"></p>
 </div>
 </section>
-
-<div style="padding:20px 5%;">
-
-<div style="position:relative;">
-
-<button class="btn-main" id="seasonBtn">
-Saison 1 ▼
-</button>
-
-<div class="season-menu" id="seasonMenu"></div>
-
-</div>
-</div>
 
 <div class="episodes" id="episodes"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-getAuth,
-onAuthStateChanged,
-signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import {
-getFirestore,
-doc,
-setDoc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey:"AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -452,288 +387,62 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let userProgress = { watched:[], lastBySerie:{} };
-
 const serieId = "MEDICOPTER";
-
-let unlocked = false;
+let userUnlocked = false;
 
 window.toggleMenu = () => {
 document.getElementById("menu").classList.toggle("open");
 document.getElementById("overlay").classList.toggle("show");
 };
 
+/* ===== CHECK USER + POPUP ===== */
 onAuthStateChanged(auth, async(user)=>{
 
-if(user){
-
-const userDoc = await getDoc(doc(db,"users",user.uid));
-
-if(userDoc.exists()){
-
-const userData = userDoc.data();
-
-if(userData.progress){
-userProgress = userData.progress;
-
-if(!userProgress.lastBySerie){
-userProgress.lastBySerie = {};
+if(!user){
+window.location.href="login.html";
+return;
 }
 
-checkResume();
+const snap = await getDoc(doc(db,"users",user.uid));
+
+if(snap.exists()){
+const data = snap.data();
+if(data.seriesUnlocked?.includes(serieId)){
+userUnlocked = true;
+}
 }
 
-if(userData.seriesUnlocked &&
-userData.seriesUnlocked.includes(serieId)){
-unlocked = true;
-}
-
+if(!userUnlocked){
+document.getElementById("vipPopup").style.display="flex";
 }
 
 loadSeries();
 
-}else{
-window.location.href="login.html";
-}
-
 });
 
-document.getElementById("vipAccessBtn").onclick = async()=>{
-
-const user = auth.currentUser;
-
-if(!user) return;
-
-const userRef = doc(db,"users",user.uid);
-
-const snap = await getDoc(userRef);
-
-let seriesUnlocked = [];
-
-if(snap.exists()){
-seriesUnlocked = snap.data().seriesUnlocked || [];
-}
-
-if(!seriesUnlocked.includes(serieId)){
-seriesUnlocked.push(serieId);
-}
-
-await setDoc(userRef,{
-seriesUnlocked:seriesUnlocked
-},{ merge:true });
-
-window.location.href = "vipmedicopter.html";
-
-};
-
-document.getElementById("logoutBtn").onclick = ()=>{
-signOut(auth).then(()=>{
-window.location.href="login.html";
-});
-};
-
-window.saveProgress = async(s,e,title,img)=>{
-
+/* ===== VIP ACTION ===== */
+window.unlockVip = async () => {
 const user = auth.currentUser;
 if(!user) return;
 
-const epKey = `${serieId}-S${s}E${e}`;
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
 
-if(!userProgress.watched.includes(epKey)){
-userProgress.watched.push(epKey);
+let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+
+if(!unlocked.includes(serieId)){
+unlocked.push(serieId);
+await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
 }
 
-userProgress.lastBySerie[serieId] = {
-s,e,title,img,
-serieName:"Medicopter 117",
-link:"medicopter.html",
-timestamp:Date.now()
+window.location.href="vipmedicopter.html";
 };
 
-await setDoc(
-doc(db,"users",user.uid),
-{ progress:userProgress },
-{ merge:true }
-);
-
-renderEpisodes();
-checkResume();
-
-};
-
-function checkResume(){
-
-const last = userProgress.lastBySerie[serieId];
-
-if(last){
-
-const btn = document.getElementById("resumeBtn");
-
-btn.style.display = "inline-flex";
-
-btn.innerText = `▶ Reprendre S${last.s}E${last.e}`;
-
-btn.onclick = ()=>{
-window.openVideo(last.s,last.e,last.title,last.img);
-};
-
-}
-
-}
-
-const videasSources = {
-
-1:{
-1:"https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"
-}
-
-};
-
-const apiKey = "182c7173698e34803715eacab5c693a7";
-const tmdbId = 40996;
-
-let currentEpisodes = [];
-let currentS = 1;
-
-async function loadSeries(){
-
-const res = await fetch(
-`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`
-);
-
-const data = await res.json();
-
-document.getElementById("overview").innerText = data.overview;
-
-document.getElementById("hero").style.backgroundImage =
-`url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
-
-const menu = document.getElementById("seasonMenu");
-
-menu.innerHTML = "";
-
-for(let i=1;i<=data.number_of_seasons;i++){
-
-const d = document.createElement("div");
-
-d.innerText = "Saison "+i;
-
-d.onclick = ()=>{
-
-currentS = i;
-
-document.getElementById("seasonBtn").innerText =
-"Saison "+i+" ▼";
-
-loadEpisodes(i);
-
-menu.classList.remove("show");
-
-};
-
-menu.appendChild(d);
-
-}
-
-loadEpisodes(1);
-
-}
-
-async function loadEpisodes(s){
-
-const res = await fetch(
-`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`
-);
-
-const data = await res.json();
-
-currentEpisodes = data.episodes;
-
-renderEpisodes();
-
-}
-
-function renderEpisodes(){
-
-const container = document.getElementById("episodes");
-
-container.innerHTML = "";
-
-currentEpisodes.forEach(ep=>{
-
-const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
-
-const isWatched = userProgress.watched.includes(epKey);
-
-const card = document.createElement("div");
-
-card.className = "card";
-
-card.innerHTML = `
-<img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
-${isWatched ? '<div class="watched-tag">VU</div>' : ''}
-<div class="progress-bar" style="width:${isWatched ? '100%' : '0%'}"></div>
-<div style="padding:10px;">
-<b>E${ep.episode_number}</b> - ${ep.name}
-</div>
-`;
-
-card.onclick = ()=>{
-window.openVideo(
-currentS,
-ep.episode_number,
-ep.name,
-ep.still_path
-);
-};
-
-container.appendChild(card);
-
-});
-
-}
-
-window.openVideo = (s,e,title,img)=>{
-
-if(!unlocked){
-
-document.getElementById("vipPopup").style.display = "flex";
-return;
-
-}
-
-const url = videasSources[s]
-? videasSources[s][e]
-: null;
-
-if(url){
-
-document.getElementById("video-iframe").src = url;
-
-document.getElementById("video-overlay").style.display = "flex";
-
-window.saveProgress(s,e,title,img);
-
-}else{
-
-alert("Lien vidéo bientôt disponible.");
-
-}
-
-};
-
-window.closeVideo = ()=>{
-
-document.getElementById("video-overlay").style.display = "none";
-
-document.getElementById("video-iframe").src = "";
-
-};
-
-document.getElementById("seasonBtn").onclick = ()=>{
-document.getElementById("seasonMenu").classList.toggle("show");
+window.closeVip = ()=>{
+document.getElementById("vipPopup").style.display="none";
 };
 
 </script>
+
 </body>
 </html>
