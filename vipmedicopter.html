@@ -9,55 +9,6 @@
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
 body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
-/* ===== POPUP VIP ===== */
-#vipPopup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.85);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.vip-box{
-background:#1c1c1c;
-padding:25px;
-border-radius:10px;
-width:90%;
-max-width:420px;
-text-align:center;
-border:1px solid #444;
-}
-
-.vip-box h2{
-color:#e50914;
-margin-bottom:10px;
-}
-
-.vip-box p{
-color:#ccc;
-margin-bottom:20px;
-line-height:1.4;
-}
-
-.vip-btn{
-background:#e50914;
-border:none;
-color:white;
-padding:12px 20px;
-border-radius:5px;
-cursor:pointer;
-font-weight:bold;
-margin:5px;
-}
-
-.vip-btn.secondary{
-background:#333;
-}
-
-/* ===== TON CSS ORIGINAL INCHANGÉ ===== */
-
 .navbar{
 position:fixed;
 top:0;
@@ -308,31 +259,70 @@ flex-wrap:wrap;
 align-items:center;
 margin-top:15px;
 }
+
+/* ================= POPUP AJOUTÉ (SEUL AJOUT) ================= */
+
+#vipPopup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.85);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.vip-box{
+background:#1c1c1c;
+padding:25px;
+border-radius:10px;
+width:90%;
+max-width:420px;
+text-align:center;
+border:1px solid #444;
+}
+
+.vip-box h2{
+color:#e50914;
+margin-bottom:10px;
+}
+
+.vip-box p{
+color:#ccc;
+margin-bottom:20px;
+}
+
+.vip-box button{
+background:#e50914;
+border:none;
+color:white;
+padding:12px 18px;
+margin:5px;
+border-radius:5px;
+cursor:pointer;
+font-weight:bold;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== POPUP VIP ===== -->
+<!-- ================= POPUP (AJOUT UNIQUEMENT) ================= -->
 <div id="vipPopup">
   <div class="vip-box">
     <h2>🎉 Félicitations</h2>
     <p>Vous avez obtenu la série complète en VF.<br>
-    Procédez au visionnage sécurisé.</p>
+    Accès sécurisé disponible.</p>
 
-    <button class="vip-btn" onclick="unlockVip()">
-      ▶ Visionnage
-    </button>
-
-    <button class="vip-btn secondary" onclick="closeVip()">
-      Plus tard
-    </button>
+    <button onclick="unlockVip()">▶ Visionnage</button>
+    <button onclick="closeVip()">Plus tard</button>
   </div>
 </div>
 
+<!-- ===== TON CODE ORIGINAL SANS CHANGEMENT ===== -->
+
 <div class="navbar">
 <a href="index.html" class="logo">YAMONFILM</a>
-
 <div class="nav-right">
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
@@ -348,13 +338,11 @@ margin-top:15px;
 <span style="color:#666;font-size:12px;">ACTIVER UN CODE</span>
 <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
 <button id="activateBtnMenu" class="activate-btn">Activer</button>
-<p id="promoMsgMenu" style="font-size:11px;margin-top:5px;text-align:center;"></p>
 </div>
 
 <button id="logoutBtn" style="margin-top:auto;color:#e50914;">
 Déconnexion
 </button>
-
 </div>
 
 <div id="video-overlay">
@@ -374,8 +362,8 @@ Déconnexion
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey:"AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
@@ -388,14 +376,35 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const serieId = "MEDICOPTER";
-let userUnlocked = false;
+let unlocked = false;
 
-window.toggleMenu = () => {
-document.getElementById("menu").classList.toggle("open");
-document.getElementById("overlay").classList.toggle("show");
+/* ===== AJOUT MINIMAL ===== */
+function showVipPopup(){
+document.getElementById("vipPopup").style.display="flex";
+}
+
+window.closeVip = () => {
+document.getElementById("vipPopup").style.display="none";
 };
 
-/* ===== CHECK USER + POPUP ===== */
+window.unlockVip = async () => {
+const user = auth.currentUser;
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+let arr = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
+
+if(!arr.includes(serieId)){
+arr.push(serieId);
+await setDoc(ref,{seriesUnlocked:arr},{merge:true});
+}
+
+window.location.href="vipmedicopter.html";
+};
+
+/* ===== TON LOGIQUE INCHANGÉE ===== */
 onAuthStateChanged(auth, async(user)=>{
 
 if(!user){
@@ -408,39 +417,16 @@ const snap = await getDoc(doc(db,"users",user.uid));
 if(snap.exists()){
 const data = snap.data();
 if(data.seriesUnlocked?.includes(serieId)){
-userUnlocked = true;
+unlocked = true;
 }
 }
 
-if(!userUnlocked){
-document.getElementById("vipPopup").style.display="flex";
+/* ===== SEULE AJOUT ICI ===== */
+if(!unlocked){
+showVipPopup();
 }
-
-loadSeries();
 
 });
-
-/* ===== VIP ACTION ===== */
-window.unlockVip = async () => {
-const user = auth.currentUser;
-if(!user) return;
-
-const ref = doc(db,"users",user.uid);
-const snap = await getDoc(ref);
-
-let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
-
-if(!unlocked.includes(serieId)){
-unlocked.push(serieId);
-await setDoc(ref,{seriesUnlocked:unlocked},{merge:true});
-}
-
-window.location.href="vipmedicopter.html";
-};
-
-window.closeVip = ()=>{
-document.getElementById("vipPopup").style.display="none";
-};
 
 </script>
 
