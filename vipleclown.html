@@ -9,6 +9,30 @@
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
 body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
+/* --- STYLE DU POP-UP --- */
+#popup-unlock {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 5000;
+    display: none; /* Caché par défaut, géré par JS */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+.popup-content {
+    background: #1c1c1c;
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid #e50914;
+    max-width: 500px;
+}
+.popup-content h2 { font-size: 24px; margin-bottom: 15px; }
+.popup-content p { color: #ccc; margin-bottom: 25px; }
+/* ----------------------- */
+
 .navbar{
 position:fixed;
 top:0;
@@ -264,6 +288,15 @@ margin-top:15px;
 
 <body>
 
+<!-- POPUP DE DÉBLOCAGE -->
+<div id="popup-unlock">
+    <div class="popup-content">
+        <h2>Félicitations !</h2>
+        <p>Vous venez de débloquer la série complète.</p>
+        <button id="unlock-btn" class="btn-main">Bon visionnage</button>
+    </div>
+</div>
+
 <div class="navbar">
 <a href="index.html" class="logo">YAMONFILM</a>
 
@@ -368,6 +401,32 @@ const db = getFirestore(app);
 let userProgress = { watched:[], lastBySerie:{} };
 
 const serieId = "MEDICOPTER";
+
+// --- LOGIQUE DE DÉBLOCAGE ---
+const popup = document.getElementById('popup-unlock');
+const unlockBtn = document.getElementById('unlock-btn');
+const titleElem = document.getElementById('title');
+
+function applyVIP() {
+    if (titleElem.innerText.includes("Medicopter 117")) {
+        titleElem.innerText = "VIP Medicopter pour HL";
+    }
+}
+
+// Vérification au chargement
+if (localStorage.getItem('unlocked_' + serieId)) {
+    applyVIP();
+} else {
+    popup.style.display = 'flex';
+}
+
+// Action sur le bouton du popup
+unlockBtn.onclick = () => {
+    localStorage.setItem('unlocked_' + serieId, 'true');
+    popup.style.display = 'none';
+    applyVIP();
+};
+// ----------------------------
 
 window.toggleMenu = () => {
 document.getElementById("menu").classList.toggle("open");
@@ -620,3 +679,4 @@ document.getElementById("seasonMenu").classList.toggle("show");
 </script>
 </body>
 </html>
+
