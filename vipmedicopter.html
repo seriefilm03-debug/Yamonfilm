@@ -273,6 +273,7 @@ margin-top:15px;
     </button>
   </div>
 </div>
+
 <div class="navbar">
 <a href="index.html" class="logo">YAMONFILM</a>
 
@@ -357,9 +358,10 @@ if(!popup) return;
 popup.style.display = "flex";
 
 document.getElementById("vipBtn").onclick = () => {
-window.location.href = "vipmeciopter.html";
+window.location.href = "vipmedicopter.html";
 };
 }
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
 getAuth,
@@ -402,6 +404,14 @@ const userDoc = await getDoc(doc(db,"users",user.uid));
 if(userDoc.exists()){
 
 const userData = userDoc.data();
+
+/* ✅ AJOUT UNIQUE POPUP VIP */
+const unlocked = userData?.progress?.medicopterUnlocked === true;
+if(!unlocked){
+showVipPopup();
+}
+
+/* -------------------------- */
 
 if(userData.progress){
 userProgress = userData.progress;
@@ -505,77 +515,50 @@ let currentEpisodes = [];
 let currentS = 1;
 
 async function loadSeries(){
-
-const res = await fetch(
-`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`
-);
-
+const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
 const data = await res.json();
 
 document.getElementById("overview").innerText = data.overview;
-
 document.getElementById("hero").style.backgroundImage =
 `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
 
 const menu = document.getElementById("seasonMenu");
-
 menu.innerHTML = "";
 
 for(let i=1;i<=data.number_of_seasons;i++){
-
 const d = document.createElement("div");
-
 d.innerText = "Saison "+i;
 
 d.onclick = ()=>{
-
 currentS = i;
-
 document.getElementById("seasonBtn").innerText =
 "Saison "+i+" ▼";
-
 loadEpisodes(i);
-
 menu.classList.remove("show");
-
 };
 
 menu.appendChild(d);
-
 }
 
 loadEpisodes(1);
-
 }
 
 async function loadEpisodes(s){
-
-const res = await fetch(
-`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`
-);
-
+const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
 const data = await res.json();
-
 currentEpisodes = data.episodes;
-
 renderEpisodes();
-
 }
 
 function renderEpisodes(){
-
 const container = document.getElementById("episodes");
-
 container.innerHTML = "";
 
 currentEpisodes.forEach(ep=>{
-
 const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
-
 const isWatched = userProgress.watched.includes(epKey);
 
 const card = document.createElement("div");
-
 card.className = "card";
 
 card.innerHTML = `
@@ -588,48 +571,28 @@ ${isWatched ? '<div class="watched-tag">VU</div>' : ''}
 `;
 
 card.onclick = ()=>{
-window.openVideo(
-currentS,
-ep.episode_number,
-ep.name,
-ep.still_path
-);
+window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
 };
 
 container.appendChild(card);
-
 });
-
 }
 
 window.openVideo = (s,e,title,img)=>{
-
-const url = videasSources[s]
-? videasSources[s][e]
-: null;
+const url = videasSources[s] ? videasSources[s][e] : null;
 
 if(url){
-
 document.getElementById("video-iframe").src = url;
-
 document.getElementById("video-overlay").style.display = "flex";
-
 window.saveProgress(s,e,title,img);
-
 }else{
-
 alert("Lien vidéo bientôt disponible.");
-
 }
-
 };
 
 window.closeVideo = ()=>{
-
 document.getElementById("video-overlay").style.display = "none";
-
 document.getElementById("video-iframe").src = "";
-
 };
 
 document.getElementById("seasonBtn").onclick = ()=>{
