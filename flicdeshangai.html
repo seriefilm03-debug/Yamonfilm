@@ -1,432 +1,569 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Martial Law - YAMONFILM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flic de Shanghai - YAMONFILM</title>
+    <style>
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
+        /* NAV & MENU */
+        .navbar{
+            position:fixed; top:0; left:0; width:100%; height:60px;
+            display:flex; justify-content:space-between; align-items:center;
+            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            z-index:1000;
+        }
+        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
 
-body{
-font-family:Arial, sans-serif;
-background:#0f0f0f;
-color:white;
-}
+        /* OVERLAY & SIDE MENU */
+        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+        .overlay.show{ opacity:1; pointer-events:auto; }
+        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+        .side-menu.open{ right:0; }
+        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
 
-/* HEADER */
-header{
-position:fixed;
-top:0;
-width:100%;
-padding:15px 40px;
-background:rgba(0,0,0,0.6);
-backdrop-filter:blur(10px);
-display:flex;
-justify-content:space-between;
-align-items:center;
-z-index:1000;
-}
+        /* VIDEO PLAYER */
+        #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
+        #video-overlay iframe { width: 100%; height: 90%; border: none; }
+        .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
-.logo{
-font-size:22px;
-font-weight:bold;
-color:#e50914;
-text-decoration:none;
-}
+        /* HERO */
+        .hero{ height:65vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; background-color: #111; }
+        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); }
+        .hero-content{ position:relative; z-index:2; max-width:700px; }
+        
+        /* EPISODES */
+        .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
+        .card{ background:#1c1c1c; border-radius:4px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
+        .card:hover{ transform: scale(1.05); border-color: #e50914; }
+        .card img{ width:100%; height:140px; object-fit:cover; background: #222; }
+        
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
+        .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0, 200, 0, 0.8); color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        
+        .btn-main{ background:#e50914; color:white; padding:12px 20px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; text-decoration: none; display: inline-block;}
+        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; max-height: 250px; overflow-y: auto; width: 200px; border-radius: 5px;}
+        .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
+        .season-menu div:hover{ background: #333; }
+        .show{ display:block; }
 
-/* HERO */
-.hero{
-margin-top:70px;
-height:80vh;
-background-size:cover;
-background-position:center;
-display:flex;
-align-items:flex-end;
-padding:80px;
-position:relative;
-}
-
-.hero::after{
-content:"";
-position:absolute;
-bottom:0;
-left:0;
-width:100%;
-height:60%;
-background:linear-gradient(to top,#0f0f0f,transparent);
-}
-
-.hero-content{
-position:relative;
-z-index:2;
-max-width:600px;
-}
-
-.hero h1{
-font-size:55px;
-margin-bottom:15px;
-}
-
-.meta{
-color:#ccc;
-margin-bottom:15px;
-}
-
-/* BOUTONS */
-.btn-group{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-top:15px;
-}
-
-.btn-main{
-display:inline-block;
-background:#e50914;
-color:white;
-text-decoration:none;
-padding:15px 35px;
-border-radius:8px;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
-transition:.3s;
-border:none;
-}
-
-.btn-main:hover{
-background:#ff2e2e;
-}
-
-/* SAISON */
-.season-section{
-padding:40px 80px 20px;
-}
-
-.season-dropdown{
-position:relative;
-display:inline-block;
-}
-
-.season-menu{
-position:absolute;
-background:#1c1c1c;
-border-radius:8px;
-margin-top:10px;
-display:none;
-overflow:hidden;
-}
-
-.season-menu div{
-padding:12px 20px;
-cursor:pointer;
-}
-
-.season-menu div:hover{
-background:#e50914;
-}
-
-.show{display:block}
-
-/* EPISODES */
-.episodes{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:20px;
-padding:20px 80px 80px;
-}
-
-.card{
-background:#1c1c1c;
-border-radius:12px;
-overflow:hidden;
-cursor:pointer;
-transition:.3s;
-}
-
-.card:hover{
-transform:scale(1.05);
-}
-
-.card img{
-width:100%;
-height:150px;
-object-fit:cover;
-}
-
-.card-content{
-padding:15px;
-}
-
-.badge{
-font-size:12px;
-background:#e50914;
-padding:4px 8px;
-border-radius:5px;
-}
-
-/* POPUP */
-.popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.7);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:2000;
-opacity:0;
-pointer-events:none;
-transition:.3s;
-}
-
-.popup.show{
-opacity:1;
-pointer-events:auto;
-}
-
-.popup-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:12px;
-text-align:center;
-max-width:400px;
-border:1px solid #e50914;
-animation:fadeIn .3s ease;
-}
-
-.popup-box p{
-margin-bottom:20px;
-}
-
-.popup-box button{
-background:#e50914;
-border:none;
-color:white;
-padding:10px 20px;
-border-radius:6px;
-cursor:pointer;
-font-weight:bold;
-}
-
-.popup-box button:hover{
-background:#ff2e2e;
-}
-
-@keyframes fadeIn{
-from{transform:scale(0.9);opacity:0;}
-to{transform:scale(1);opacity:1;}
-}
-
-/* RESPONSIVE */
-@media(max-width:1024px){
-.hero{padding:60px}
-.episodes{padding:20px 40px}
-}
-
-@media(max-width:768px){
-.hero{height:70vh;padding:40px}
-.hero h1{font-size:32px}
-.season-section{padding:30px}
-.episodes{padding:20px}
-}
-
-@media(max-width:480px){
-.hero{height:60vh}
-.hero h1{font-size:26px}
-.btn-main{padding:12px 20px;font-size:14px}
-}
-</style>
+        /* POPUP SYSTEM */
+        .popup{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:4000; opacity:0; pointer-events:none; transition:.3s; }
+        .popup.show{ opacity:1; pointer-events:auto; }
+        .popup-box{ background:#1c1c1c; padding:30px; border-radius:12px; text-align:center; max-width:400px; border:1px solid #e50914; animation:fadeIn .3s ease; }
+        .popup-box p{ margin-bottom:20px; color: white; }
+        .popup-box button{ background:#e50914; border:none; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; }
+        @keyframes fadeIn{ from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+    </style>
 </head>
 <body>
 
-<header>
-<a href="index.html" class="logo">YAMONFILM</a>
-</header>
+<div class="navbar">
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div class="side-menu" id="menu">
+    <a href="account.html">Mon compte</a>
+    <a href="series.html">Mes séries</a>
+    <button id="logoutBtn">Déconnexion</button>
+</div>
+
+<div id="video-overlay">
+    <span class="close-video" onclick="closeVideo()">&times;</span>
+    <iframe id="video-iframe" src="" allowfullscreen></iframe>
+</div>
 
 <section class="hero" id="hero">
-<div class="hero-content">
-<h1 id="title">Chargement...</h1>
-<p class="meta" id="meta"></p>
-<p id="overview"></p>
+    <div class="hero-content">
+        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Flic de Shanghai</h1>
 
-<div class="btn-group">
-<a href="https://buy.stripe.com/3cI14m3LXaxrd2v8KCf3a0g" class="btn-main">
-Regarder la série maintenant
-</a>
+        <p id="overview"
+           style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;">
+        </p>
 
-<a href="mes series.html" class="btn-main">
-J’ai déjà payé
-</a>
-</div>
-</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+
+            <button id="resumeBtn"
+                    class="btn-main"
+                    style="display:none; background:white; color:black;">
+
+                ▶ Reprendre l'épisode
+
+            </button>
+
+            <a href="https://buy.stripe.com/00w4gycit6hb5A3bWOf3a0c"
+               class="btn-main">
+
+               🔓 Accéder à la série complète
+
+            </a>
+
+        </div>
+
+    </div>
 </section>
 
-<div class="season-section">
-<div class="season-dropdown">
-<button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
-<div class="season-menu" id="seasonMenu"></div>
-</div>
+<div style="padding:20px 5%;">
+
+    <div style="position: relative;">
+
+        <button class="btn-main" id="seasonBtn">
+
+            Saison 1 ▼
+
+        </button>
+
+        <div class="season-menu" id="seasonMenu"></div>
+
+    </div>
+
 </div>
 
 <div class="episodes" id="episodes"></div>
 
-<!-- POPUP -->
 <div id="popupMessage" class="popup">
-<div class="popup-box">
-<p>
-Pour voir tous les épisodes, veuillez cliquer sur
-<strong>"Regarder la série maintenant"</strong>.
-</p>
-<button onclick="closePopup()">Fermer</button>
+
+    <div class="popup-box">
+
+        <p>
+
+            Pour regarder les autres épisodes,
+            veuillez cliquer sur
+            <strong>"Accéder à la série complète"</strong>.
+
+        </p>
+
+        <button onclick="closePopup()">
+
+            Fermer
+
+        </button>
+
+    </div>
+
 </div>
-</div>
 
-<script>
-const apiKey="182c7173698e34803715eacab5c693a7";
+<script type="module">
 
-/* TMDB Martial Law */
-const seriesId=586;
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-const imgBase="https://image.tmdb.org/t/p/original";
+import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const hero=document.getElementById("hero");
-const title=document.getElementById("title");
-const meta=document.getElementById("meta");
-const overview=document.getElementById("overview");
-const seasonMenu=document.getElementById("seasonMenu");
-const seasonBtn=document.getElementById("seasonBtn");
-const episodesContainer=document.getElementById("episodes");
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* POPUP FUNCTIONS */
-function showPopup(){
-document.getElementById("popupMessage").classList.add("show");
-window.scrollTo({top:0,behavior:"smooth"});
-}
+const firebaseConfig = {
 
-function closePopup(){
-document.getElementById("popupMessage").classList.remove("show");
-}
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE",
 
-/* Charger infos série */
-async function loadSeries(){
+    authDomain: "yamonfilm-fead8.firebaseapp.com",
 
-const res=await fetch(
-`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=fr-FR`
-);
-
-const data=await res.json();
-
-title.textContent=data.name;
-
-meta.textContent=
-`⭐ ${data.vote_average} • ${data.first_air_date} • ${data.number_of_seasons} saisons`;
-
-overview.textContent=data.overview;
-
-hero.style.backgroundImage=
-`url(${imgBase}${data.backdrop_path})`;
-
-loadSeasons(data.number_of_seasons);
-}
-
-/* Charger saisons */
-function loadSeasons(total){
-
-seasonMenu.innerHTML="";
-
-for(let i=1;i<=total;i++){
-
-const div=document.createElement("div");
-
-div.textContent="Saison "+i;
-
-div.onclick=()=>{
-
-seasonBtn.innerHTML="Saison "+i+" ▼";
-
-seasonMenu.classList.remove("show");
-
-loadEpisodes(i);
+    projectId: "yamonfilm-fead8"
 
 };
 
-seasonMenu.appendChild(div);
-}
+const app = initializeApp(firebaseConfig);
 
-loadEpisodes(1);
-}
+const auth = getAuth(app);
 
-/* Charger épisodes */
-async function loadEpisodes(season){
+const db = getFirestore(app);
 
-episodesContainer.innerHTML="";
+/* TMDB FLIC DE SHANGHAI */
 
-const res=await fetch(
-`https://api.themoviedb.org/3/tv/${seriesId}/season/${season}?api_key=${apiKey}&language=fr-FR`
-);
+const tmdbId = 586;
 
-const data=await res.json();
+const apiKey = "182c7173698e34803715eacab5c693a7";
 
-data.episodes.forEach(ep=>{
+const serieId = "MARTIAL_LAW";
 
-let imageUrl=ep.still_path
-?imgBase+ep.still_path
-:data.poster_path
-?imgBase+data.poster_path
-:"https://via.placeholder.com/500x281?text=Episode";
+let userProgress = {
 
-const card=document.createElement("div");
+    watched: [],
 
-card.className="card";
-
-card.innerHTML=`
-<img src="${imageUrl}">
-<div class="card-content">
-<span class="badge">⭐ ${ep.vote_average||"N/A"}</span>
-<h4>${ep.episode_number}. ${ep.name}</h4>
-<small>${ep.air_date||""}</small>
-</div>
-`;
-
-if(season==1 && ep.episode_number==1){
-
-card.style.border="2px solid #e50914";
-
-card.onclick=()=>{
-
-window.location.href=
-"https://app.videas.fr/embed/media/da8697ea-9c6e-4056-ba3b-0ef81ad8552f/";
+    lastBySerie: {}
 
 };
 
-}else{
+let currentS = 1;
 
-card.onclick=()=>{
+let fallbackImg =
+"https://image.tmdb.org/t/p/original/m9Oa3q6q7WfWv3pGIn089N07UfM.jpg";
 
-showPopup();
+/* VIDEOS */
+
+const videasSources = {
+
+    1 : {
+
+        1 : "https://app.videas.fr/embed/media/9be0c38d-cc48-406b-9c77-97926b985b98/"
+
+    }
 
 };
 
-}
+/* POPUP */
 
-episodesContainer.appendChild(card);
+window.showPopup = () => {
+
+    document.getElementById("popupMessage")
+    .classList.add("show");
+
+};
+
+window.closePopup = () => {
+
+    document.getElementById("popupMessage")
+    .classList.remove("show");
+
+};
+
+/* MENU */
+
+window.toggleMenu = () => {
+
+    document.getElementById("menu")
+    .classList.toggle("open");
+
+    document.getElementById("overlay")
+    .classList.toggle("show");
+
+};
+
+/* AUTH */
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (user) {
+
+        const userDoc =
+        await getDoc(doc(db, "users", user.uid));
+
+        if (userDoc.exists() && userDoc.data().progress) {
+
+            userProgress = userDoc.data().progress;
+
+            if(!userProgress.lastBySerie)
+                userProgress.lastBySerie = {};
+
+            checkResume();
+
+        }
+
+        loadSeries();
+
+    } else {
+
+        window.location.href = "login.html";
+
+    }
 
 });
 
+/* LOGOUT */
+
+document.getElementById("logoutBtn").onclick = () => {
+
+    signOut(auth).then(() => {
+
+        window.location.href = "login.html";
+
+    });
+
+};
+
+/* LOAD SERIES */
+
+async function loadSeries() {
+
+    const res = await fetch(
+`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`
+    );
+
+    const data = await res.json();
+
+    const backdrop = data.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${data.backdrop_path}`
+    : fallbackImg;
+
+    document.getElementById("hero")
+    .style.backgroundImage = `url(${backdrop})`;
+
+    document.getElementById("title")
+    .innerText = data.name;
+
+    document.getElementById("overview")
+    .innerText = data.overview;
+
+    const menu =
+    document.getElementById("seasonMenu");
+
+    menu.innerHTML = "";
+
+    for(let i=1; i<=data.number_of_seasons; i++) {
+
+        const d = document.createElement("div");
+
+        d.innerText = "Saison "+i;
+
+        d.onclick = () => {
+
+            currentS = i;
+
+            document.getElementById("seasonBtn")
+            .innerText = "Saison "+i+" ▼";
+
+            loadEpisodes(i);
+
+            menu.classList.remove("show");
+
+        };
+
+        menu.appendChild(d);
+
+    }
+
+    loadEpisodes(1);
+
 }
 
-seasonBtn.onclick=()=>{
+/* LOAD EPISODES */
 
-seasonMenu.classList.toggle("show");
+async function loadEpisodes(s) {
+
+    let res = await fetch(
+`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`
+    );
+
+    let data = await res.json();
+
+    renderEpisodes(data.episodes);
 
 }
 
-loadSeries();
+/* RENDER */
+
+function renderEpisodes(episodes) {
+
+    const container =
+    document.getElementById("episodes");
+
+    container.innerHTML = "";
+
+    if(!episodes) return;
+
+    episodes.forEach(ep => {
+
+        const epKey =
+        `${serieId}-S${currentS}E${ep.episode_number}`;
+
+        const isWatched =
+        userProgress.watched.includes(epKey);
+
+        const imgPath = ep.still_path
+        ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
+        : fallbackImg;
+
+        const card =
+        document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+
+<div style="position:relative; height:140px;">
+
+<img src="${imgPath}"
+     style="width:100%; height:100%; object-fit:cover;">
+
+${isWatched
+? '<div class="watched-tag">VU</div>'
+: ''}
+
+<div class="progress-bar"
+     style="width:${isWatched ? '100%' : '0%'}">
+</div>
+
+</div>
+
+<div style="padding:10px;">
+
+<b style="color:#e50914;">
+
+E${ep.episode_number}
+
+</b>
+
+- ${ep.name}
+
+</div>
+
+`;
+
+        /* PREMIER EPISODE GRATUIT */
+
+        if(currentS == 1 && ep.episode_number == 1) {
+
+            card.onclick = () =>
+            window.openVideo(
+                currentS,
+                ep.episode_number,
+                ep.name,
+                ep.still_path || fallbackImg
+            );
+
+        } else {
+
+            card.onclick = () => window.showPopup();
+
+        }
+
+        container.appendChild(card);
+
+    });
+
+}
+
+/* VIDEO */
+
+window.openVideo = (s, e, title, img) => {
+
+    if (!videasSources[s] || !videasSources[s][e]) {
+
+        alert("Bientôt disponible !");
+
+        return;
+
+    }
+
+    document.getElementById("video-iframe").src =
+    videasSources[s][e];
+
+    document.getElementById("video-overlay")
+    .style.display = "flex";
+
+    window.saveProgress(s, e, title, img);
+
+};
+
+/* SAVE PROGRESS */
+
+window.saveProgress = async (s, e, title, img) => {
+
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    const epKey =
+    `${serieId}-S${s}E${e}`;
+
+    const userRef =
+    doc(db, "users", user.uid);
+
+    const userDoc =
+    await getDoc(userRef);
+
+    if (userDoc.exists() && userDoc.data().progress) {
+
+        userProgress = userDoc.data().progress;
+
+    }
+
+    if(!userProgress.watched.includes(epKey)) {
+
+        userProgress.watched.push(epKey);
+
+    }
+
+    userProgress.lastBySerie[serieId] = {
+
+        s,
+        e,
+        title,
+        img,
+
+        serieName: "Flic de Shanghai",
+
+        link: "flicdeshanghai.html",
+
+        timestamp: Date.now()
+
+    };
+
+    await setDoc(userRef, {
+
+        progress: userProgress
+
+    }, { merge: true });
+
+    checkResume();
+
+};
+
+/* RESUME */
+
+function checkResume() {
+
+    const last =
+    userProgress.lastBySerie[serieId];
+
+    if(last && last.s == 1 && last.e == 1) {
+
+        const btn =
+        document.getElementById("resumeBtn");
+
+        btn.style.display = "block";
+
+        btn.innerText =
+        `▶ Reprendre E${last.e}`;
+
+        btn.onclick = () =>
+        window.openVideo(
+            last.s,
+            last.e,
+            last.title,
+            last.img
+        );
+
+    }
+
+}
+
+/* CLOSE VIDEO */
+
+window.closeVideo = () => {
+
+    document.getElementById("video-overlay")
+    .style.display="none";
+
+    document.getElementById("video-iframe")
+    .src="";
+
+};
+
+/* SEASONS MENU */
+
+document.getElementById("seasonBtn")
+.onclick = () =>
+
+document.getElementById("seasonMenu")
+.classList.toggle("show");
+
 </script>
-
 </body>
 </html>
