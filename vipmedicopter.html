@@ -263,7 +263,16 @@ margin-top:15px;
 </head>
 
 <body>
-
+  
+<div id="vipPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;justify-content:center;align-items:center;">
+  <div style="background:#111;padding:20px;border-radius:10px;width:300px;text-align:center;border:1px solid #333;">
+    <h2 style="color:#e50914;">Félicitations 🎉</h2>
+    <p>Vous avez obtenu la série complète.</p>
+    <button id="vipBtn" style="margin-top:15px;padding:12px;width:100%;background:#e50914;color:white;border:none;border-radius:5px;cursor:pointer;">
+      Visionnage
+    </button>
+  </div>
+</div>
 <div class="navbar">
 <a href="index.html" class="logo">YAMONFILM</a>
 
@@ -341,6 +350,16 @@ Saison 1 ▼
 
 <script type="module">
 
+function showVipPopup(){
+const popup = document.getElementById("vipPopup");
+if(!popup) return;
+
+popup.style.display = "flex";
+
+document.getElementById("vipBtn").onclick = () => {
+window.location.href = "vipmeciopter.html";
+};
+}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
 getAuth,
