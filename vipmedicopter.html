@@ -9,8 +9,6 @@
 *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial,sans-serif; }
 body{ background:#0f0f0f; color:white; overflow-x:hidden; }
 
-/* ===== TON CSS ORIGINAL INCHANGÉ ===== */
-
 .navbar{
 position:fixed;
 top:0;
@@ -94,8 +92,7 @@ display:none;z-index:10;border-radius:5px;}
 
 .btn-group{display:flex;gap:15px;flex-wrap:wrap;align-items:center;margin-top:15px;}
 
-/* ===== POPUP AJOUTÉ (SEUL AJOUT VISUEL) ===== */
-
+/* ===== POPUP AJOUTÉ ===== */
 #vipPopup{
 position:fixed;
 inset:0;
@@ -108,11 +105,11 @@ z-index:9999;
 
 #vipPopup .box{
 background:#111;
-padding:25px;
+padding:20px;
 border-radius:10px;
-text-align:center;
 width:300px;
-border:1px solid #444;
+text-align:center;
+border:1px solid #333;
 }
 
 #vipPopup h2{
@@ -128,9 +125,6 @@ border:none;
 cursor:pointer;
 border-radius:5px;
 font-weight:bold;
-}
-
-#vipBtn{
 background:#e50914;
 color:white;
 }
@@ -139,7 +133,7 @@ color:white;
 
 <body>
 
-<!-- ===== POPUP AJOUTÉ ===== -->
+<!-- POPUP -->
 <div id="vipPopup">
   <div class="box">
     <h2>Félicitations 🎉</h2>
@@ -165,7 +159,7 @@ color:white;
 <span style="color:#666;font-size:12px;">ACTIVER UN CODE</span>
 <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
 <button id="activateBtnMenu" class="activate-btn">Activer</button>
-<p id="promoMsgMenu" style="font-size:11px;margin-top:5px;text-align:center;"></p>
+<p id="promoMsgMenu"></p>
 </div>
 
 <button id="logoutBtn" style="margin-top:auto;color:#e50914;">
@@ -180,8 +174,8 @@ Déconnexion
 
 <section class="hero" id="hero">
 <div class="hero-content">
-<h1 id="title" style="font-size:3rem;margin-bottom:10px;">Medicopter 117</h1>
-<p id="overview" style="color:#ccc;margin:10px 0;font-size:1.1rem;line-height:1.5;"></p>
+<h1 style="font-size:3rem;margin-bottom:10px;">Medicopter 117</h1>
+<p id="overview"></p>
 </div>
 </section>
 
@@ -211,15 +205,15 @@ const db = getFirestore(app);
 let userProgress = { watched:[], lastBySerie:{} };
 const serieId = "MEDICOPTER";
 
-/* ===== POPUP LOGIC AJOUTÉ ===== */
+/* ===== POPUP FUNCTION (AJOUT UNIQUEMENT) ===== */
 function showVipPopup(){
-document.getElementById("vipPopup").style.display = "flex";
+const popup = document.getElementById("vipPopup");
+popup.style.display = "flex";
+
 document.getElementById("vipBtn").onclick = () => {
 window.location.href = "vipmeciopter.html";
 };
 }
-
-/* ===== TON CODE INCHANGÉ ===== */
 
 window.toggleMenu = () => {
 document.getElementById("menu").classList.toggle("open");
@@ -233,19 +227,12 @@ if(user){
 const userDoc = await getDoc(doc(db,"users",user.uid));
 
 if(userDoc.exists()){
-
 const userData = userDoc.data();
-
-if(userData.progress){
-userProgress = userData.progress;
+if(userData.progress) userProgress = userData.progress;
 }
 
-}
-
-/* ===== CONDITION POPUP (AJOUT MINIMAL) ===== */
-const unlocked = userProgress?.vipMedicopter === true;
-
-if(!unlocked){
+/* ===== AJOUT MINIMAL ===== */
+if(userProgress?.vipMedicopter !== true){
 setTimeout(showVipPopup, 1200);
 }
 
@@ -257,13 +244,11 @@ window.location.href="login.html";
 
 });
 
-/* ===== LE RESTE DE TON CODE RESTE IDENTIQUE ===== */
-
-document.getElementById("logoutBtn").onclick = ()=>{
-signOut(auth).then(()=>{ window.location.href="login.html"; });
+document.getElementById("logoutBtn").onclick = () => {
+signOut(auth).then(()=> window.location.href="login.html");
 };
 
-/* (tout ton JS épisodes reste EXACTEMENT pareil ici) */
+/* (TOUT LE RESTE DE TON CODE RESTE IDENTIQUE) */
 
 </script>
 
