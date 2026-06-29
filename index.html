@@ -105,17 +105,12 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <section class="movies">
     <a id="cardClown" href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
     <a id="cardMedic" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-  <a id="cardflicdeshangai" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
-      
-
-  
-  
+    <a id="cardflicdeshangai" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
 </section>
 
-  <h3 class="movies-label">Film</h3>
+<h3 class="movies-label">Film</h3>
 <section class="movies">
     <a id="cardsupercross" href="supercross.html" class="movie" style="background-image: url('https://media.themoviedb.org/t/p/w440_and_h660_face/sHgPR5jrN09KoHKltAnLp8cfgg3.jpg');">Supercross</a>
-   
 </section>
   
 <script type="module">
@@ -153,19 +148,32 @@ onAuthStateChanged(auth, async (user) => {
         const unlocked = data.seriesUnlocked || [];
 
         // --- GESTION DU DÉBLOCAGE LE CLOWN ---
-        if (unlocked.includes("LECLOWN")) {
+        if (unlocked.includes("LECLOWN") || unlocked.includes("vipclown")) {
             document.getElementById("heroClownBtn").href = "vipleclown.html";
             const cardClown = document.getElementById("cardClown");
-            cardClown.href = "vipleclown.html";
-            cardClown.innerText = "Le Clown VIP 🔥";
+            if (cardClown) {
+                cardClown.href = "vipleclown.html";
+                cardClown.innerText = "Le Clown VIP 🔥";
+            }
         }
 
         // --- GESTION DU DÉBLOCAGE MEDICOPTER ---
         if (unlocked.includes("MEDICOPTER")) {
             document.getElementById("heroMedicBtn").href = "vipmedicopter.html";
             const cardMedic = document.getElementById("cardMedic");
-            cardMedic.href = "vipmedicopter.html";
-            cardMedic.innerText = "Medicopter VIP 🔥";
+            if (cardMedic) {
+                cardMedic.href = "vipmedicopter.html";
+                cardMedic.innerText = "Medicopter VIP 🔥";
+            }
+        }
+
+        // --- GESTION DU DÉBLOCAGE LE FLIC DE SHANGHAÏ ---
+        if (unlocked.includes("vipflicdeshanghai")) {
+            const cardFlic = document.getElementById("cardflicdeshangai");
+            if (cardFlic) {
+                cardFlic.href = "vipflicdeshanghai.html"; // Redirige vers la page VIP
+                cardFlic.innerText = "Le Flic de Shanghaï VIP 🔥";
+            }
         }
 
         if (data.progress?.lastBySerie) {
@@ -187,9 +195,10 @@ function displayContinue(lastBySerie, unlocked) {
             const imgUrl = item.img.startsWith('http') ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
             
             let finalLink = item.link;
-            // Redirection automatique si la série a été débloquée entre temps
-            if(item.serieName === "Le Clown" && unlocked.includes("LECLOWN")) finalLink = "vipleclown.html";
+            // Redirection automatique dans "Reprendre la lecture" si débloqué
+            if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
+            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("vipflicdeshanghai")) finalLink = "vipflicdeshanghai.html";
 
             const card = document.createElement("a");
             card.href = finalLink;
