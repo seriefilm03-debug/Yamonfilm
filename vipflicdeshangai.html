@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YAMONFILM - Streaming</title>
+    <title>Les Flics de Shanghai - YAMONFILM</title>
     <style>
         /* --- STYLE GLOBAL --- */
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
@@ -95,7 +95,7 @@
 
 <section class="hero" id="hero">
     <div class="hero-content">
-        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Chargement...</h1>
+        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Les Flics de Shanghai</h1>
         <p id="overview" style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;"></p>
         
         <div class="btn-group">
@@ -117,7 +117,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // --- CONFIGURATION FIREBASE ---
     const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
@@ -125,31 +125,26 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let userProgress = { watched: [], lastBySerie: {} };
+    
     // =========================================================================
-    // ⚙️ --- CONFIGURATION DE LA SÉRIE (À MODIFIER ICI) --- ⚙️
+    // Identifiant crucial synchronisé avec ton index.html et ta page mes séries
     // =========================================================================
-    const serieId = "MARTIAL_LAW"; // IMPORTANT : Doit correspondre à l'ID de la série partout sur ton site (Ex: "MEDICOPTER", "FLICSSHANGHAI")
-    const pageLink = "vipflicdeshangai.html";       // Le nom du fichier HTML actuel (Ex: "medicopter.html")
-    const tmdbId = 586;                                 // Remplace 0 par l'ID de la série sur TMDB
-    const promoCodeVIP = "CODEVIP";                  // Code promo pour la barre latérale
-    const apiKey = "182c7173698e34803715eacab5c693a7"; 
+    const serieId = "vipflicdeshanghai"; 
+    const pageLink = "vipflicdeshanghai.html";
+    const tmdbId = 2102; 
+    const apiKey = "182c7173698e34803715eacab5c693a7";
+    // =========================================================================
 
     // 🎬 --- AJOUTER LES LIENS DE TES ÉPISODES ICI ---
     const videasSources = {
-        1: { // SAISON 1
-            1: "https://url_de_l_episode_1_ici",
-            2: "https://url_de_l_episode_2_ici"
-        },
-        2: { // SAISON 2
-            1: "https://url_de_l_saison2_episode1_ici"
+        1: {
+            1: "https://url_de_l_episode_1_ici"
         }
     };
-    // =========================================================================
 
-    let userProgress = { watched: [], lastBySerie: {} };
     let currentEpisodes = [];
     let currentS = 1;
-    let serieRealName = "Série";
 
     // TOGGLE MENU
     window.toggleMenu = () => {
@@ -167,6 +162,7 @@
                     if(!userProgress.lastBySerie) userProgress.lastBySerie = {};
                     checkResume();
                 }
+                // Si la série est déjà débloquée, on cache le bouton tout de suite
                 if (userData.seriesUnlocked && userData.seriesUnlocked.includes(serieId)) {
                     document.getElementById("unlockBtn").style.display = "none";
                 }
@@ -180,23 +176,43 @@
         signOut(auth).then(() => { window.location.href = "login.html"; });
     };
 
-    // BOUTON DEBLOCAGE DIRECT (Fonctionne à 100% sur tout le site via Firebase)
+    // 🔓 BOUTON DEBLOCAGE DIRECT (Ajoute l'ID proprement via arrayUnion sans rien écraser)
     document.getElementById("unlockBtn").onclick = async () => {
         const user = auth.currentUser;
         if (!user) return;
+        
         const msg = document.getElementById("unlockMsg");
         const userRef = doc(db, "users", user.uid);
+        
         try {
-            const snap = await getDoc(userRef);
-            let unlocked = snap.exists() ? (snap.data().seriesUnlocked || []) : [];
-            if (!unlocked.includes(serieId)) {
-                unlocked.push(serieId);
-                await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
+            // Utilisation de updateDoc + arrayUnion pour préserver les autres clés (ex: LECLOWN)
+            await updateDoc(userRef, {
+                seriesUnlocked: arrayUnion(serieId)
+            });
+
+            msg.style.color = "#00ff00";
+            msg.innerText = "Série débloquée ! Redirection vers l'accueil...";
+            document.getElementById("unlockBtn").style.display = "none";
+            
+            // Redirection après 1.5s pour forcer la page d'accueil à lire le changement
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
+
+        } catch (e) { 
+            console.error(e);
+            // Sécurité au cas où le document de l'utilisateur n'existe pas encore du tout
+            try {
+                await setDoc(userRef, { seriesUnlocked: [serieId] }, { merge: true });
                 msg.style.color = "#00ff00";
-                msg.innerText = "Série débloquée ! Elle est maintenant dans 'Mes Séries'.";
+                msg.innerText = "Série débloquée ! Redirection...";
                 document.getElementById("unlockBtn").style.display = "none";
+                setTimeout(() => { window.location.href = "index.html"; }, 1500);
+            } catch(err) {
+                msg.style.color = "red"; 
+                msg.innerText = "Erreur de mise à jour de la base de données."; 
             }
-        } catch (e) { msg.style.color = "red"; msg.innerText = "Erreur de connexion."; }
+        }
     };
 
     // LOGIQUE CODE PROMO BARRE LATERALE
@@ -204,17 +220,20 @@
         const code = document.getElementById("promoCode").value.trim().toUpperCase();
         const msg = document.getElementById("promoMsgMenu");
         if (!code || !auth.currentUser) return;
-        let serieToUnlock = (code === promoCodeVIP.toUpperCase()) ? serieId : "";
+        
+        let serieToUnlock = (code === "SHANGHAIVIP") ? serieId : "";
         if (!serieToUnlock) { msg.style.color="red"; msg.innerText="Code invalide."; return; }
+        
         const userRef = doc(db, "users", auth.currentUser.uid);
-        const snap = await getDoc(userRef);
-        let unlocked = snap.data().seriesUnlocked || [];
-        if (!unlocked.includes(serieToUnlock)) {
-            unlocked.push(serieToUnlock);
-            await setDoc(userRef, { seriesUnlocked: unlocked }, { merge: true });
+        try {
+            await updateDoc(userRef, {
+                seriesUnlocked: arrayUnion(serieToUnlock)
+            });
             msg.style.color="lime"; msg.innerText="Débloqué !";
-            setTimeout(() => location.reload(), 1000);
-        } else { msg.innerText="Déjà actif."; }
+            setTimeout(() => window.location.href = "index.html", 1000);
+        } catch(err) {
+            msg.innerText="Erreur ou déjà actif.";
+        }
     };
 
     window.saveProgress = async (s, e, title, img) => {
@@ -224,7 +243,7 @@
         if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
         userProgress.lastBySerie[serieId] = { 
             s, e, title, img, 
-            serieName: serieRealName, 
+            serieName: "Les Flics de Shanghai", 
             link: pageLink,
             timestamp: Date.now() 
         };
@@ -244,44 +263,26 @@
     }
 
     async function loadSeries() {
-        if(tmdbId === 0) {
-            document.getElementById("title").innerText = "Configurez l'ID TMDB";
-            document.getElementById("overview").innerText = "Veuillez entrer un ID TMDB valide dans la configuration de la balise script.";
-            return;
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        document.getElementById("overview").innerText = data.overview;
+        document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+        
+        const menu = document.getElementById("seasonMenu");
+        menu.innerHTML = "";
+        for(let i=1; i<=data.number_of_seasons; i++) {
+            const d = document.createElement("div"); d.innerText = "Saison "+i;
+            d.onclick = () => { currentS = i; document.getElementById("seasonBtn").innerText = "Saison "+i+" ▼"; loadEpisodes(i); menu.classList.remove("show"); };
+            menu.appendChild(d);
         }
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
-            const data = await res.json();
-            serieRealName = data.name;
-            document.title = `${serieRealName} - YAMONFILM`;
-            document.getElementById("title").innerText = serieRealName;
-            document.getElementById("overview").innerText = data.overview || "Aucun résumé disponible.";
-            if(data.backdrop_path) {
-                document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
-            }
-            
-            const menu = document.getElementById("seasonMenu");
-            menu.innerHTML = "";
-            for(let i=1; i<=data.number_of_seasons; i++) {
-                const d = document.createElement("div"); d.innerText = "Saison "+i;
-                d.onclick = () => { currentS = i; document.getElementById("seasonBtn").innerText = "Saison "+i+" ▼"; loadEpisodes(i); menu.classList.remove("show"); };
-                menu.appendChild(d);
-            }
-            loadEpisodes(1);
-        } catch(err) {
-            document.getElementById("title").innerText = "Erreur de chargement TMDB";
-        }
+        loadEpisodes(1);
     }
 
     async function loadEpisodes(s) {
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
-            const data = await res.json();
-            currentEpisodes = data.episodes;
-            renderEpisodes();
-        } catch(err) {
-            console.error("Erreur lors du chargement des épisodes", err);
-        }
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        currentEpisodes = data.episodes;
+        renderEpisodes();
     }
 
     function renderEpisodes() {
@@ -292,11 +293,8 @@
             const isWatched = userProgress.watched.includes(epKey);
             const card = document.createElement("div");
             card.className = "card";
-            
-            const imgPath = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : 'https://via.placeholder.com/300x168/1c1c1c/ffffff?text=YAMONFILM';
-            
             card.innerHTML = `
-                <img src="${imgPath}">
+                <img src="https://image.tmdb.org/t/p/w300${ep.still_path}">
                 ${isWatched ? '<div class="watched-tag">VU</div>' : ''}
                 <div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div>
                 <div style="padding:10px;"><b>E${ep.episode_number}</b> - ${ep.name}</div>
@@ -307,13 +305,13 @@
     }
 
     window.openVideo = (s, e, title, img) => {
-        const url = (videasSources[s] && videasSources[s][e]) ? videasSources[s][e] : null;
+        const url = videasSources[s] ? videasSources[s][e] : null;
         if(url) {
             document.getElementById("video-iframe").src = url;
             document.getElementById("video-overlay").style.display = "flex";
             window.saveProgress(s, e, title, img);
         } else {
-            alert("Lecteur vidéo non configuré ou lien vide pour cet épisode.");
+            alert("Lecteur vidéo non configuré pour cet épisode.");
         }
     };
 
