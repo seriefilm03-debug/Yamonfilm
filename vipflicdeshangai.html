@@ -128,25 +128,21 @@
     // =========================================================================
     // ⚙️ --- CONFIGURATION DE LA SÉRIE (À MODIFIER ICI) --- ⚙️
     // =========================================================================
-    const serieId = "MARTIAL_LAW"; // Exemple: "BREAKINGBAD"
-    const pageLink = "viplesflicdeshanghai.html";       // Le nom exact de cette page HTML
-    const tmdbId = 586;                                 // Remplace 0 par l'ID de la série trouvé sur TMDB
-    const promoCodeVIP = "CODEVIP";                  // Code promo pour débloquer cette série
+    const serieId = "METS_ICI_ID_SERIE_EN_MAJUSCULES"; // IMPORTANT : Doit correspondre à l'ID de la série partout sur ton site (Ex: "MEDICOPTER", "FLICSSHANGHAI")
+    const pageLink = "nom_de_ce_fichier.html";       // Le nom du fichier HTML actuel (Ex: "medicopter.html")
+    const tmdbId = 0;                                 // Remplace 0 par l'ID de la série sur TMDB
+    const promoCodeVIP = "CODEVIP";                  // Code promo pour la barre latérale
     const apiKey = "182c7173698e34803715eacab5c693a7"; 
 
-    // 🎬 --- METS TES LIENS DE LECTEUR (VIDEAS / EMBED) ICI ---
+    // 🎬 --- AJOUTER LES LIENS DE TES ÉPISODES ICI ---
     const videasSources = {
         1: { // SAISON 1
             1: "https://url_de_l_episode_1_ici",
-            2: "https://url_de_l_episode_2_ici",
-            3: "https://url_de_l_episode_3_ici"
-            // Continue la liste pour chaque épisode...
+            2: "https://url_de_l_episode_2_ici"
         },
         2: { // SAISON 2
-            1: "https://url_de_l_saison2_episode1_ici",
-            2: "https://url_de_l_saison2_episode2_ici"
+            1: "https://url_de_l_saison2_episode1_ici"
         }
-        // Tu peux rajouter des blocs 3: {}, 4: {}, etc. pour les saisons suivantes
     };
     // =========================================================================
 
@@ -184,7 +180,7 @@
         signOut(auth).then(() => { window.location.href = "login.html"; });
     };
 
-    // BOUTON DEBLOCAGE DIRECT
+    // BOUTON DEBLOCAGE DIRECT (Fonctionne à 100% sur tout le site via Firebase)
     document.getElementById("unlockBtn").onclick = async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -297,7 +293,6 @@
             const card = document.createElement("div");
             card.className = "card";
             
-            // Image de fallback si TMDB n'a pas de vignette pour l'épisode
             const imgPath = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : 'https://via.placeholder.com/300x168/1c1c1c/ffffff?text=YAMONFILM';
             
             card.innerHTML = `
@@ -313,7 +308,7 @@
 
     window.openVideo = (s, e, title, img) => {
         const url = (videasSources[s] && videasSources[s][e]) ? videasSources[s][e] : null;
-        if(url && url !== "https://url_de_l_episode_1_ici") {
+        if(url) {
             document.getElementById("video-iframe").src = url;
             document.getElementById("video-overlay").style.display = "flex";
             window.saveProgress(s, e, title, img);
