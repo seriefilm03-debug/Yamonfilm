@@ -168,12 +168,17 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         // --- GESTION DU DÉBLOCAGE LE FLIC DE SHANGHAÏ ---
-        if (unlocked.includes("vipflicdeshanghai")) {
-            const cardFlic = document.getElementById("cardMARTIAL_LAW");
-            if (cardFlic) {
-                cardFlic.href = "vipflicdeshangai.html"; // Redirige vers la page VIP
-                cardFlic.innerText = "Le Flic de Shanghaï VIP 🔥";
-            }
+      // On vérifie si le tableau contient l'ID technique "MARTIAL_LAW"
+if (unlocked.includes("MARTIAL_LAW")) {
+    const cardFlic = document.getElementById("cardMARTIAL_LAW");
+    if (cardFlic) {
+        cardFlic.href = "vipflicdeshanghai.html"; // Attention à l'orthographe exacte du fichier (avec un 'h')
+        
+        // Si ta carte contient du texte directement, utilise innerText. 
+        // Si c'est une carte complexe avec une image, commente ou adapte la ligne suivante pour ne pas casser le design :
+        cardFlic.innerText = "Les Flics de Shanghai VIP 🔥"; 
+    }
+}
         }
 
         if (data.progress?.lastBySerie) {
