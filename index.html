@@ -42,6 +42,14 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .play-btn { padding: 12px 35px; background: white; color: black; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-flex; transition: 0.3s; }
 .play-btn:hover { background: #e50914; color: white; }
 
+/* STYLE AJOUTÉ POUR BANNIÈRE DEMANDE */
+.request-banner-section { padding: 40px 5% 0px; }
+.request-banner { display: flex; justify-content: space-between; align-items: center; background: #1f1f1f; padding: 20px 30px; border-radius: 6px; border: 1px solid #333; gap: 20px; }
+.request-banner-text h3 { font-size: 20px; margin-bottom: 5px; }
+.request-banner-text p { color: #aaa; font-size: 14px; }
+.request-link-btn { background: #e50914; color: white; text-decoration: none; font-weight: bold; padding: 12px 25px; border-radius: 4px; transition: 0.3s; text-align: center; white-space: nowrap; }
+.request-link-btn:hover { background: white; color: black; }
+
 /* REPRENDRE LA LECTURE */
 .continue-section { padding: 40px 5% 10px; display: none; }
 .continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
@@ -57,6 +65,11 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
 .movie:hover { transform: scale(1.05); border-color: #555; }
 .hidden { display: none; }
+
+@media (max-width: 600px) {
+    .request-banner { flex-direction: column; text-align: center; padding: 20px; }
+    .request-link-btn { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -96,6 +109,17 @@ body{ background:#141414; color:white; overflow-x:hidden; }
     </div>
 </section>
 
+<!-- SECTION AJOUTÉE : CASE DE DEMANDE DE FILMS / SÉRIES -->
+<section class="request-banner-section">
+    <div class="request-banner">
+        <div class="request-banner-text">
+            <h3>Une idée de film ou de série ?</h3>
+            <p>Fais une demande d'ajout directement en recherchant ton contenu sur TMDB.</p>
+        </div>
+        <a href="demande d'ajout.html" class="request-link-btn">Faire une demande</a>
+    </div>
+</section>
+
 <section id="continue-watching" class="continue-section">
     <h3>Reprendre la lecture</h3>
     <div id="continue-container" class="continue-grid"></div>
@@ -105,7 +129,6 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <section class="movies">
     <a id="cardClown" href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
     <a id="cardMedic" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-    <!-- Changement de l'ID ici pour correspondre au script JS -->
     <a id="cardMARTIAL_LAW" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
 </section>
 
@@ -172,7 +195,7 @@ onAuthStateChanged(auth, async (user) => {
         if (unlocked.includes("MARTIAL_LAW")) {
             const cardFlic = document.getElementById("cardMARTIAL_LAW");
             if (cardFlic) {
-                cardFlic.href = "vipflicdeshangai.html";
+                cardFlic.href = "vipflicdeshanghai.html";
                 cardFlic.innerText = "Les Flics de Shanghai VIP 🔥"; 
             }
         }
@@ -199,7 +222,7 @@ function displayContinue(lastBySerie, unlocked) {
             // Redirection automatique dans "Reprendre la lecture" si débloqué
             if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
-            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshangai.html";
+            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshanghai.html";
 
             const card = document.createElement("a");
             card.href = finalLink;
@@ -218,5 +241,7 @@ function displayContinue(lastBySerie, unlocked) {
     }
 }
 </script>
+</body>
+</html>
 </body>
 </html>
