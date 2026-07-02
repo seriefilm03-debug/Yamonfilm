@@ -83,6 +83,16 @@
             <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
         </div>
     </a>
+
+    <!-- SÉRIE AJOUTÉE : LE FLIC DE SHANGHAÏ -->
+    <a href="vipflicdeshanghai.html" class="card" id="card-MARTIAL_LAW">
+        <img src="https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg" alt="Le Flic de Shanghaï">
+        <div class="card-info">
+            <span class="badge">VIP 🔥</span>
+            <b>Le Flic de Shanghaï</b>
+            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
+        </div>
+    </a>
 </div>
 
 <div id="no-series">
@@ -121,7 +131,7 @@
             if (unlocked.length > 0) {
                 let hasVisibleSeries = false;
 
-                // On parcourt les IDs débloqués (ex: LECLOWN, MEDICOPTER)
+                // On parcourt les IDs débloqués (ex: LECLOWN, MEDICOPTER, MARTIAL_LAW)
                 unlocked.forEach(id => {
                     const card = document.getElementById(`card-${id}`);
                     if (card) {
