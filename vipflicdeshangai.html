@@ -99,7 +99,6 @@
     <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
 </div>
 
-<!-- POP-UP DEBLOCAGE (Cachée par défaut) -->
 <div id="unlockModal" class="unlock-modal">
     <div class="unlock-modal-content">
         <h2>Série Verrouillée 🔒</h2>
@@ -154,7 +153,52 @@
 
     const videasSources = {
         1: {
-            1: "https://url_de_l_episode_1_ici"
+            1: "https://app.videas.fr/embed/media/da8697ea-9c6e-4056-ba3b-0ef81ad8552f/",
+            2: "https://app.videas.fr/embed/media/9cd32488-ddd8-4ba9-80c5-ea8e7db5804b/",
+            3: "https://app.videas.fr/embed/media/2aa897f5-7e23-4a22-abe1-f2cd82370a9a/",
+            4: "https://app.videas.fr/embed/media/a281bd73-7ed2-4661-bed0-8d88e289df01/",
+            5: "https://app.videas.fr/embed/media/c82c3116-f6c0-4a5f-8877-c5d824342806/",
+            6: "https://app.videas.fr/embed/media/ddc5552b-08eb-47ca-97f2-7035efb6b240/",
+            7: "https://app.videas.fr/embed/media/200a0738-7d7d-43ca-b588-ee98d0612449/",
+            8: "https://app.videas.fr/embed/media/c143560f-49ff-4ffb-bb27-5b02fbef895d/",
+            9: "https://app.videas.fr/embed/media/65c24ae6-4a17-469e-bf40-382c19a6723c/",
+            10: "https://app.videas.fr/embed/media/1b8c944a-c1c9-447a-8d26-59ba87a817f5/",
+            11: "https://app.videas.fr/embed/media/faa79461-b7aa-4ca8-afa7-cd4674c4998c/",
+            12: "https://app.videas.fr/embed/media/d79960e7-54a2-478b-9db2-0344a86fedd4/",
+            13: "https://app.videas.fr/embed/media/f73f5b64-23b9-4f65-8b4b-6f5ebd777a6c/",
+            14: "https://app.videas.fr/embed/media/78f803c3-4c05-4972-bf73-90454430f625/",
+            15: "https://app.videas.fr/embed/media/bc37d551-9d17-4a5f-8b64-f4d6d591975b/",
+            16: "https://app.videas.fr/embed/media/9ed5914a-9513-433f-8964-d86c50fd1e0f/",
+            17: "https://app.videas.fr/embed/media/564142b4-f3ef-4c73-bee5-a9fa1f1b4c2d/",
+            18: "https://app.videas.fr/embed/media/f1e1508b-f913-43fa-a438-7fa389b62521/",
+            19: "https://app.videas.fr/embed/media/367f1ac0-7bf5-490a-b6e6-2fe217a3f2a8/",
+            20: "https://app.videas.fr/embed/media/3709d6cb-63c5-4425-89a6-8e3f64b9d0a2/",
+            21: "https://app.videas.fr/embed/media/e6addcce-b064-44b2-a5f4-5f9631fc4bf4/",
+            22: "https://app.videas.fr/embed/media/ca4f59ba-5439-4f34-afa1-a24313a95b55/"
+        },
+        2: {
+            1: "https://app.videas.fr/embed/media/a4cf68d6-16d4-47e2-bfba-880c95207828/",
+            2: "https://app.videas.fr/embed/media/bdf40549-ab28-425e-88fe-fcb4adb05834/",
+            3: "https://app.videas.fr/embed/media/7c3ace81-0e43-4be3-99f6-554d8ed90762/",
+            4: "https://app.videas.fr/embed/media/57b369f0-bf6a-4c93-b541-f54c64eb6ef4/",
+            5: "https://app.videas.fr/embed/media/f3299558-0b6d-4c1f-a3b6-766c897ffad3/",
+            6: "https://app.videas.fr/embed/media/d983965a-07c5-4bba-bc1d-314e2e7ef7d4/",
+            7: "https://app.videas.fr/embed/media/66990f7a-434f-4847-938b-94bb4ae14155/",
+            8: "https://app.videas.fr/embed/media/31942cf2-1f59-4923-96fd-987d6e46f746/",
+            9: "https://app.videas.fr/embed/media/6d734fb1-420d-438f-a807-89f0a3959247/",
+            10: "https://app.videas.fr/embed/media/354203c9-3df6-4d03-abfd-f4806fe1e486/",
+            11: "https://app.videas.fr/embed/media/39946cd2-af65-4df5-bde7-6af7053e46ea/",
+            12: "https://app.videas.fr/embed/media/108dd4ba-b80e-4655-b630-e3d8ac6913be/",
+            13: "https://app.videas.fr/embed/media/d0d3bf3a-763b-45c5-bbe2-c283007767ff/",
+            14: "https://app.videas.fr/embed/media/778bc4be-2fed-4e24-8b96-d971c609b133/",
+            15: "https://app.videas.fr/embed/media/c6d18b33-b87b-4497-aa42-c5b89792191b/",
+            16: "https://app.videas.fr/embed/media/361c3cd2-ad36-4f84-ad8a-16ca9ca72138/",
+            17: "https://app.videas.fr/embed/media/6fa22b35-e6ad-42ba-a6c3-cf182fa5fcad/",
+            18: "https://app.videas.fr/embed/media/03e01fb1-215d-4dea-aa7a-aa9700f3d579/",
+            19: "https://app.videas.fr/embed/media/276e1123-635b-438b-a634-84b63c03e01e/",
+            20: "https://app.videas.fr/embed/media/096735e6-9d40-4340-8f1b-a0d79e7e9a61/",
+            21: "https://app.videas.fr/embed/media/c841f276-22f5-4a83-b902-ec3eb1013485/",
+            22: "https://app.videas.fr/embed/media/b0868e4b-4d0c-41a5-9a5e-9b5ce62d3733/"
         }
     };
 
@@ -184,7 +228,6 @@
                     document.getElementById("unlockModal").style.display = "flex";
                 }
             } else {
-                // Si l'utilisateur n'a aucun document, la série n'est pas débloquée d'office
                 document.getElementById("unlockModal").style.display = "flex";
             }
             loadSeries();
