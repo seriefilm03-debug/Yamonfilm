@@ -52,15 +52,27 @@
         
         .btn-main{ background:#e50914; color:white; padding:12px 25px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; display: inline-flex; align-items: center; transition: 0.2s; }
         .btn-main:hover { transform: scale(1.02); opacity: 0.9; }
-
-        /* Style spécifique pour le bouton dans la nav */
-        #unlockBtn { margin-top: 0; padding: 8px 15px; font-size: 13px; }
         
         .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; border-radius: 5px; }
         .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
         .show{ display:block; }
 
         .btn-group { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 15px; }
+
+        /* --- POPUP / MODAL DEBLOCAGE --- */
+        .unlock-modal {
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            z-index: 4000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .unlock-modal-content {
+            background: #181818; border: 1px solid #333; border-radius: 10px;
+            max-width: 450px; width: 100%; padding: 30px; text-align: center;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+        }
+        .unlock-modal-content h2 { font-size: 24px; margin-bottom: 15px; color: #fff; }
+        .unlock-modal-content p { color: #aaa; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+        .unlock-modal-content .btn-main { width: 100%; justify-content: center; padding: 14px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -68,7 +80,6 @@
 <div class="navbar">
     <a href="index.html" class="logo">YAMONFILM</a>
     <div class="nav-right">
-        <button id="unlockBtn" class="btn-main">🔓 Débloquer la série VIP</button>
         <div class="menu-btn" onclick="toggleMenu()">☰</div>
     </div>
 </div>
@@ -88,6 +99,16 @@
     <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
 </div>
 
+<!-- POP-UP DEBLOCAGE (Cachée par défaut) -->
+<div id="unlockModal" class="unlock-modal">
+    <div class="unlock-modal-content">
+        <h2>Série Verrouillée 🔒</h2>
+        <p>Cette série fait partie de la Zone VIP. Clique sur le bouton ci-dessous pour la débloquer instantanément et l'ajouter à ta bibliothèque.</p>
+        <button id="unlockBtn" class="btn-main">🔓 Débloquer la série VIP</button>
+        <p id="unlockMsg" style="font-size: 14px; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+</div>
+
 <div id="video-overlay">
     <span class="close-video" onclick="closeVideo()">&times;</span>
     <iframe id="video-iframe" src="" allowfullscreen></iframe>
@@ -101,7 +122,6 @@
         <div class="btn-group">
             <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
         </div>
-        <p id="unlockMsg" style="font-size: 14px; margin-top: 10px; font-weight: bold;"></p>
     </div>
 </section>
 
@@ -127,16 +147,11 @@
 
     let userProgress = { watched: [], lastBySerie: {} };
     
-    // =========================================================================
-    // Identifiant crucial synchronisé avec ton index.html et ta page mes séries
-    // =========================================================================
     const serieId = "vipflicdeshanghai"; 
     const pageLink = "vipflicdeshanghai.html";
     const tmdbId = 2102; 
     const apiKey = "182c7173698e34803715eacab5c693a7";
-    // =========================================================================
 
-    // 🎬 --- AJOUTER LES LIENS DE TES ÉPISODES ICI ---
     const videasSources = {
         1: {
             1: "https://url_de_l_episode_1_ici"
@@ -146,7 +161,6 @@
     let currentEpisodes = [];
     let currentS = 1;
 
-    // TOGGLE MENU
     window.toggleMenu = () => {
         document.getElementById("menu").classList.toggle("open");
         document.getElementById("overlay").classList.toggle("show");
@@ -162,21 +176,26 @@
                     if(!userProgress.lastBySerie) userProgress.lastBySerie = {};
                     checkResume();
                 }
-                // Si la série est déjà débloquée, on cache le bouton tout de suite
+                
+                // POP-UP : Affichage dynamique uniquement si NON DEBLOQUÉ
                 if (userData.seriesUnlocked && userData.seriesUnlocked.includes(serieId)) {
-                    document.getElementById("unlockBtn").style.display = "none";
+                    document.getElementById("unlockModal").style.display = "none";
+                } else {
+                    document.getElementById("unlockModal").style.display = "flex";
                 }
+            } else {
+                // Si l'utilisateur n'a aucun document, la série n'est pas débloquée d'office
+                document.getElementById("unlockModal").style.display = "flex";
             }
             loadSeries();
         } else { window.location.href = "login.html"; }
     });
 
-    // DECONNEXION
     document.getElementById("logoutBtn").onclick = () => {
         signOut(auth).then(() => { window.location.href = "login.html"; });
     };
 
-    // 🔓 BOUTON DEBLOCAGE DIRECT (Ajoute l'ID proprement via arrayUnion sans rien écraser)
+    // ACTION DU BOUTON DANS LA POP-UP
     document.getElementById("unlockBtn").onclick = async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -185,23 +204,20 @@
         const userRef = doc(db, "users", user.uid);
         
         try {
-            // Utilisation de updateDoc + arrayUnion pour préserver les autres clés (ex: LECLOWN)
             await updateDoc(userRef, {
                 seriesUnlocked: arrayUnion(serieId)
             });
 
             msg.style.color = "#00ff00";
-            msg.innerText = "Série débloquée ! Redirection vers l'accueil...";
+            msg.innerText = "Série débloquée ! Redirection...";
             document.getElementById("unlockBtn").style.display = "none";
             
-            // Redirection après 1.5s pour forcer la page d'accueil à lire le changement
             setTimeout(() => {
                 window.location.href = "index.html";
             }, 1500);
 
         } catch (e) { 
             console.error(e);
-            // Sécurité au cas où le document de l'utilisateur n'existe pas encore du tout
             try {
                 await setDoc(userRef, { seriesUnlocked: [serieId] }, { merge: true });
                 msg.style.color = "#00ff00";
@@ -210,12 +226,11 @@
                 setTimeout(() => { window.location.href = "index.html"; }, 1500);
             } catch(err) {
                 msg.style.color = "red"; 
-                msg.innerText = "Erreur de mise à jour de la base de données."; 
+                msg.innerText = "Erreur de mise à jour."; 
             }
         }
     };
 
-    // LOGIQUE CODE PROMO BARRE LATERALE
     document.getElementById("activateBtnMenu").onclick = async () => {
         const code = document.getElementById("promoCode").value.trim().toUpperCase();
         const msg = document.getElementById("promoMsgMenu");
