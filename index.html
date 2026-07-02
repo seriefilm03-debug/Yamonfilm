@@ -105,7 +105,8 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 <section class="movies">
     <a id="cardClown" href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
     <a id="cardMedic" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-    <a id="cardflicdeshangai" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
+    <!-- Changement de l'ID ici pour correspondre au script JS -->
+    <a id="cardMARTIAL_LAW" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
 </section>
 
 <h3 class="movies-label">Film</h3>
@@ -168,17 +169,12 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         // --- GESTION DU DÉBLOCAGE LE FLIC DE SHANGHAÏ ---
-      // On vérifie si le tableau contient l'ID technique "MARTIAL_LAW"
-if (unlocked.includes("MARTIAL_LAW")) {
-    const cardFlic = document.getElementById("cardMARTIAL_LAW");
-    if (cardFlic) {
-        cardFlic.href = "vipflicdeshanghai.html"; // Attention à l'orthographe exacte du fichier (avec un 'h')
-        
-        // Si ta carte contient du texte directement, utilise innerText. 
-        // Si c'est une carte complexe avec une image, commente ou adapte la ligne suivante pour ne pas casser le design :
-        cardFlic.innerText = "Les Flics de Shanghai VIP 🔥"; 
-    }
-}
+        if (unlocked.includes("MARTIAL_LAW")) {
+            const cardFlic = document.getElementById("cardMARTIAL_LAW");
+            if (cardFlic) {
+                cardFlic.href = "vipflicdeshanghai.html";
+                cardFlic.innerText = "Les Flics de Shanghai VIP 🔥"; 
+            }
         }
 
         if (data.progress?.lastBySerie) {
@@ -203,7 +199,7 @@ function displayContinue(lastBySerie, unlocked) {
             // Redirection automatique dans "Reprendre la lecture" si débloqué
             if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
-            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("vipflicdeshanghai")) finalLink = "vipflicdeshanghai.html";
+            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshanghai.html";
 
             const card = document.createElement("a");
             card.href = finalLink;
