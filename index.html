@@ -199,7 +199,7 @@ function displayContinue(lastBySerie, unlocked) {
             // Redirection automatique dans "Reprendre la lecture" si débloqué
             if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
-            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshanghai.html";
+            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshangai.html";
 
             const card = document.createElement("a");
             card.href = finalLink;
