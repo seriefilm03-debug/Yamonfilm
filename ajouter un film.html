@@ -1,229 +1,182 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demander un contenu - YAMONFILM</title>
-
-<style>
-/* --- STYLE DE BASE (Harmonisé avec ton index.html) --- */
-*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-body{ background:#141414; color:white; overflow-x:hidden; padding-top: 80px; }
-
-/* NAV */
-.navbar{
-  position:fixed; top:0; left:0; width:100%; height:60px;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:0 20px; background: rgba(0,0,0,0.9);
-  z-index:1000; border-bottom: 1px solid #222;
-}
-.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
-.back-btn { color: white; text-decoration: none; font-size: 16px; background: #222; padding: 8px 15px; border-radius: 4px; }
-
-/* CONTENEUR PRINCIPAL */
-.container { max-width: 800px; margin: 0 auto; padding: 20px; text-align: center; }
-h1 { font-size: 32px; margin-bottom: 10px; }
-p { color: #aaa; margin-bottom: 30px; }
-
-/* BARRE DE RECHERCHE */
-.search-box { position: relative; max-width: 500px; margin: 0 auto 40px; }
-.search-input { width: 100%; padding: 15px 20px; background: #222; border: 2px solid #444; color: white; border-radius: 30px; font-size: 16px; outline: none; transition: 0.3s; }
-.search-input:focus { border-color: #e50914; background: #2a2a2a; }
-
-/* RÉSULTATS DE RECHERCHE */
-.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 10px 0; }
-.media-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid transparent; display: flex; flex-direction: column; text-align: left; }
-.media-card:hover { transform: translateY(-5px); border-color: #e50914; }
-.media-poster { width: 100%; height: 240px; object-fit: cover; background: #333; }
-.media-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.media-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.media-type { font-size: 11px; color: #e50914; text-transform: uppercase; font-weight: bold; }
-.media-date { font-size: 12px; color: #777; }
-
-/* MODAL DE CONFIRMATION */
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 2000; }
-.modal.show { opacity: 1; pointer-events: auto; }
-.modal-content { background: #181818; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center; border: 1px solid #333; }
-.modal-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-.btn { padding: 10px 20px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; }
-.btn-confirm { background: #e50914; color: white; }
-.btn-cancel { background: #333; color: white; }
-
-/* NOTIFICATION DE SUCCÈS */
-.toast { position: fixed; bottom: 20px; right: 20px; background: #2ecc71; color: white; padding: 15px 25px; border-radius: 4px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 3000; }
-.toast.show { transform: translateY(0); opacity: 1; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NakaStream Clone - Streaming Gratuit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#E50914', // Rouge Netflix/Stream
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-zinc-950 text-stone-100 min-h-screen font-sans">
 
-<div class="navbar">
-  <a href="index.html" class="logo">YAMONFILM</a>
-  <a href="index.html" class="back-btn">Retour</a>
-</div>
-
-<div class="container">
-    <h1>Une idée ? Une envie ?</h1>
-    <p>Recherche un film ou une série via TMDB pour nous envoyer ta demande !</p>
-    
-    <div class="search-box">
-        <input type="text" id="searchInput" class="search-input" placeholder="Tape le nom d'un film ou d'une série...">
-    </div>
-
-    <div id="resultsGrid" class="results-grid"></div>
-</div>
-
-<!-- Modal de demande -->
-<div id="requestModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalMediaTitle">Titre du film</h3>
-        <p style="margin: 10px 0 20px; font-size: 14px;">Souhaites-tu envoyer une demande pour ajouter ce contenu ?</p>
-        <div class="modal-buttons">
-            <button class="btn btn-cancel" onclick="closeModal()">Annuler</button>
-            <button id="submitRequestBtn" class="btn btn-confirm">Envoyer la demande</button>
+    <header class="sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-900 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-8">
+            <h1 class="text-2xl font-black text-brand tracking-widest cursor-pointer" onclick="showHome()">NAKASTREAM</h1>
+            <nav class="hidden md:flex gap-6 text-sm font-medium text-zinc-400">
+                <a href="#" class="hover:text-white transition" onclick="showHome()">Accueil</a>
+                <a href="#" class="hover:text-white transition">Films</a>
+                <a href="#" class="hover:text-white transition">Séries</a>
+            </nav>
         </div>
-    </div>
-</div>
+        
+        <div class="relative w-full md:w-80">
+            <input 
+                type="text" 
+                id="search-input"
+                placeholder="Rechercher un film ou une série..." 
+                class="w-full bg-zinc-900 border border-zinc-800 rounded-full py-2 px-5 pl-11 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand transition"
+                onkeyup="handleSearch(event)"
+            >
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+        </div>
+    </header>
 
-<!-- Notification -->
-<div id="toast" class="toast">Demande envoyée avec succès ! 🎉</div>
+    <section id="player-section" class="hidden max-w-5xl mx-auto px-4 py-8">
+        <button onclick="showHome()" class="mb-4 flex items-center gap-2 text-zinc-400 hover:text-white transition text-sm">
+            <i class="fa-solid fa-arrow-left"></i> Retour à l'accueil
+        </button>
+        
+        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-zinc-800 shadow-2xl shadow-brand/5">
+            <iframe 
+                id="video-player"
+                src="" 
+                class="absolute top-0 left-0 w-full h-full" 
+                allowfullscreen 
+                scrolling="no">
+            </iframe>
+        </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        <div class="mt-6">
+            <h2 id="player-title" class="text-3xl font-bold text-white">Nom du film</h2>
+            <p id="player-desc" class="text-zinc-400 mt-2 text-sm md:text-base leading-relaxed">Description du film...</p>
+        </div>
+        <hr class="border-zinc-900 my-8">
+    </section>
 
-// Configuration Firebase (Identique à ton projet)
-const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// Configuration TMDB
-const TMDB_API_KEY = "182c7173698e34803715eacab5c693a7";
-
-let currentUser = null;
-let selectedMedia = null;
-let searchTimeout = null;
-
-// Vérification de la connexion
-onAuthStateChanged(auth, (user) => {
-    if (!user) { window.location.href = "login.html"; } 
-    else { currentUser = user; }
-});
-
-// Écouteur sur la barre de recherche (avec un "debounce" pour éviter de saturer l'API à chaque lettre)
-document.getElementById("searchInput").addEventListener("input", (e) => {
-    clearTimeout(searchTimeout);
-    const query = e.target.value.trim();
-    
-    if (query.length < 2) {
-        document.getElementById("resultsGrid").innerHTML = "";
-        return;
-    }
-
-    searchTimeout = setTimeout(() => {
-        searchTMDB(query);
-    }, 400); // Attend 400ms sans frappe avant de lancer la recherche
-});
-
-// Fonction pour interroger l'API TMDB en "multi-search" (films + séries en même temps)
-async function searchTMDB(query) {
-    const url = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=fr-FR&query=${encodeURIComponent(query)}&page=1&include_adult=false`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        displayResults(data.results);
-    } catch (error) {
-        console.error("Erreur TMDB :", error);
-    }
-}
-
-// Affichage des résultats trouvés
-function displayResults(results) {
-    const grid = document.getElementById("resultsGrid");
-    grid.innerHTML = "";
-
-    // On filtre pour ne garder que les films (movie) et les séries (tv)
-    const filteredResults = results.filter(item => item.media_type === "movie" || item.media_type === "tv");
-
-    if (filteredResults.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1/-1; color: #555;">Aucun résultat trouvé.</p>`;
-        return;
-    }
-
-    filteredResults.forEach(item => {
-        const isMovie = item.media_type === "movie";
-        const title = isMovie ? item.title : item.name;
-        const date = isMovie ? (item.release_date ? item.release_date.substring(0, 4) : 'N/A') : (item.first_air_date ? item.first_air_date.substring(0, 4) : 'N/A');
-        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450/222/fff?text=Pas+d%27image';
-
-        const card = document.createElement("div");
-        card.className = "media-card";
-        card.innerHTML = `
-            <img class="media-poster" src="${poster}" alt="${title}">
-            <div class="media-info">
-                <div class="media-title">${title}</div>
-                <div>
-                    <span class="media-type">${isMovie ? 'Film' : 'Série'}</span>
-                    <span class="media-date"> • ${date}</span>
-                </div>
+    <main id="catalog-section" class="max-w-7xl mx-auto px-6 py-8">
+        <h2 id="section-title" class="text-xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-brand rounded-full"></span> Films Populaires
+        </h2>
+        
+        <div id="movies-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             </div>
-        `;
+    </main>
 
-        // Événement au clic sur un film/série
-        card.onclick = () => openModal(item, title);
-        grid.appendChild(card);
-    });
-}
+    <footer class="border-t border-zinc-900 py-8 text-center text-xs text-zinc-600 mt-20">
+        <p>© 2026 Nakastream Clone. Tous droits réservés.</p>
+        <p class="mt-1 text-zinc-700">Ce site est un clone d'apprentissage éducatif.</p>
+    </footer>
 
-// Fonctions du Modal
-window.openModal = (item, title) => {
-    selectedMedia = item;
-    document.getElementById("modalMediaTitle").innerText = title;
-    document.getElementById("requestModal").classList.add("show");
-};
+    <script>
+        // Clé API TMDB publique de test (utilisez la vôtre si vous le souhaitez)
+        const TMDB_API_KEY = "15d2ea6d0dc1d476efbca3eba2b9a775"; 
+        const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
-window.closeModal = () => {
-    document.getElementById("requestModal").classList.remove("show");
-    selectedMedia = null;
-};
+        // Au chargement de la page, on affiche les films populaires
+        window.onload = () => {
+            fetchMovies('/movie/popular');
+        };
 
-// Envoi de la demande dans Firestore
-document.getElementById("submitRequestBtn").onclick = async () => {
-    if (!selectedMedia || !currentUser) return;
+        // Charger et afficher les films depuis TMDB
+        async function fetchMovies(endpoint, query = '') {
+            const url = `https://api.themoviedb.org/3${endpoint}?api_key=${TMDB_API_KEY}&language=fr-FR${query}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayMovies(data.results);
+            } catch (error) {
+                console.error("Erreur lors du chargement des films :", error);
+            }
+        }
 
-    const isMovie = selectedMedia.media_type === "movie";
-    
-    try {
-        // Enregistre la demande dans la collection "requests"
-        await addDoc(collection(db, "requests"), {
-            userId: currentUser.uid,
-            userEmail: currentUser.email,
-            tmdbId: selectedMedia.id,
-            title: isMovie ? selectedMedia.title : selectedMedia.name,
-            type: selectedMedia.media_type,
-            posterPath: selectedMedia.poster_path,
-            status: "En attente", // Permet de suivre l'avancement (En attente, Ajouté, etc.)
-            timestamp: serverTimestamp()
-        });
+        // Injecter les cartes de films dans la grille HTML
+        function displayMovies(movies) {
+            const grid = document.getElementById('movies-grid');
+            grid.innerHTML = ''; // On vide l'ancienne liste
 
-        closeModal();
-        showToast();
-        document.getElementById("searchInput").value = "";
-        document.getElementById("resultsGrid").innerHTML = "";
-    } catch (error) {
-        alert("Erreur lors de l'envoi de la demande : " + error.message);
-    }
-};
+            if (movies.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-zinc-500 py-12">Aucun résultat trouvé.</p>';
+                return;
+            }
 
-function showToast() {
-    const toast = document.getElementById("toast");
-    toast.classList.add("show");
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
-}
-</script>
+            movies.forEach(movie => {
+                if(!movie.poster_path) return; // Ignore si pas d'affiche
+
+                const card = document.createElement('div');
+                card.className = "group cursor-pointer bg-zinc-900/50 rounded-lg overflow-hidden border border-zinc-900 hover:border-zinc-700 transition duration-300 shadow-lg";
+                card.onclick = () => playMovie(movie.id, movie.title, movie.overview);
+
+                card.innerHTML = `
+                    <div class="relative overflow-hidden aspect-[2/3]">
+                        <img 
+                            src="${TMDB_IMAGE_BASE}${movie.poster_path}" 
+                            alt="${movie.title || movie.name}" 
+                            class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                            loading="lazy"
+                        >
+                        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-brand flex items-center justify-center text-white text-lg shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">
+                                <i class="fa-solid fa-play ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-sm truncate text-zinc-200 group-hover:text-white transition">${movie.title || movie.name}</h3>
+                        <p class="text-xs text-zinc-500 mt-1">${new Date(movie.release_date || movie.first_air_date).getFullYear() || 'N/A'}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Lancer la lecture du film
+        function playMovie(id, title, overview) {
+            // Afficher la section lecteur et cacher l'accueil
+            document.getElementById('catalog-section').classList.add('hidden');
+            document.getElementById('player-section').classList.remove('hidden');
+
+            // Configurer le lecteur vidéo vidsrc (lecteur de streaming automatique)
+            const playerUrl = `https://vidsrc.to/embed/movie/${id}`;
+            document.getElementById('video-player').src = playerUrl;
+
+            // Mettre à jour les infos
+            document.getElementById('player-title').innerText = title;
+            document.getElementById('player-desc').innerText = overview || "Aucun résumé disponible pour ce film.";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Retourner à l'accueil
+        function showHome() {
+            document.getElementById('player-section').classList.add('hidden');
+            document.getElementById('video-player').src = ""; // Coupe le son de la vidéo
+            document.getElementById('catalog-section').classList.remove('hidden');
+            document.getElementById('search-input').value = "";
+            document.getElementById('section-title').innerHTML = `<span class="w-1.5 h-6 bg-brand rounded-full"></span> Films Populaires`;
+            fetchMovies('/movie/popular');
+        }
+
+        // Gérer la barre de recherche
+        function handleSearch(event) {
+            const query = event.target.value.trim();
+            if (query.length > 2) {
+                document.getElementById('section-title').innerHTML = `<span class="w-1.5 h-6 bg-brand rounded-full"></span> Résultats pour "${query}"`;
+                fetchMovies('/search/movie', `&query=${encodeURIComponent(query)}`);
+            } else if (query.length === 0) {
+                showHome();
+            }
+        }
+    </script>
 </body>
 </html>
