@@ -120,7 +120,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Configuration Firebase (Identique à ton projet)
+// Configuration Firebase
 const firebaseConfig = { 
     apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
     authDomain: "yamonfilm-fead8.firebaseapp.com", 
@@ -243,9 +243,14 @@ function displayResults(results) {
         `;
 
         if (!isAlreadyRequested) {
-            card.onclick = () => openModal(item, title);
+            // Liaison robuste de la fonction de clic
+            card.addEventListener('click', () => {
+                window.openModal(item, title);
+            });
         } else {
-            card.onclick = () => alert(`"${title}" a déjà été demandé et est actuellement : ${isAlreadyRequested.status || 'En attente'}`);
+            card.addEventListener('click', () => {
+                alert(`"${title}" a déjà été demandé et est actuellement : ${isAlreadyRequested.status || 'En attente'}`);
+            });
         }
         
         grid.appendChild(card);
@@ -284,7 +289,7 @@ function renderExistingRequests() {
     });
 }
 
-// Fonction de bascule des onglets
+// DECLARATIONS DES FONCTIONS GLOBALES SUR WINDOW (Règle le problème de portée lié à type="module")
 window.switchTab = (type) => {
     currentTab = type;
     document.getElementById("tab-movie").classList.remove("active");
@@ -309,7 +314,7 @@ window.closeModal = () => {
     selectedMedia = null;
 };
 
-// Envoi de la demande dans Realtime Database avec logs et alertes de secours
+// Envoi de la demande dans Realtime Database
 document.getElementById("submitRequestBtn").onclick = async () => {
     if (!selectedMedia) {
         alert("Erreur : Aucun film ou série n'a été sélectionné.");
@@ -338,10 +343,9 @@ document.getElementById("submitRequestBtn").onclick = async () => {
         });
 
         console.log("Demande enregistrée avec succès !");
-        closeModal();
+        window.closeModal();
         showToast();
         
-        // On vide la recherche pour voir la grille se mettre à jour directement en dessous
         document.getElementById("searchInput").value = "";
         document.getElementById("resultsGrid").innerHTML = "";
         lastSearchQuery = "";
