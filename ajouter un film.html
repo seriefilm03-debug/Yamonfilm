@@ -6,7 +6,7 @@
 <title>Demander un contenu - YAMONFILM</title>
 
 <style>
-/* --- STYLE DE BASE (Harmonisé avec ton index.html) --- */
+/* --- STYLE DE BASE --- */
 *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
 body{ background:#141414; color:white; overflow-x:hidden; padding-top: 80px; }
 
@@ -21,7 +21,7 @@ body{ background:#141414; color:white; overflow-x:hidden; padding-top: 80px; }
 .back-btn { color: white; text-decoration: none; font-size: 16px; background: #222; padding: 8px 15px; border-radius: 4px; }
 
 /* CONTENEUR PRINCIPAL */
-.container { max-width: 800px; margin: 0 auto; padding: 20px; text-align: center; }
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; text-align: center; }
 h1 { font-size: 32px; margin-bottom: 10px; }
 p { color: #aaa; margin-bottom: 30px; }
 
@@ -31,14 +31,27 @@ p { color: #aaa; margin-bottom: 30px; }
 .search-input:focus { border-color: #e50914; background: #2a2a2a; }
 
 /* RÉSULTATS DE RECHERCHE */
-.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 10px 0; }
-.media-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid transparent; display: flex; flex-direction: column; text-align: left; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 10px 0; margin-bottom: 50px; }
+.media-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid transparent; display: flex; flex-direction: column; text-align: left; position: relative; }
 .media-card:hover { transform: translateY(-5px); border-color: #e50914; }
 .media-poster { width: 100%; height: 240px; object-fit: cover; background: #333; }
 .media-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .media-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .media-type { font-size: 11px; color: #e50914; text-transform: uppercase; font-weight: bold; }
 .media-date { font-size: 12px; color: #777; }
+
+/* ÉTAT "DÉJÀ DEMANDÉ" / DESACTIVÉ */
+.media-card.already-requested { cursor: not-allowed; opacity: 0.6; border-color: #2ecc71; }
+.media-card.already-requested:hover { transform: none; }
+.status-badge { position: absolute; top: 10px; right: 10px; background: #2ecc71; color: white; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.status-badge.pending { background: #e67e22; }
+
+/* SECTION LISTE DES DEMANDES DE L'UTILISATEUR */
+.requests-section { margin-top: 50px; text-align: left; border-top: 1px solid #222; padding-top: 40px; }
+.requests-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.tabs { display: flex; gap: 10px; }
+.tab-btn { background: #222; border: none; color: #aaa; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.tab-btn.active { background: #e50914; color: white; }
 
 /* MODAL DE CONFIRMATION */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 2000; }
@@ -69,7 +82,22 @@ p { color: #aaa; margin-bottom: 30px; }
         <input type="text" id="searchInput" class="search-input" placeholder="Tape le nom d'un film ou d'une série...">
     </div>
 
+    <!-- Grille de résultats de recherche -->
     <div id="resultsGrid" class="results-grid"></div>
+
+    <!-- Section : Suivi des demandes existantes -->
+    <div class="requests-section">
+        <div class="requests-header">
+            <h2>Demandes de la communauté</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('movie')">Films</button>
+                <button class="tab-btn" onclick="switchTab('tv')">Séries</button>
+            </div>
+        </div>
+        <div id="existingRequestsGrid" class="results-grid">
+            <!-- Les demandes existantes chargées de Firebase s'afficheront ici -->
+        </div>
+    </div>
 </div>
 
 <!-- Modal de demande -->
@@ -90,13 +118,19 @@ p { color: #aaa; margin-bottom: 30px; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// On importe le module Realtime Database
+import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Configuration Firebase (Identique à ton projet)
-const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+// Configuration Firebase
+const firebaseConfig = { 
+    apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
+    authDomain: "yamonfilm-fead8.firebaseapp.com", 
+    projectId: "yamonfilm-fead8",
+    databaseURL: "https://yamonfilm-fead8-default-rtdb.firebaseio.com" // URL standard de ta base de données
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = getDatabase(app); // Initialise la Realtime Database
 
 // Configuration TMDB
 const TMDB_API_KEY = "182c7173698e34803715eacab5c693a7";
@@ -105,30 +139,55 @@ let currentUser = null;
 let selectedMedia = null;
 let searchTimeout = null;
 
+let dbRequests = []; 
+let currentTab = 'movie'; 
+let lastSearchQuery = ""; 
+
 // Vérification de la connexion
 onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = "login.html"; } 
     else { currentUser = user; }
 });
 
-// Écouteur sur la barre de recherche (avec un "debounce" pour éviter de saturer l'API à chaque lettre)
+// ÉCOUTE EN TEMPS RÉEL SUR REALTIME DATABASE
+const requestsRef = ref(db, 'requests');
+onValue(requestsRef, (snapshot) => {
+    dbRequests = [];
+    const data = snapshot.val();
+    if (data) {
+        // Realtime Database renvoie un objet, on le convertit en tableau
+        Object.keys(data).forEach((key) => {
+            dbRequests.push({ id: key, ...data[key] });
+        });
+        // Trier par date décroissante (plus récent en premier)
+        dbRequests.sort((a, b) => b.timestamp - a.timestamp);
+    }
+    
+    renderExistingRequests();
+
+    if (lastSearchQuery.length >= 2) {
+        searchTMDB(lastSearchQuery);
+    }
+});
+
+// Écouteur sur la barre de recherche
 document.getElementById("searchInput").addEventListener("input", (e) => {
     clearTimeout(searchTimeout);
-    const query = e.target.value.trim();
+    const queryStr = e.target.value.trim();
+    lastSearchQuery = queryStr;
     
-    if (query.length < 2) {
+    if (queryStr.length < 2) {
         document.getElementById("resultsGrid").innerHTML = "";
         return;
     }
 
     searchTimeout = setTimeout(() => {
-        searchTMDB(query);
-    }, 400); // Attend 400ms sans frappe avant de lancer la recherche
+        searchTMDB(queryStr);
+    }, 400);
 });
 
-// Fonction pour interroger l'API TMDB en "multi-search" (films + séries en même temps)
-async function searchTMDB(query) {
-    const url = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=fr-FR&query=${encodeURIComponent(query)}&page=1&include_adult=false`;
+async function searchTMDB(queryStr) {
+    const url = `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=fr-FR&query=${encodeURIComponent(queryStr)}&page=1&include_adult=false`;
     
     try {
         const response = await fetch(url);
@@ -139,12 +198,10 @@ async function searchTMDB(query) {
     }
 }
 
-// Affichage des résultats trouvés
 function displayResults(results) {
     const grid = document.getElementById("resultsGrid");
     grid.innerHTML = "";
 
-    // On filtre pour ne garder que les films (movie) et les séries (tv)
     const filteredResults = results.filter(item => item.media_type === "movie" || item.media_type === "tv");
 
     if (filteredResults.length === 0) {
@@ -158,9 +215,22 @@ function displayResults(results) {
         const date = isMovie ? (item.release_date ? item.release_date.substring(0, 4) : 'N/A') : (item.first_air_date ? item.first_air_date.substring(0, 4) : 'N/A');
         const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450/222/fff?text=Pas+d%27image';
 
+        // Recherche si cet élément existe déjà dans la Realtime Database
+        const isAlreadyRequested = dbRequests.find(req => Number(req.tmdbId) === Number(item.id) && req.type === item.media_type);
+
         const card = document.createElement("div");
         card.className = "media-card";
+        
+        let badgeHTML = "";
+        if (isAlreadyRequested) {
+            card.classList.add("already-requested");
+            const statusLabel = isAlreadyRequested.status || "En attente";
+            const badgeClass = statusLabel === "En attente" ? "status-badge pending" : "status-badge";
+            badgeHTML = `<span class="${badgeClass}">${statusLabel}</span>`;
+        }
+
         card.innerHTML = `
+            ${badgeHTML}
             <img class="media-poster" src="${poster}" alt="${title}">
             <div class="media-info">
                 <div class="media-title">${title}</div>
@@ -171,13 +241,55 @@ function displayResults(results) {
             </div>
         `;
 
-        // Événement au clic sur un film/série
-        card.onclick = () => openModal(item, title);
+        if (!isAlreadyRequested) {
+            card.onclick = () => openModal(item, title);
+        } else {
+            card.onclick = () => alert(`"${title}" a déjà été demandé et est actuellement : ${isAlreadyRequested.status || 'En attente'}`);
+        }
+        
         grid.appendChild(card);
     });
 }
 
-// Fonctions du Modal
+function renderExistingRequests() {
+    const grid = document.getElementById("existingRequestsGrid");
+    grid.innerHTML = "";
+
+    const filtered = dbRequests.filter(req => req.type === currentTab);
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1/-1; color: #555; text-align:center; padding: 20px;">Aucune demande de ${currentTab === 'movie' ? 'film' : 'série'} pour le moment.</p>`;
+        return;
+    }
+
+    filtered.forEach(req => {
+        const poster = req.posterPath ? `https://image.tmdb.org/t/p/w300${req.posterPath}` : 'https://via.placeholder.com/300x450/222/fff?text=Pas+d%27image';
+        const statusLabel = req.status || "En attente";
+        const badgeClass = statusLabel === "En attente" ? "status-badge pending" : "status-badge";
+
+        const card = document.createElement("div");
+        card.className = "media-card already-requested";
+        card.innerHTML = `
+            <span class="${badgeClass}">${statusLabel}</span>
+            <img class="media-poster" src="${poster}" alt="${req.title}">
+            <div class="media-info">
+                <div class="media-title">${req.title}</div>
+                <div>
+                    <span class="media-type">${req.type === 'movie' ? 'Film' : 'Série'}</span>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+window.switchTab = (type) => {
+    currentTab = type;
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+    renderExistingRequests();
+};
+
 window.openModal = (item, title) => {
     selectedMedia = item;
     document.getElementById("modalMediaTitle").innerText = title;
@@ -189,22 +301,21 @@ window.closeModal = () => {
     selectedMedia = null;
 };
 
-// Envoi de la demande dans Firestore
+// Envoi de la demande dans Realtime Database
 document.getElementById("submitRequestBtn").onclick = async () => {
     if (!selectedMedia || !currentUser) return;
 
     const isMovie = selectedMedia.media_type === "movie";
     
     try {
-        // Enregistre la demande dans la collection "requests"
-        await addDoc(collection(db, "requests"), {
+        await push(ref(db, 'requests'), {
             userId: currentUser.uid,
             userEmail: currentUser.email,
             tmdbId: selectedMedia.id,
             title: isMovie ? selectedMedia.title : selectedMedia.name,
             type: selectedMedia.media_type,
             posterPath: selectedMedia.poster_path,
-            status: "En attente", // Permet de suivre l'avancement (En attente, Ajouté, etc.)
+            status: "En attente",
             timestamp: serverTimestamp()
         });
 
@@ -212,6 +323,7 @@ document.getElementById("submitRequestBtn").onclick = async () => {
         showToast();
         document.getElementById("searchInput").value = "";
         document.getElementById("resultsGrid").innerHTML = "";
+        lastSearchQuery = "";
     } catch (error) {
         alert("Erreur lors de l'envoi de la demande : " + error.message);
     }
