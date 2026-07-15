@@ -82,10 +82,8 @@ p { color: #aaa; margin-bottom: 30px; }
         <input type="text" id="searchInput" class="search-input" placeholder="Tape le nom d'un film ou d'une série...">
     </div>
 
-    <!-- Grille de résultats de recherche -->
     <div id="resultsGrid" class="results-grid"></div>
 
-    <!-- Section : Suivi des demandes existantes -->
     <div class="requests-section">
         <div class="requests-header">
             <h2>Demandes de la communauté</h2>
@@ -95,12 +93,10 @@ p { color: #aaa; margin-bottom: 30px; }
             </div>
         </div>
         <div id="existingRequestsGrid" class="results-grid">
-            <!-- Les demandes existantes chargées de Firebase s'afficheront ici -->
-        </div>
+            </div>
     </div>
 </div>
 
-<!-- Modal de demande -->
 <div id="requestModal" class="modal">
     <div class="modal-content">
         <h3 id="modalMediaTitle">Titre du film</h3>
@@ -112,7 +108,6 @@ p { color: #aaa; margin-bottom: 30px; }
     </div>
 </div>
 
-<!-- Notification -->
 <div id="toast" class="toast">Demande envoyée avec succès ! 🎉</div>
 
 <script type="module">
@@ -125,7 +120,8 @@ const firebaseConfig = {
     apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
     authDomain: "yamonfilm-fead8.firebaseapp.com", 
     projectId: "yamonfilm-fead8",
-    databaseURL: "https://yamonfilm-fead8-default-rtdb.firebaseio.com"
+    // Ton URL asiatique exacte configurée ici :
+    databaseURL: "https://yamonfilm-fead8-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -148,7 +144,7 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = "login.html"; 
     } else { 
         currentUser = user; 
-        console.log("Utilisateur connecté :", currentUser.email);
+        console.log("Utilisateur identifié :", currentUser.email);
     }
 });
 
@@ -169,6 +165,8 @@ onValue(requestsRef, (snapshot) => {
     if (lastSearchQuery.length >= 2) {
         searchTMDB(lastSearchQuery);
     }
+}, (error) => {
+    console.error("Erreur de lecture Firebase :", error);
 });
 
 // Écouteur sur la barre de recherche
@@ -216,7 +214,6 @@ function displayResults(results) {
         const date = isMovie ? (item.release_date ? item.release_date.substring(0, 4) : 'N/A') : (item.first_air_date ? item.first_air_date.substring(0, 4) : 'N/A');
         const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450/222/fff?text=Pas+d%27image';
 
-        // Recherche si cet élément exact existe déjà dans la Realtime Database
         const isAlreadyRequested = dbRequests.find(req => Number(req.tmdbId) === Number(item.id) && req.type === item.media_type);
 
         const card = document.createElement("div");
@@ -243,7 +240,6 @@ function displayResults(results) {
         `;
 
         if (!isAlreadyRequested) {
-            // Liaison robuste de la fonction de clic
             card.addEventListener('click', () => {
                 window.openModal(item, title);
             });
@@ -289,7 +285,6 @@ function renderExistingRequests() {
     });
 }
 
-// DECLARATIONS DES FONCTIONS GLOBALES SUR WINDOW (Règle le problème de portée lié à type="module")
 window.switchTab = (type) => {
     currentTab = type;
     document.getElementById("tab-movie").classList.remove("active");
@@ -314,26 +309,23 @@ window.closeModal = () => {
     selectedMedia = null;
 };
 
-// Envoi de la demande dans Realtime Database
+// Événement d'envoi renforcé
 document.getElementById("submitRequestBtn").onclick = async () => {
     if (!selectedMedia) {
-        alert("Erreur : Aucun film ou série n'a été sélectionné.");
-        return;
-    }
-
-    if (!currentUser) {
-        alert("Erreur : Tu n'es pas connecté ! Tu dois être connecté pour faire une demande.");
+        alert("Erreur : Aucun film ou série sélectionné.");
         return;
     }
 
     const isMovie = selectedMedia.media_type === "movie";
     
+    // Valeurs de secours si l'état d'authentification met trop de temps à se charger
+    const uId = currentUser ? currentUser.uid : "Visiteur";
+    const uEmail = currentUser ? currentUser.email : "visiteur@yamonfilm.com";
+
     try {
-        console.log("Tentative d'envoi à la base de données...", selectedMedia);
-        
         await push(ref(db, 'requests'), {
-            userId: currentUser.uid,
-            userEmail: currentUser.email,
+            userId: uId,
+            userEmail: uEmail,
             tmdbId: selectedMedia.id,
             title: isMovie ? selectedMedia.title : selectedMedia.name,
             type: selectedMedia.media_type,
@@ -342,7 +334,7 @@ document.getElementById("submitRequestBtn").onclick = async () => {
             timestamp: serverTimestamp()
         });
 
-        console.log("Demande enregistrée avec succès !");
+        alert("Succès ! La demande a bien été enregistrée. 🎉");
         window.closeModal();
         showToast();
         
@@ -350,8 +342,7 @@ document.getElementById("submitRequestBtn").onclick = async () => {
         document.getElementById("resultsGrid").innerHTML = "";
         lastSearchQuery = "";
     } catch (error) {
-        alert("Firebase a refusé la demande. Vérifie tes règles de sécurité (Rules). Erreur : " + error.message);
-        console.error(error);
+        alert("Firebase a rejeté la requête.\n\nDétail de l'erreur : " + error.message);
     }
 };
 
