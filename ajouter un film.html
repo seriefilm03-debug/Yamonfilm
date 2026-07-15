@@ -90,8 +90,8 @@ p { color: #aaa; margin-bottom: 30px; }
         <div class="requests-header">
             <h2>Demandes de la communauté</h2>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('movie')">Films</button>
-                <button class="tab-btn" onclick="switchTab('tv')">Séries</button>
+                <button class="tab-btn active" id="tab-movie" onclick="switchTab('movie')">Films</button>
+                <button class="tab-btn" id="tab-tv" onclick="switchTab('tv')">Séries</button>
             </div>
         </div>
         <div id="existingRequestsGrid" class="results-grid">
@@ -118,19 +118,18 @@ p { color: #aaa; margin-bottom: 30px; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-// On importe le module Realtime Database
 import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Configuration Firebase
+// Configuration Firebase (Identique à ton projet)
 const firebaseConfig = { 
     apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
     authDomain: "yamonfilm-fead8.firebaseapp.com", 
     projectId: "yamonfilm-fead8",
-    databaseURL: "https://yamonfilm-fead8-default-rtdb.firebaseio.com" // URL standard de ta base de données
+    databaseURL: "https://yamonfilm-fead8-default-rtdb.firebaseio.com"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app); // Initialise la Realtime Database
+const db = getDatabase(app);
 
 // Configuration TMDB
 const TMDB_API_KEY = "182c7173698e34803715eacab5c693a7";
@@ -145,8 +144,12 @@ let lastSearchQuery = "";
 
 // Vérification de la connexion
 onAuthStateChanged(auth, (user) => {
-    if (!user) { window.location.href = "login.html"; } 
-    else { currentUser = user; }
+    if (!user) { 
+        window.location.href = "login.html"; 
+    } else { 
+        currentUser = user; 
+        console.log("Utilisateur connecté :", currentUser.email);
+    }
 });
 
 // ÉCOUTE EN TEMPS RÉEL SUR REALTIME DATABASE
@@ -155,11 +158,9 @@ onValue(requestsRef, (snapshot) => {
     dbRequests = [];
     const data = snapshot.val();
     if (data) {
-        // Realtime Database renvoie un objet, on le convertit en tableau
         Object.keys(data).forEach((key) => {
             dbRequests.push({ id: key, ...data[key] });
         });
-        // Trier par date décroissante (plus récent en premier)
         dbRequests.sort((a, b) => b.timestamp - a.timestamp);
     }
     
@@ -215,7 +216,7 @@ function displayResults(results) {
         const date = isMovie ? (item.release_date ? item.release_date.substring(0, 4) : 'N/A') : (item.first_air_date ? item.first_air_date.substring(0, 4) : 'N/A');
         const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/300x450/222/fff?text=Pas+d%27image';
 
-        // Recherche si cet élément existe déjà dans la Realtime Database
+        // Recherche si cet élément exact existe déjà dans la Realtime Database
         const isAlreadyRequested = dbRequests.find(req => Number(req.tmdbId) === Number(item.id) && req.type === item.media_type);
 
         const card = document.createElement("div");
@@ -283,10 +284,17 @@ function renderExistingRequests() {
     });
 }
 
+// Fonction de bascule des onglets
 window.switchTab = (type) => {
     currentTab = type;
-    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
+    document.getElementById("tab-movie").classList.remove("active");
+    document.getElementById("tab-tv").classList.remove("active");
+    
+    if(type === 'movie') {
+        document.getElementById("tab-movie").classList.add("active");
+    } else {
+        document.getElementById("tab-tv").classList.add("active");
+    }
     renderExistingRequests();
 };
 
@@ -301,13 +309,23 @@ window.closeModal = () => {
     selectedMedia = null;
 };
 
-// Envoi de la demande dans Realtime Database
+// Envoi de la demande dans Realtime Database avec logs et alertes de secours
 document.getElementById("submitRequestBtn").onclick = async () => {
-    if (!selectedMedia || !currentUser) return;
+    if (!selectedMedia) {
+        alert("Erreur : Aucun film ou série n'a été sélectionné.");
+        return;
+    }
+
+    if (!currentUser) {
+        alert("Erreur : Tu n'es pas connecté ! Tu dois être connecté pour faire une demande.");
+        return;
+    }
 
     const isMovie = selectedMedia.media_type === "movie";
     
     try {
+        console.log("Tentative d'envoi à la base de données...", selectedMedia);
+        
         await push(ref(db, 'requests'), {
             userId: currentUser.uid,
             userEmail: currentUser.email,
@@ -319,13 +337,17 @@ document.getElementById("submitRequestBtn").onclick = async () => {
             timestamp: serverTimestamp()
         });
 
+        console.log("Demande enregistrée avec succès !");
         closeModal();
         showToast();
+        
+        // On vide la recherche pour voir la grille se mettre à jour directement en dessous
         document.getElementById("searchInput").value = "";
         document.getElementById("resultsGrid").innerHTML = "";
         lastSearchQuery = "";
     } catch (error) {
-        alert("Erreur lors de l'envoi de la demande : " + error.message);
+        alert("Firebase a refusé la demande. Vérifie tes règles de sécurité (Rules). Erreur : " + error.message);
+        console.error(error);
     }
 };
 
