@@ -73,17 +73,18 @@
             font-weight: bold; border: 1px solid #ffd700;
         }
 
-        .lock-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(2px); display: flex; align-items: center;
-            justify-content: center; font-size: 32px;
+        .free-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0, 0, 0, 0.85); color: #aaa;
+            padding: 4px 8px; border-radius: 4px; font-size: 11px;
+            font-weight: bold; border: 1px solid #555;
         }
 
         .serie-info { padding: 12px; }
         .serie-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .serie-status { font-size: 12px; font-weight: bold; }
-        .unlocked-text { color: #00ff00; }
-        .locked-text { color: #e50914; }
+        .vip-text { color: #ffd700; }
+        .free-text { color: #aaa; }
     </style>
 </head>
 <body>
@@ -130,7 +131,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // LISTE COMPLÈTE DE TOUTES LES SÉRIES
     const catalogSeries = [
         {
             ids: ["LECLOWN", "vipclown"],
@@ -191,9 +191,7 @@
         }
 
         list.forEach(item => {
-            // Vérifie si au moins un des identifiants VIP est débloqué par l'utilisateur
             const isUnlocked = item.ids.some(id => userUnlocked.includes(id));
-            
             const targetLink = isUnlocked ? item.unlockedLink : item.defaultLink;
 
             const card = document.createElement("a");
@@ -203,13 +201,14 @@
             card.innerHTML = `
                 <div class="poster-wrapper">
                     <img class="poster-img" src="${item.poster}" alt="${item.title}">
-                    <span class="vip-badge">VIP</span>
-                    ${!isUnlocked ? '<div class="lock-overlay">🔒</div>' : ''}
+                    <span class="${isUnlocked ? 'vip-badge' : 'free-badge'}">
+                        ${isUnlocked ? 'VIP' : 'Gratuit'}
+                    </span>
                 </div>
                 <div class="serie-info">
                     <div class="serie-title">${item.title} ${isUnlocked ? 'VIP 🔥' : ''}</div>
-                    <div class="serie-status ${isUnlocked ? 'unlocked-text' : 'locked-text'}">
-                        ${isUnlocked ? 'Débloqué' : 'Verrouillé'}
+                    <div class="serie-status ${isUnlocked ? 'vip-text' : 'free-text'}">
+                        ${isUnlocked ? 'Version VIP' : 'Version Gratuite'}
                     </div>
                 </div>
             `;
@@ -217,7 +216,6 @@
         });
     }
 
-    // BARRE DE RECHERCHE EN TEMPS RÉEL (RECHERCHE SUR LES SÉRIES DE LA PAGE)
     document.getElementById("searchInput").addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
         const filtered = catalogSeries.filter(serie => serie.title.toLowerCase().includes(query));
