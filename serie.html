@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Séries - YAMONFILM</title>
+    <title>Toutes les Séries - YAMONFILM</title>
     <style>
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-        body{ background:#0f0f0f; color:white; overflow-x: hidden; padding-bottom: 50px; }
+        body{ background:#141414; color:white; overflow-x: hidden; padding-bottom: 50px; }
 
         /* NAVBAR & SIDE MENU */
         .navbar{
@@ -52,7 +52,7 @@
         /* GRID DES SÉRIES */
         .series-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px; padding: 0 5%; margin-top: 20px;
         }
 
@@ -63,7 +63,7 @@
         }
         .serie-card:hover { transform: translateY(-5px); border-color: #e50914; }
         
-        .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; background: #222; }
+        .poster-wrapper { position: relative; width: 100%; height: 280px; background: #222; }
         .poster-img { width: 100%; height: 100%; object-fit: cover; }
 
         .vip-badge {
@@ -74,14 +74,14 @@
         }
 
         .lock-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+            position: absolute; inset: 0; background: rgba(0,0,0,0.55);
             backdrop-filter: blur(2px); display: flex; align-items: center;
-            justify-content: center; font-size: 30px;
+            justify-content: center; font-size: 32px;
         }
 
         .serie-info { padding: 12px; }
-        .serie-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .serie-status { font-size: 12px; color: #888; }
+        .serie-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .serie-status { font-size: 12px; font-weight: bold; }
         .unlocked-text { color: #00ff00; }
         .locked-text { color: #e50914; }
     </style>
@@ -130,18 +130,39 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // CATALOGUE DES SÉRIES (Vous pouvez aussi le charger dynamiquement depuis Firestore)
-    const catalog = [
+    // LISTE COMPLÈTE DE TOUTES LES SÉRIES
+    const catalogSeries = [
         {
-            id: "LE_REBELLE",
+            ids: ["LECLOWN", "vipclown"],
+            title: "Le Clown",
+            defaultLink: "le clown.html",
+            unlockedLink: "vipleclown.html",
+            poster: "https://media.senscritique.com/media/000016277047/0/le_clown.jpg"
+        },
+        {
+            ids: ["MEDICOPTER"],
+            title: "Medicopter 117",
+            defaultLink: "medicopter.html",
+            unlockedLink: "vipmedicopter.html",
+            poster: "s-l1200.jpg"
+        },
+        {
+            ids: ["MARTIAL_LAW"],
+            title: "Le Flic de Shanghaï",
+            defaultLink: "flicdeshangai.html",
+            unlockedLink: "vipflicdeshangai.html",
+            poster: "https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg"
+        },
+        {
+            ids: ["LE_REBELLE"],
             title: "Le Rebelle",
-            isVip: true,
-            link: "viple-rebelle.html",
-            poster: "https://image.tmdb.org/t/p/w500/i9ne16v8U9y85PCoDToKkWy4e4R.jpg" // Image exemple TMDB
+            defaultLink: "lerebelle.html",
+            unlockedLink: "viplerebelle.html",
+            poster: "https://www.themoviedb.org/t/p/w1280/4zxane7abfe7Tt3NnuZulLF5Orz.jpg"
         }
     ];
 
-    let unlockedSeries = [];
+    let userUnlocked = [];
 
     window.toggleMenu = () => {
         document.getElementById("menu").classList.toggle("open");
@@ -152,9 +173,9 @@
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists() && userDoc.data().seriesUnlocked) {
-                unlockedSeries = userDoc.data().seriesUnlocked;
+                userUnlocked = userDoc.data().seriesUnlocked;
             }
-            renderSeries(catalog);
+            renderSeries(catalogSeries);
         } else {
             window.location.href = "login.html";
         }
@@ -165,26 +186,30 @@
         container.innerHTML = "";
 
         if (list.length === 0) {
-            container.innerHTML = `<p style="color:#888; grid-column: 1/-1;">Aucune série trouvée.</p>`;
+            container.innerHTML = `<p style="color:#888; grid-column: 1/-1;">Aucune série trouvée pour cette recherche.</p>`;
             return;
         }
 
         list.forEach(item => {
-            const isUnlocked = !item.isVip || unlockedSeries.includes(item.id);
+            // Vérifie si au moins un des identifiants VIP est débloqué par l'utilisateur
+            const isUnlocked = item.ids.some(id => userUnlocked.includes(id));
+            
+            const targetLink = isUnlocked ? item.unlockedLink : item.defaultLink;
+
             const card = document.createElement("a");
-            card.href = item.link;
+            card.href = targetLink;
             card.className = "serie-card";
 
             card.innerHTML = `
                 <div class="poster-wrapper">
                     <img class="poster-img" src="${item.poster}" alt="${item.title}">
-                    ${item.isVip ? '<span class="vip-badge">VIP</span>' : ''}
+                    <span class="vip-badge">VIP</span>
                     ${!isUnlocked ? '<div class="lock-overlay">🔒</div>' : ''}
                 </div>
                 <div class="serie-info">
-                    <div class="serie-title">${item.title}</div>
+                    <div class="serie-title">${item.title} ${isUnlocked ? 'VIP 🔥' : ''}</div>
                     <div class="serie-status ${isUnlocked ? 'unlocked-text' : 'locked-text'}">
-                        ${isUnlocked ? 'Disponible' : 'Verrouillé'}
+                        ${isUnlocked ? 'Débloqué' : 'Verrouillé'}
                     </div>
                 </div>
             `;
@@ -192,10 +217,10 @@
         });
     }
 
-    // LOGIQUE DE RECHERCHE EN TEMPS RÉEL
+    // BARRE DE RECHERCHE EN TEMPS RÉEL (RECHERCHE SUR LES SÉRIES DE LA PAGE)
     document.getElementById("searchInput").addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
-        const filtered = catalog.filter(serie => serie.title.toLowerCase().includes(query));
+        const filtered = catalogSeries.filter(serie => serie.title.toLowerCase().includes(query));
         renderSeries(filtered);
     });
 
