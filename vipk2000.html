@@ -12,7 +12,7 @@
         /* NAV & MENU */
         .navbar{
             position:fixed; top:0; left:0; width:100%; height:60px;
-            display:flex; justify-space-between; align-items:center;
+            display:flex; justify-content:space-between; align-items:center;
             padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
             z-index:1000;
         }
@@ -152,15 +152,99 @@
     const tmdbId = 4626; // ID TMDB pour Knight Rider (K 2000)
     const apiKey = "182c7173698e34803715eacab5c693a7";
 
-    // Insérer ici les liens vidéo pour K 2000
+    // Liens vidéo pour K 2000 (Saisons 1, 2, 3 et 4)
     const videasSources = {
         1: {
-            1: "https://vidzy.org/embed-exemple-k2000-s1e1.html",
-            2: "https://vidzy.org/embed-exemple-k2000-s1e2.html"
+            1: "https://vidzy.org/embed-o586wv0puznx.html",
+            2: "https://caseyimpactstation.com/e/shv3zeexnruc",
+            3: "https://caseyimpactstation.com/e/ffcbxygheqjk",
+            4: "https://caseyimpactstation.com/e/hjmazxxkfdr8",
+            5: "https://caseyimpactstation.com/e/dnq1md7ur6wo",
+            6: "https://caseyimpactstation.com/e/bqku3q4a1hzj",
+            7: "https://caseyimpactstation.com/e/c2ift4me9add",
+            8: "https://caseyimpactstation.com/e/ufzcqxzhzovn",
+            9: "https://caseyimpactstation.com/e/qdaaoqksrkxm",
+            10: "https://caseyimpactstation.com/e/cz69rauolqke",
+            11: "https://caseyimpactstation.com/e/han7kponr58f",
+            12: "https://caseyimpactstation.com/e/cmxhi8qyxlgz",
+            13: "https://caseyimpactstation.com/e/89in66ii50jw",
+            14: "https://caseyimpactstation.com/e/dap5rkvgrjhh",
+            15: "https://caseyimpactstation.com/e/tfu65mrw5g2k",
+            16: "https://movix.show/watch/tv/UZRfCRVnAqsqlPflEiLAas93eYlbo7UQUwl/s/1/e/16",
+            17: "https://caseyimpactstation.com/e/sg4bvyqacohn",
+            18: "https://caseyimpactstation.com/e/dojjeyo3y1xe",
+            19: "https://vidzy.org/embed-htiaokvl088p.html",
+            20: "https://caseyimpactstation.com/e/ohqniexjswf8",
+            21: "https://caseyimpactstation.com/e/g9wtc5hc2gya"
         },
-        2: {},
-        3: {},
-        4: {}
+        2: {
+            1: "https://vidzy.org/embed-s9a8d5hr44oy.html",
+            2: "https://vidzy.org/embed-ncxqp5pwua50.html",
+            3: "https://vidzy.org/embed-jsud32spxhrf.html",
+            4: "https://caseyimpactstation.com/e/wyvd5sfzgeji",
+            5: "https://caseyimpactstation.com/e/yxnppajkkpxy",
+            6: "https://caseyimpactstation.com/e/tqezphfibyiw",
+            7: "https://vidzy.org/embed-k611fh5hzn9d.html",
+            8: "https://caseyimpactstation.com/e/ife2ju6bf9yo",
+            9: "https://caseyimpactstation.com/e/ovetkwwpznc9",
+            10: "https://caseyimpactstation.com/e/s6rxjphclgyn",
+            11: "https://caseyimpactstation.com/e/v1zh9z7tsdss",
+            12: "https://caseyimpactstation.com/e/drjjqylerbhs",
+            13: "https://caseyimpactstation.com/e/wydelvykp08o",
+            14: "https://caseyimpactstation.com/e/eqtnir03mb36",
+            15: "https://vidzy.org/embed-43jsoe51f51u.html",
+            16: "https://vidzy.org/embed-togc5dkoz7he.html",
+            17: "https://caseyimpactstation.com/e/xraeddkzead9",
+            18: "https://caseyimpactstation.com/e/ga7y24nyjnjy",
+            19: "https://caseyimpactstation.com/e/fqnwgem1z7ly",
+            20: "https://caseyimpactstation.com/e/ch3anwluwc0y",
+            21: "https://caseyimpactstation.com/e/49luoc4xneoc"
+        },
+        3: {
+            1: "https://caseyimpactstation.com/e/ueesae7vchkx",
+            2: "https://caseyimpactstation.com/e/bqlsmnrltylq",
+            3: "https://caseyimpactstation.com/e/dmesfshmwsqa",
+            4: "https://caseyimpactstation.com/e/ooccvyiswzqv",
+            5: "https://caseyimpactstation.com/e/yzovajos2ddo",
+            6: "https://caseyimpactstation.com/e/9elbtzaegyk8",
+            7: "https://caseyimpactstation.com/e/nokk5bvbeyzz",
+            8: "https://caseyimpactstation.com/e/l0wmts3supv6",
+            9: "https://caseyimpactstation.com/e/mlldkxroycdi",
+            10: "https://caseyimpactstation.com/e/qbbcrkxy33tc",
+            12: "https://caseyimpactstation.com/e/qz7xy7nk8ytm",
+            13: "https://caseyimpactstation.com/e/ctvaumewfjmi",
+            14: "https://caseyimpactstation.com/e/b915vgh2amma",
+            15: "https://caseyimpactstation.com/e/vcz8pb8hbzd2",
+            16: "https://caseyimpactstation.com/e/wyyjrroda3pg",
+            17: "https://vidzy.org/embed-h94lhw2h4u7h.html",
+            18: "https://caseyimpactstation.com/e/rb2mxqvhh4vu",
+            19: "https://caseyimpactstation.com/e/nnop4o1tqyp6",
+            20: "https://caseyimpactstation.com/e/qaqqx6wklklv",
+            21: "https://caseyimpactstation.com/e/kk7c30cym2qj"
+        },
+        4: {
+            1: "https://caseyimpactstation.com/e/cymvqd5gorx2",
+            2: "https://caseyimpactstation.com/e/aajgak72pf8z",
+            3: "https://caseyimpactstation.com/e/jggatjcf6t6c",
+            4: "https://vidzy.org/embed-hh63qzzxwzdu.html",
+            5: "https://vidzy.org/embed-8hkkv5no4w54.html",
+            6: "https://vidzy.org/embed-cd1q4yxvftm6.html",
+            7: "https://vidzy.org/embed-wo84sp0qee6o.html",
+            8: "https://vidzy.org/embed-ir4vsne7a48c.html",
+            9: "https://vidzy.org/embed-vd990m4wlujo.html",
+            10: "https://vidzy.org/embed-r8b8go6ox7gs.html",
+            11: "https://vidzy.org/embed-wvmrvnuysssc.html",
+            12: "https://vidzy.org/embed-6ybg2scm0fdk.html",
+            13: "https://vidzy.org/embed-uy7vai85i5qc.html",
+            14: "https://vidzy.org/embed-33abw3vucpuo.html",
+            15: "https://vidzy.org/embed-tpjhxw0aqa1q.html",
+            16: "https://vidzy.org/embed-amh0inu2g0sn.html",
+            17: "https://vidzy.org/embed-vpm0mris3fpa.html",
+            18: "https://vidzy.org/embed-04jsegvh34oy.html",
+            19: "https://vidzy.org/embed-epbzryoqnzo8.html",
+            20: "https://vidzy.org/embed-5wpfpisjts0d.html",
+            21: "https://caseyimpactstation.com/e/c0qeffm4biys"
+        }
     };
 
     let currentEpisodes = [];
