@@ -40,7 +40,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
 .play-btn { padding: 12px 35px; background: white; color: black; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-flex; transition: 0.3s; }
 .play-btn:hover { background: #e50914; color: white; }
 
-/* STYLE BARRE DE RECHERCHE INTEGRÉE */
+/* BARRE DE RECHERCHE */
 .search-section { padding: 30px 5% 0px; display: flex; justify-content: flex-end; }
 .search-wrapper { position: relative; width: 100%; max-width: 400px; }
 .search-input { width: 100%; padding: 12px 40px 12px 15px; background: #222; border: 1px solid #444; color: white; border-radius: 25px; font-size: 16px; transition: 0.3s; }
@@ -114,7 +114,7 @@ body{ background:#141414; color:white; overflow-x:hidden; }
     </div>
 </section>
 
-<!-- NOUVELLE BARRE DE RECHERCHE LOCALISÉE -->
+<!-- BARRE DE RECHERCHE -->
 <section class="search-section">
     <div class="search-wrapper">
         <input type="text" id="localSearch" class="search-input" placeholder="Rechercher un film ou une série sur le site...">
@@ -153,18 +153,18 @@ const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", auth
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const TMDB_API_KEY = "182c7173698e34803715eacab5c693a7";
 
-// --- CONFIGURATION CATALOGUE ---
+// --- AJOUTE TES IMAGES ET TES TITRES ICI DIRECTEMENT ---
+// Tu as le contrôle total sur le titre et l'image de fond (image) !
 const mesSeries = [
-    { id: 914, dbKey: "LECLOWN", defaultLink: "le clown.html", vipLink: "vipleclown.html" },
-    { id: 4414, dbKey: "MEDICOPTER", defaultLink: "medicopter.html", vipLink: "vipmedicopter.html" },
-    { id: 4429, dbKey: "MARTIAL_LAW", defaultLink: "flicdeshangai.html", vipLink: "vipflicdeshangai.html" },
-    { id: 600, dbKey: "LE_REBELLE", defaultLink: "lerebelle.html", vipLink: "viplerebelle.html" }
+    { dbKey: "LECLOWN", titre: "Le Clown", image: "https://media.senscritique.com/media/000006485088/0/le_clown.jpg", defaultLink: "le clown.html", vipLink: "vipleclown.html" },
+    { dbKey: "MEDICOPTER", titre: "Medicopter 117", image: "s-l1200.jpg", defaultLink: "medicopter.html", vipLink: "vipmedicopter.html" },
+    { dbKey: "MARTIAL_LAW", titre: "Le Flic de Shanghaï", image: "https://www.themoviedb.org/t/p/w1280/fN7b68Cq6Xwz37e9UfG8S77NLyv.jpg", defaultLink: "flicdeshangai.html", vipLink: "vipflicdeshangai.html" },
+    { dbKey: "LE_REBELLE", titre: "Le Rebelle", image: "https://www.themoviedb.org/t/p/w1280/4zxane7abfe7Tt3NnuZulLF5Orz.jpg", defaultLink: "lerebelle.html", vipLink: "viplerebelle.html" }
 ];
 
 const mesFilms = [
-    { id: 18274, dbKey: "SUPERCROSS", defaultLink: "supercross.html", vipLink: "vipersupercross.html" }
+    { dbKey: "SUPERCROSS", titre: "Supercross", image: "https://m.media-amazon.com/images/M/MV5BMTI5NzE0NDUxNV5BMl5BanBnXkFtZTcwODQ0NjkyMQ@@._V1_.jpg", defaultLink: "supercross.html", vipLink: "vipersupercross.html" }
 ];
 
 window.toggleMenu = () => {
@@ -198,13 +198,11 @@ onAuthStateChanged(auth, async (user) => {
             document.getElementById("heroMedicBtn").href = "vipmedicopter.html";
         }
 
-        // On attend que les deux grilles soient générées avant d'activer la recherche
-        await Promise.all([
-            genererGrille(mesSeries, "tv", "grid-series", unlocked),
-            genererGrille(mesFilms, "movie", "grid-films", unlocked)
-        ]);
+        // On génère instantanément les grilles avec tes propres données
+        genererGrille(mesSeries, "grid-series", unlocked);
+        genererGrille(mesFilms, "grid-films", unlocked);
 
-        // Activation de la fonction de filtrage
+        // Activation de la recherche
         creerSystemeRecherche();
 
         if (data.progress?.lastBySerie) {
@@ -213,41 +211,36 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-function genererGrille(listeMedia, type, elementId, unlocked) {
+function genererGrille(listeMedia, elementId, unlocked) {
     const container = document.getElementById(elementId);
     container.innerHTML = "";
 
-    const poms = listeMedia.map(media => {
-        return fetch(`https://api.themoviedb.org/3/${type}/${media.id}?api_key=${TMDB_API_KEY}&language=fr-FR`)
-            .then(res => res.json())
-            .then(data => {
-                const card = document.createElement("a");
-                card.className = "movie";
-                
-                const bgPath = data.backdrop_path || data.poster_path;
-                if(bgPath) card.style.backgroundImage = `url(https://image.tmdb.org/t/p/w780${bgPath})`;
+    listeMedia.forEach(media => {
+        const card = document.createElement("a");
+        card.className = "movie";
+        
+        // Applique l'image exacte que tu as choisie dans la liste au-dessus
+        card.style.backgroundImage = `url(${media.image})`;
 
-                let finalHref = media.defaultLink;
-                let textAffichage = data.name || data.title;
+        let finalHref = media.defaultLink;
+        let textAffichage = media.titre; // Utilise ton propre titre
 
-                if (unlocked.includes(media.dbKey) || (media.dbKey === "LECLOWN" && unlocked.includes("vipclown"))) {
-                    finalHref = media.vipLink;
-                    textAffichage += " VIP 🔥";
-                }
+        if (unlocked.includes(media.dbKey) || (media.dbKey === "LECLOWN" && unlocked.includes("vipclown"))) {
+            finalHref = media.vipLink;
+            textAffichage += " VIP 🔥";
+        }
 
-                card.href = finalHref;
-                card.innerText = textAffichage;
-                
-                // IMPORTANT : On stocke le nom en minuscule dans la carte pour pouvoir chercher dedans
-                card.setAttribute("data-title", (data.name || data.title).toLowerCase());
-                
-                container.appendChild(card);
-            });
+        card.href = finalHref;
+        card.innerText = textAffichage;
+        
+        // On garde la mémoire pour le moteur de recherche
+        card.setAttribute("data-title", media.titre.toLowerCase());
+        
+        container.appendChild(card);
     });
-    return Promise.all(poms);
 }
 
-// --- LOGIQUE DE LA BARRE DE RECHERCHE ---
+// LOGIQUE DE LA BARRE DE RECHERCHE LOCALISÉE
 function creerSystemeRecherche() {
     const searchInput = document.getElementById("localSearch");
     
@@ -258,15 +251,13 @@ function creerSystemeRecherche() {
         toutesLesCartes.forEach(carte => {
             const titreFilm = carte.getAttribute("data-title");
             
-            // Si la recherche est vide OU si le titre contient le mot cherché, on l'affiche
             if (valeurAChercher === "" || titreFilm.includes(valeurAChercher)) {
                 carte.style.display = "flex";
             } else {
-                carte.style.display = "none"; // Sinon on le cache
+                carte.style.display = "none";
             }
         });
 
-        // Gestion propre de l'affichage des titres des catégories "Nos Séries" et "Nos Films"
         gererTitresCategories();
     });
 }
