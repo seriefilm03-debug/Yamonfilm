@@ -204,7 +204,7 @@ onAuthStateChanged(auth, async (user) => {
         if (unlocked.includes("LE_REBELLE")) {
             const cardRebelle = document.getElementById("cardLE_REBELLE");
             if (cardRebelle) {
-                cardRebelle.href = "viple-rebelle.html";
+                cardRebelle.href = "viplerebelle.html";
                 cardRebelle.innerText = "Le Rebelle VIP 🔥";
             }
         }
@@ -232,7 +232,7 @@ function displayContinue(lastBySerie, unlocked) {
             if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
             if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
             if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshanghai.html";
-            if(item.serieName === "Le Rebelle" && unlocked.includes("LE_REBELLE")) finalLink = "viple-rebelle.html";
+            if(item.serieName === "Le Rebelle" && unlocked.includes("LE_REBELLE")) finalLink = "viplerebelle.html";
 
             const card = document.createElement("a");
             card.href = finalLink;
