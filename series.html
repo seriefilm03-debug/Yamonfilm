@@ -6,151 +6,202 @@
     <title>Mes Séries - YAMONFILM</title>
     <style>
         *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-        body{ background:#141414; color:white; padding: 20px; }
+        body{ background:#0f0f0f; color:white; overflow-x: hidden; padding-bottom: 50px; }
+
+        /* NAVBAR & SIDE MENU */
+        .navbar{
+            position:fixed; top:0; left:0; width:100%; height:60px;
+            display:flex; justify-content:space-between; align-items:center;
+            padding:0 20px; background:rgba(0,0,0,0.95); z-index:1000;
+            border-bottom: 1px solid #222;
+        }
+        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
+
+        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+        .overlay.show{ opacity:1; pointer-events:auto; }
+        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+        .side-menu.open{ right:0; }
+        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+
+        .menu-nav-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .menu-nav-row a { border-bottom: none; }
+        .see-all-link { font-size: 13px !important; color: #e50914 !important; font-weight: bold; }
+
+        /* HEADER & SEARCH BAR */
+        .header-section {
+            margin-top: 80px; padding: 20px 5%;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .header-title { font-size: 2rem; font-weight: bold; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; }
-        .logo { color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
-        
-        h2 { margin: 20px 5%; font-size: 24px; }
-        
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-            gap: 20px; 
-            padding: 20px 5%; 
+        .search-container {
+            position: relative; width: 100%; max-width: 500px;
+        }
+        .search-input {
+            width: 100%; padding: 12px 15px 12px 40px; background: #1c1c1c;
+            border: 1px solid #333; border-radius: 6px; color: white;
+            font-size: 16px; outline: none; transition: 0.3s;
+        }
+        .search-input:focus { border-color: #e50914; }
+        .search-icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #888; font-size: 18px;
         }
 
-        .card { 
-            background: #222; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            text-decoration: none; 
-            color: white; 
-            transition: 0.3s; 
-            border: 1px solid #333;
-            display: none; /* Masqué par défaut, affiché si débloqué */
+        /* GRID DES SÉRIES */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px; padding: 0 5%; margin-top: 20px;
         }
 
-        .card:hover { transform: scale(1.05); border-color: #e50914; }
-        .card img { width: 100%; height: 150px; object-fit: cover; }
-        .card-info { padding: 15px; }
-        .card-info b { font-size: 18px; display: block; margin-bottom: 5px; }
-        .badge { background: #e50914; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-
-        #no-series { 
-            text-align: center; 
-            margin-top: 100px; 
-            color: #888; 
-            display: none; 
+        .serie-card {
+            background: #181818; border-radius: 8px; overflow: hidden;
+            border: 1px solid #222; text-decoration: none; color: white;
+            transition: 0.3s; position: relative; display: flex; flex-direction: column;
         }
+        .serie-card:hover { transform: translateY(-5px); border-color: #e50914; }
         
-        .btn-unlock {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #e50914;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+        .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; background: #222; }
+        .poster-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .vip-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0, 0, 0, 0.85); color: #ffd700;
+            padding: 4px 8px; border-radius: 4px; font-size: 11px;
+            font-weight: bold; border: 1px solid #ffd700;
         }
+
+        .lock-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px); display: flex; align-items: center;
+            justify-content: center; font-size: 30px;
+        }
+
+        .serie-info { padding: 12px; }
+        .serie-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .serie-status { font-size: 12px; color: #888; }
+        .unlocked-text { color: #00ff00; }
+        .locked-text { color: #e50914; }
     </style>
 </head>
 <body>
 
-<header>
+<div class="navbar">
     <a href="index.html" class="logo">YAMONFILM</a>
-    <a href="index.html" style="color: white; text-decoration: none;">Retour</a>
-</header>
-
-<h2>Mes Séries VIP</h2>
-
-<div class="grid" id="series-grid">
-    <a href="vipclown.html" class="card" id="card-LECLOWN">
-        <img src="https://media.senscritique.com/media/000016277047/0/le_clown.jpg" alt="Le Clown">
-        <div class="card-info">
-            <span class="badge">VIP 🔥</span>
-            <b>Le Clown</b>
-            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
-        </div>
-    </a>
-
-    <a href="vipmedicopter.html" class="card" id="card-MEDICOPTER">
-        <img src="s-l1200.jpg" alt="Medicopter 117">
-        <div class="card-info">
-            <span class="badge">VIP 🔥</span>
-            <b>Medicopter 117</b>
-            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
-        </div>
-    </a>
-
-    <!-- SÉRIE AJOUTÉE : LE FLIC DE SHANGHAÏ -->
-    <a href="vipflicdeshanghai.html" class="card" id="card-MARTIAL_LAW">
-        <img src="https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg" alt="Le Flic de Shanghaï">
-        <div class="card-info">
-            <span class="badge">VIP 🔥</span>
-            <b>Le Flic de Shanghaï</b>
-            <p style="font-size: 13px; color: #aaa;">Série complète débloquée</p>
-        </div>
-    </a>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </div>
 
-<div id="no-series">
-    <p>Vous n'avez aucune série VIP pour le moment.</p>
-    <a href="debloquer.html" class="btn-unlock">Activer un code</a>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="menu">
+    <a href="account.html">Mon compte</a>
+    
+    <div class="menu-nav-row">
+        <a href="series.html">Mes séries</a>
+        <a href="serie.html" class="see-all-link">Voir tout ›</a>
+    </div>
+
+    <div class="menu-nav-row">
+        <a href="films.html">Mes films</a>
+        <a href="film.html" class="see-all-link">Voir tout ›</a>
+    </div>
+
+    <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
 </div>
+
+<div class="header-section">
+    <h1 class="header-title">Toutes les Séries</h1>
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher une série...">
+    </div>
+</div>
+
+<div class="series-grid" id="seriesGrid"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", 
-        authDomain: "yamonfilm-fead8.firebaseapp.com", 
-        projectId: "yamonfilm-fead8" 
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // CATALOGUE DES SÉRIES (Vous pouvez aussi le charger dynamiquement depuis Firestore)
+    const catalog = [
+        {
+            id: "LE_REBELLE",
+            title: "Le Rebelle",
+            isVip: true,
+            link: "viple-rebelle.html",
+            poster: "https://image.tmdb.org/t/p/w500/i9ne16v8U9y85PCoDToKkWy4e4R.jpg" // Image exemple TMDB
+        }
+    ];
+
+    let unlockedSeries = [];
+
+    window.toggleMenu = () => {
+        document.getElementById("menu").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("show");
+    };
+
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().seriesUnlocked) {
+                unlockedSeries = userDoc.data().seriesUnlocked;
+            }
+            renderSeries(catalog);
+        } else {
             window.location.href = "login.html";
+        }
+    });
+
+    function renderSeries(list) {
+        const container = document.getElementById("seriesGrid");
+        container.innerHTML = "";
+
+        if (list.length === 0) {
+            container.innerHTML = `<p style="color:#888; grid-column: 1/-1;">Aucune série trouvée.</p>`;
             return;
         }
 
-        const userRef = doc(db, "users", user.uid);
-        const snap = await getDoc(userRef);
+        list.forEach(item => {
+            const isUnlocked = !item.isVip || unlockedSeries.includes(item.id);
+            const card = document.createElement("a");
+            card.href = item.link;
+            card.className = "serie-card";
 
-        if (snap.exists()) {
-            const data = snap.data();
-            const unlocked = data.seriesUnlocked || [];
+            card.innerHTML = `
+                <div class="poster-wrapper">
+                    <img class="poster-img" src="${item.poster}" alt="${item.title}">
+                    ${item.isVip ? '<span class="vip-badge">VIP</span>' : ''}
+                    ${!isUnlocked ? '<div class="lock-overlay">🔒</div>' : ''}
+                </div>
+                <div class="serie-info">
+                    <div class="serie-title">${item.title}</div>
+                    <div class="serie-status ${isUnlocked ? 'unlocked-text' : 'locked-text'}">
+                        ${isUnlocked ? 'Disponible' : 'Verrouillé'}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 
-            if (unlocked.length > 0) {
-                let hasVisibleSeries = false;
-
-                // On parcourt les IDs débloqués (ex: LECLOWN, MEDICOPTER, MARTIAL_LAW)
-                unlocked.forEach(id => {
-                    const card = document.getElementById(`card-${id}`);
-                    if (card) {
-                        card.style.display = "block"; // On affiche la carte correspondante
-                        hasVisibleSeries = true;
-                    }
-                });
-
-                if (!hasVisibleSeries) {
-                    document.getElementById("no-series").style.display = "block";
-                }
-            } else {
-                document.getElementById("no-series").style.display = "block";
-            }
-        } else {
-            document.getElementById("no-series").style.display = "block";
-        }
+    // LOGIQUE DE RECHERCHE EN TEMPS RÉEL
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const filtered = catalog.filter(serie => serie.title.toLowerCase().includes(query));
+        renderSeries(filtered);
     });
-</script>
 
+    document.getElementById("logoutBtn").onclick = () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+    };
+</script>
 </body>
 </html>
