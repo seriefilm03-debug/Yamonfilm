@@ -1,255 +1,468 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMONFILM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Rebelle - YAMONFILM</title>
+    <style>
+        /* --- STYLE GLOBAL --- */
+        *{ box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+        body{ background:#0f0f0f; color:white; overflow-x: hidden; }
 
-<style>
-/* --- STYLE DE BASE --- */
-*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-body{ background:#141414; color:white; overflow-x:hidden; }
+        /* NAV & MENU */
+        .navbar{
+            position:fixed; top:0; left:0; width:100%; height:60px;
+            display:flex; justify-content:space-between; align-items:center;
+            padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            z-index:1000;
+        }
+        .logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none; }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
 
-/* NAV & MENU LATÉRAL */
-.navbar{
-  position:fixed; top:0; left:0; width:100%; height:60px;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:0 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-  z-index:1000;
-}
-.logo{ color:#e50914; font-size:28px; font-weight:bold; text-decoration:none;}
-.menu-btn{ font-size:28px; cursor:pointer; z-index: 2100; }
+        /* OVERLAY & SIDE MENU */
+        .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
+        .overlay.show{ opacity:1; pointer-events:auto; }
+        .side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
+        .side-menu.open{ right:0; }
+        .side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
 
-.overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.3s; z-index:1500; }
-.overlay.show{ opacity:1; pointer-events:auto; }
-.side-menu{ position:fixed; top:0; right:-100%; width:300px; height:100%; background:#111; padding:80px 20px 20px; display:flex; flex-direction:column; gap:15px; transition:0.3s; z-index:2000; border-left: 1px solid #333;}
-.side-menu.open{ right:0; }
-.side-menu a, .side-menu button{ color:white; text-decoration:none; background:none; border:none; font-size:18px; padding:10px 0; cursor:pointer; text-align:left; border-bottom: 1px solid #222;}
+        /* LIGNES MENU AVEC VOIR TOUT */
+        .menu-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+        }
+        .menu-nav-row a { border-bottom: none; }
+        .see-all-link {
+            font-size: 13px !important;
+            color: #e50914 !important;
+            font-weight: bold;
+        }
 
-/* STYLE AJOUTÉ POUR LE CODE PROMO */
-.promo-box { padding: 10px 0; border-bottom: 1px solid #222; }
-.promo-input { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; }
-.activate-btn { background: #e50914; color: white; width: 100%; padding: 10px; border-radius: 4px; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; text-align: center; text-decoration: none; display: block;}
+        /* STYLE BARRE DROITE PROMO */
+        .promo-section { margin-top: 10px; padding: 10px 0; border-bottom: 1px solid #222; }
+        .promo-input { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; margin-top: 10px; font-size: 14px; }
+        .activate-btn { background: #e50914; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; margin-top: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
-/* HERO CARROUSEL */
-.hero-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
-.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease-in-out; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; }
-.hero-slide.active { opacity: 1; }
-.hero-slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.8), transparent 60%), linear-gradient(to top, #141414, transparent 40%); }
-.hero-content { position: relative; z-index: 10; max-width: 600px; }
-.hero-content h1 { font-size: clamp(35px, 6vw, 70px); margin-bottom: 10px; }
+        /* --- LECTEUR VIDEO --- */
+        #video-overlay { display: none; position: fixed; inset: 0; background: black; z-index: 3000; flex-direction: column; justify-content: center; align-items: center; }
+        #video-overlay iframe { width: 100%; height: 90%; border: none; }
+        .close-video { position: absolute; top: 15px; right: 25px; font-size: 35px; color: white; cursor: pointer; }
 
-.play-btn { padding: 12px 35px; background: white; color: black; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-flex; transition: 0.3s; }
-.play-btn:hover { background: #e50914; color: white; }
+        /* --- HERO & EPISODES --- */
+        .hero{ height:65vh; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:40px 5%; position:relative; }
+        .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(to top,#0f0f0f, transparent 50%), linear-gradient(to right, #0f0f0f, transparent); }
+        .hero-content{ position:relative; z-index:2; max-width:700px; }
+        
+        .episodes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; padding:20px 5%; }
+        .card{ background:#1c1c1c; border-radius:8px; overflow:hidden; cursor:pointer; position: relative; transition: 0.3s; border: 1px solid #333;}
+        .card:hover{ transform: scale(1.05); border-color: #e50914; }
+        .card img{ width:100%; height:140px; object-fit:cover; }
+        
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 0%; transition: 0.3s; }
+        .watched-tag { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #00ff00; font-size: 10px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        
+        .btn-main{ background:#e50914; color:white; padding:12px 25px; border-radius:5px; font-weight:bold; cursor:pointer; border:none; margin-top:10px; display: inline-flex; align-items: center; transition: 0.2s; }
+        .btn-main:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        .season-menu{ background:#1c1c1c; border:1px solid #333; position:absolute; display:none; z-index:10; border-radius: 5px; }
+        .season-menu div{ padding:12px 20px; cursor:pointer; border-bottom: 1px solid #222; }
+        .show{ display:block; }
 
-/* STYLE AJOUTÉ POUR BANNIÈRE DEMANDE */
-.request-banner-section { padding: 40px 5% 0px; }
-.request-banner { display: flex; justify-content: space-between; align-items: center; background: #1f1f1f; padding: 20px 30px; border-radius: 6px; border: 1px solid #333; gap: 20px; }
-.request-banner-text h3 { font-size: 20px; margin-bottom: 5px; }
-.request-banner-text p { color: #aaa; font-size: 14px; }
-.request-link-btn { background: #e50914; color: white; text-decoration: none; font-weight: bold; padding: 12px 25px; border-radius: 4px; transition: 0.3s; text-align: center; white-space: nowrap; }
-.request-link-btn:hover { background: white; color: black; }
+        .btn-group { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-top: 15px; }
 
-/* REPRENDRE LA LECTURE */
-.continue-section { padding: 40px 5% 10px; display: none; }
-.continue-grid { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-.continue-card { min-width: 260px; text-decoration: none; color: white; transition: 0.3s; }
-.continue-card:hover { transform: scale(1.05); }
-.img-container { position: relative; width: 100%; height: 145px; border-radius: 4px; overflow: hidden; background: #222; }
-.img-container img { width: 100%; height: 100%; object-fit: cover; }
-.progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #e50914; width: 100%; }
-
-/* GRILLE SERIES */
-.movies-label { padding: 30px 5% 0; font-size: 22px; font-weight: bold; }
-.movies{ padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.movie { height: 300px; background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: flex-end; padding: 15px; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; border: 1px solid transparent;}
-.movie:hover { transform: scale(1.05); border-color: #555; }
-.hidden { display: none; }
-
-@media (max-width: 600px) {
-    .request-banner { flex-direction: column; text-align: center; padding: 20px; }
-    .request-link-btn { width: 100%; }
-}
-</style>
+        /* --- POPUP / MODAL DEBLOCAGE --- */
+        .unlock-modal {
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            z-index: 4000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .unlock-modal-content {
+            background: #181818; border: 1px solid #333; border-radius: 10px;
+            max-width: 450px; width: 100%; padding: 30px; text-align: center;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5);
+        }
+        .unlock-modal-content h2 { font-size: 24px; margin-bottom: 15px; color: #fff; }
+        .unlock-modal-content p { color: #aaa; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+        .unlock-modal-content .btn-main { width: 100%; justify-content: center; padding: 14px; font-size: 16px; }
+    </style>
 </head>
 <body>
 
 <div class="navbar">
-  <a href="index.html" class="logo">YAMONFILM</a>
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <a href="index.html" class="logo">YAMONFILM</a>
+    <div class="nav-right">
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 <div class="side-menu" id="menu">
     <a href="account.html">Mon compte</a>
-    <a href="series.html">Mes séries</a>
     
-    <div class="promo-box">
-        <span style="color: #666; font-size: 12px;">ZONE VIP</span>
-        <a href="debloquer.html" class="activate-btn">Activer un code</a>
+    <div class="menu-nav-row">
+        <a href="series.html">Mes séries</a>
+        <a href="serie.html" class="see-all-link">Voir tout ›</a>
+    </div>
+
+    <div class="menu-nav-row">
+        <a href="films.html">Mes films</a>
+        <a href="film.html" class="see-all-link">Voir tout ›</a>
+    </div>
+    
+    <div class="promo-section">
+        <span style="color: #666; font-size: 12px;">ACTIVER UN CODE</span>
+        <input type="text" id="promoCode" class="promo-input" placeholder="Entrez votre code...">
+        <button id="activateBtnMenu" class="activate-btn">Activer</button>
+        <p id="promoMsgMenu" style="font-size: 11px; margin-top: 5px; text-align: center;"></p>
     </div>
 
     <button id="logoutBtn" style="margin-top: auto; color: #e50914; text-align: left; padding: 10px 0;">Déconnexion</button>
 </div>
 
-<section class="hero-container">
-    <div class="hero-slide active" style="background-image: url('https://media.senscritique.com/media/000006485088/0/le_clown.jpg');">
-        <div class="hero-content">
-            <h1>Le Clown</h1>
-            <p>Le justicier au masque de cuir revient pour faire régner la justice.</p><br>
-            <a id="heroClownBtn" href="le clown.html" class="play-btn">▶ Lecture</a>
+<div id="unlockModal" class="unlock-modal">
+    <div class="unlock-modal-content">
+        <h2>Série Verrouillée 🔒</h2>
+        <p>Cette série fait partie de la Zone VIP. Clique sur le bouton ci-dessous pour la débloquer instantanément et l'ajouter à ta bibliothèque.</p>
+        <button id="unlockBtn" class="btn-main">🔓 Débloquer la série VIP</button>
+        <p id="unlockMsg" style="font-size: 14px; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+</div>
+
+<div id="video-overlay">
+    <span class="close-video" onclick="closeVideo()">&times;</span>
+    <iframe id="video-iframe" src="" allowfullscreen></iframe>
+</div>
+
+<section class="hero" id="hero">
+    <div class="hero-content">
+        <h1 id="title" style="font-size: 3rem; margin-bottom: 10px;">Le Rebelle</h1>
+        <p id="overview" style="color:#ccc; margin:10px 0; font-size: 1.1rem; line-height: 1.5;"></p>
+        
+        <div class="btn-group">
+            <button id="resumeBtn" class="btn-main" style="display:none; background:white; color:black;">▶ Reprendre l'épisode</button>
         </div>
     </div>
-    <div class="hero-slide" style="background-image: url('s-l1200.jpg');">
-        <div class="hero-content">
-            <h1>Medicopter 117</h1>
-            <p>Des vies en jeu, une équipe d'élite prête à tout.</p><br>
-            <a id="heroMedicBtn" href="medicopter.html" class="play-btn">▶ Lecture</a>
-        </div>
+</section>
+
+<div style="padding:20px 5%;">
+    <div style="position: relative;">
+        <button class="btn-main" id="seasonBtn">Saison 1 ▼</button>
+        <div class="season-menu" id="seasonMenu"></div>
     </div>
-</section>
+</div>
 
-<section class="request-banner-section">
-    <div class="request-banner">
-        <div class="request-banner-text">
-            <h3>Une idée de film ou de série ?</h3>
-            <p>Fais une demande d'ajout directement en recherchant ton contenu sur TMDB.</p>
-        </div>
-        <a href="ajouter un film.html" class="request-link-btn">Faire une demande</a>
-    </div>
-</section>
+<div class="episodes" id="episodes"></div>
 
-<section id="continue-watching" class="continue-section">
-    <h3>Reprendre la lecture</h3>
-    <div id="continue-container" class="continue-grid"></div>
-</section>
-
-<h3 class="movies-label">Nos Séries</h3>
-<section class="movies">
-    <a id="cardClown" href="le clown.html" class="movie" style="background-image: url('https://media.senscritique.com/media/000016277047/0/le_clown.jpg');">Le Clown</a>
-    <a id="cardMedic" href="medicopter.html" class="movie" style="background-image: url('s-l1200.jpg');">Medicopter 117</a>
-    <a id="cardMARTIAL_LAW" href="flicdeshangai.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/jFlldIdhLYe9NSxZFFxUUVXAvPu.jpg');">Le Flic de Shanghaï</a>
-    <a id="cardLE_REBELLE" href="lerebelle.html" class="movie" style="background-image: url('https://www.themoviedb.org/t/p/w1280/4zxane7abfe7Tt3NnuZulLF5Orz.jpg');">Le Rebelle</a>
-</section>
-
-<h3 class="movies-label">Film</h3>
-<section class="movies">
-    <a id="cardsupercross" href="supercross.html" class="movie" style="background-image: url('https://media.themoviedb.org/t/p/w440_and_h660_face/sHgPR5jrN09KoHKltAnLp8cfgg3.jpg');">Supercross</a>
-</section>
-  
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    // --- CONFIGURATION FIREBASE ---
+    const firebaseConfig = { apiKey: "AIzaSyAQnexePSWAJdgZc2WO2BFKL8Z_jnDKbqE", authDomain: "yamonfilm-fead8.firebaseapp.com", projectId: "yamonfilm-fead8" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-window.toggleMenu = () => {
-    document.getElementById("menu").classList.toggle("open");
-    document.getElementById("overlay").classList.toggle("show");
-};
-
-document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "login.html");
-
-// Carrousel
-let currentSlide = 0;
-const slides = document.querySelectorAll('.hero-slide');
-setInterval(() => {
-    slides[currentSlide].classList.remove('active');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active');
-}, 6000);
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "login.html"; return; }
+    let userProgress = { watched: [], lastBySerie: {} };
     
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (snap.exists()) {
-        const data = snap.data();
-        const unlocked = data.seriesUnlocked || [];
+    const serieId = "LE_REBELLE"; 
+    const pageLink = "viple-rebelle.html";
+    const tmdbId = 600; 
+    const apiKey = "182c7173698e34803715eacab5c693a7";
 
-        // --- GESTION DU DÉBLOCAGE LE CLOWN ---
-        if (unlocked.includes("LECLOWN") || unlocked.includes("vipclown")) {
-            document.getElementById("heroClownBtn").href = "vipleclown.html";
-            const cardClown = document.getElementById("cardClown");
-            if (cardClown) {
-                cardClown.href = "vipleclown.html";
-                cardClown.innerText = "Le Clown VIP 🔥";
+    const videasSources = {
+        1: {
+            1: "https://vidzy.org/embed-gte6c1qxszuv.html",
+            2: "https://vidzy.org/embed-lyuybqfx2v08.html",
+            3: "https://vidzy.org/embed-crc707u2addc.html",
+            4: "https://vidzy.org/embed-tnc2fx2pej55.html",
+            5: "https://vidzy.org/embed-7v7p1xww7j9d.html",
+            6: "https://vidzy.org/embed-5oj9ijhfkf2e.html",
+            7: "https://vidzy.org/embed-bj0sr9t4y1dr.html",
+            8: "https://vidzy.org/embed-0tdp1vcy3m30.html",
+            9: "https://vidzy.org/embed-j3w6eq3o9tz7.html",
+            11: "https://vidzy.org/embed-4kgs0gf01rne.html",
+            12: "https://vidzy.org/embed-jf7qh9swyhkn.html",
+            13: "https://vidzy.org/embed-ljyaju449ya6.html",
+            14: "https://vidzy.org/embed-cg96rjxkb85v.html",
+            15: "https://vidzy.org/embed-1ajpig5un4zv.html",
+            16: "https://vidzy.org/embed-1k7cs89fwoql.html",
+            17: "https://vidzy.org/embed-q28o1yk7esmb.html",
+            18: "https://vidzy.org/embed-wrg4qrqg1mu0.html",
+            19: "https://vidzy.org/embed-mwpgwsaft6fv.html",
+            20: "https://vidzy.org/embed-hazz9rm3chwj.html",
+            21: "https://vidzy.org/embed-7ncx7c7ndots.html",
+            22: "https://vidzy.org/embed-iuhnetmzsvfm.html"
+        },
+        2: {
+            1: "https://vidzy.org/embed-5v07kzorsfs1.html",
+            2: "https://vidzy.org/embed-i8jde0izvpdu.html",
+            4: "https://vidzy.org/embed-2svg0y5zz53a.html",
+            5: "https://vidzy.org/embed-aojykhpq5po0.html",
+            6: "https://vidzy.org/embed-ntvu7luwza4g.html",
+            7: "https://vidzy.org/embed-wtytupe9il0e.html",
+            8: "https://vidzy.org/embed-3a33257yxxyk.html",
+            9: "https://vidzy.org/embed-f5lpdez27rf4.html",
+            10: "https://vidzy.org/embed-a09jqa6wbln4.html",
+            11: "https://vidzy.org/embed-bh7xkfe2t6b0.html",
+            12: "https://vidzy.org/embed-0howxbzimo57.html",
+            13: "https://vidzy.org/embed-zit8fmdg0jtc.html",
+            14: "https://vidzy.org/embed-57ievemzzsmb.html",
+            15: "https://vidzy.org/embed-blrn6ucydgg8.html",
+            16: "https://vidzy.org/embed-yd23xv3jib4a.html",
+            17: "https://vidzy.org/embed-yd23xv3jib4a.html",
+            18: "https://vidzy.org/embed-5y4fk46psl8m.html",
+            19: "https://vidzy.org/embed-e5g3vt75bk72.html",
+            20: "https://vidzy.org/embed-mpi77cuarf4n.html",
+            21: "https://vidzy.org/embed-6pb95jzxtpky.html",
+            22: "https://vidzy.org/embed-kte3vapckj0y.html"
+        },
+        3: {
+            1: "https://uqload.is/embed-18lj84fx83qb.html",
+            2: "https://uqload.is/embed-vufqvhi9k9u5.html",
+            3: "https://uqload.is/embed-522v0jmrn9r0.html",
+            4: "https://uqload.is/embed-hfdhnr5zzphs.html",
+            5: "https://uqload.is/embed-bvdfl6k5vz0t.html",
+            6: "https://uqload.is/embed-5h8byhzo6atk.html",
+            7: "https://uqload.is/embed-ekie93r21p71.html",
+            8: "https://uqload.is/embed-f39xiecrtf8v.html",
+            9: "https://uqload.is/embed-byrfkfvm9nax.html",
+            10: "https://uqload.is/embed-zqhhooj1l2sn.html",
+            11: "https://uqload.is/embed-scvvxi7kuhkl.html",
+            12: "https://uqload.is/embed-7mu5gabgg4qc.html",
+            14: "https://uqload.is/embed-jfz8khilqmmt.html",
+            15: "https://uqload.is/embed-2sm0ci9lauh2.html",
+            16: "https://uqload.is/embed-z1y97kzyh6z6.html",
+            17: "https://uqload.is/embed-eej8surovq76.html",
+            18: "https://uqload.is/embed-chw1nl5xagu1.html",
+            19: "https://uqload.is/embed-2zy9uvx7sob0.html",
+            20: "https://uqload.is/embed-57y2h56fw7x8.html",
+            21: "https://uqload.is/embed-d6s2g1r9abjz.html"
+        },
+        4: {
+            2: "https://uqload.is/embed-aidcn5jmhz6u.html",
+            4: "https://uqload.is/embed-lup0rwtw1tyw.html",
+            5: "https://uqload.is/embed-iv4b43vzbsws.html",
+            6: "https://uqload.is/embed-ydwz4aqnfv0o.html",
+            7: "https://uqload.is/embed-dnruyzasl4f0.html",
+            8: "https://uqload.is/embed-ussti9r6o6f4.html",
+            9: "https://uqload.is/embed-6lk424vzzftz.html",
+            10: "https://uqload.is/embed-sm2aeraa365o.html",
+            12: "https://uqload.is/embed-mut1h95nyez3.html",
+            13: "https://uqload.is/embed-3m2rghl2gq3m.html",
+            14: "https://uqload.is/embed-vrsrdqdfruw6.html",
+            15: "https://uqload.is/embed-h57ud1f1u2s2.html",
+            17: "https://uqload.is/embed-994tsq408jfb.html",
+            19: "https://uqload.is/embed-t3cnabb7r75s.html",
+            21: "https://uqload.is/embed-h3facm5smzp3.html",
+            22: "https://uqload.is/embed-xwnwzqqlub9z.html"
+        },
+        5: {
+            1: "https://uqload.is/embed-ov35wm8bo1f5.html",
+            2: "https://uqload.is/embed-if9at2y9cbp3.html",
+            3: "https://uqload.is/embed-bwsg3mnuia11.html",
+            4: "https://uqload.is/embed-bacdkqfa3ju8.html",
+            5: "https://uqload.is/embed-0vr79hifqoz5.html",
+            6: "https://uqload.is/embed-o1346qynpmof.html",
+            7: "https://uqload.is/embed-821hwrzc2j6m.html",
+            8: "https://uqload.is/embed-sk2a5g0ibgzy.html",
+            9: "https://uqload.is/embed-n4r8n69e4beu.html",
+            10: "https://uqload.is/embed-cb7ly6gdnbzy.html",
+            11: "https://uqload.is/embed-v0rhmkdfgwmj.html",
+            13: "https://uqload.is/embed-80xibw645cj5.html",
+            14: "https://uqload.is/embed-xdry0m6culz2.html",
+            15: "https://uqload.is/embed-j8rbpk730b5s.html",
+            16: "https://uqload.is/embed-df9w7v0k1rrt.html",
+            17: "https://uqload.is/embed-qwm9frolrbld.html",
+            18: "https://uqload.is/embed-658y7635tp0v.html",
+            19: "https://uqload.is/embed-qwm9frolrbld.html",
+            20: "https://uqload.is/embed-lnztaltgx3cr.html",
+            21: "https://uqload.is/embed-lnztaltgx3cr.html",
+            22: "https://uqload.is/embed-9ljsvp8kzoy1.html"
+        }
+    };
+
+    let currentEpisodes = [];
+    let currentS = 1;
+
+    window.toggleMenu = () => {
+        document.getElementById("menu").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("show");
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.progress) {
+                    userProgress = userData.progress;
+                    if(!userProgress.lastBySerie) userProgress.lastBySerie = {};
+                    checkResume();
+                }
+                
+                if (userData.seriesUnlocked && userData.seriesUnlocked.includes(serieId)) {
+                    document.getElementById("unlockModal").style.display = "none";
+                } else {
+                    document.getElementById("unlockModal").style.display = "flex";
+                }
+            } else {
+                document.getElementById("unlockModal").style.display = "flex";
+            }
+            loadSeries();
+        } else { window.location.href = "login.html"; }
+    });
+
+    document.getElementById("logoutBtn").onclick = () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+    };
+
+    document.getElementById("unlockBtn").onclick = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const msg = document.getElementById("unlockMsg");
+        const userRef = doc(db, "users", user.uid);
+        
+        try {
+            await updateDoc(userRef, {
+                seriesUnlocked: arrayUnion(serieId)
+            });
+
+            msg.style.color = "#00ff00";
+            msg.innerText = "Série débloquée ! Redirection...";
+            document.getElementById("unlockBtn").style.display = "none";
+            
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
+
+        } catch (e) { 
+            console.error(e);
+            try {
+                await setDoc(userRef, { seriesUnlocked: [serieId] }, { merge: true });
+                msg.style.color = "#00ff00";
+                msg.innerText = "Série débloquée ! Redirection...";
+                document.getElementById("unlockBtn").style.display = "none";
+                setTimeout(() => { window.location.href = "index.html"; }, 1500);
+            } catch(err) {
+                msg.style.color = "red"; 
+                msg.innerText = "Erreur de mise à jour."; 
             }
         }
+    };
 
-        // --- GESTION DU DÉBLOCAGE MEDICOPTER ---
-        if (unlocked.includes("MEDICOPTER")) {
-            document.getElementById("heroMedicBtn").href = "vipmedicopter.html";
-            const cardMedic = document.getElementById("cardMedic");
-            if (cardMedic) {
-                cardMedic.href = "vipmedicopter.html";
-                cardMedic.innerText = "Medicopter VIP 🔥";
-            }
+    document.getElementById("activateBtnMenu").onclick = async () => {
+        const code = document.getElementById("promoCode").value.trim().toUpperCase();
+        const msg = document.getElementById("promoMsgMenu");
+        if (!code || !auth.currentUser) return;
+        
+        let serieToUnlock = (code === "REBELVIP") ? serieId : "";
+        if (!serieToUnlock) { msg.style.color="red"; msg.innerText="Code invalide."; return; }
+        
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        try {
+            await updateDoc(userRef, {
+                seriesUnlocked: arrayUnion(serieToUnlock)
+            });
+            msg.style.color="lime"; msg.innerText="Débloqué !";
+            setTimeout(() => window.location.href = "index.html", 1000);
+        } catch(err) {
+            msg.innerText="Erreur ou déjà actif.";
         }
+    };
 
-        // --- GESTION DU DÉBLOCAGE LE FLIC DE SHANGHAÏ ---
-        if (unlocked.includes("MARTIAL_LAW")) {
-            const cardFlic = document.getElementById("cardMARTIAL_LAW");
-            if (cardFlic) {
-                cardFlic.href = "vipflicdeshangai.html";
-                cardFlic.innerText = "Les Flics de Shanghai VIP 🔥"; 
-            }
-        }
+    window.saveProgress = async (s, e, title, img) => {
+        const user = auth.currentUser;
+        if(!user) return;
+        const epKey = `${serieId}-S${s}E${e}`;
+        if(!userProgress.watched.includes(epKey)) userProgress.watched.push(epKey);
+        userProgress.lastBySerie[serieId] = { 
+            s, e, title, img, 
+            serieName: "Le Rebelle", 
+            link: pageLink,
+            timestamp: Date.now() 
+        };
+        await setDoc(doc(db, "users", user.uid), { progress: userProgress }, { merge: true });
+        renderEpisodes();
+        checkResume();
+    };
 
-        // --- GESTION DU DÉBLOCAGE LE REBELLE ---
-        if (unlocked.includes("LE_REBELLE")) {
-            const cardRebelle = document.getElementById("cardLE_REBELLE");
-            if (cardRebelle) {
-                cardRebelle.href = "viplerebelle.html";
-                cardRebelle.innerText = "Le Rebelle VIP 🔥";
-            }
-        }
-
-        if (data.progress?.lastBySerie) {
-            displayContinue(data.progress.lastBySerie, unlocked);
+    function checkResume() {
+        const last = userProgress.lastBySerie[serieId];
+        if(last) {
+            const btn = document.getElementById("resumeBtn");
+            btn.style.display = "inline-flex";
+            btn.innerText = `▶ Reprendre S${last.s}E${last.e}`;
+            btn.onclick = () => window.openVideo(last.s, last.e, last.title, last.img);
         }
     }
-});
 
-function displayContinue(lastBySerie, unlocked) {
-    const container = document.getElementById("continue-container");
-    const section = document.getElementById("continue-watching");
-    container.innerHTML = "";
-    
-    const items = Object.values(lastBySerie).sort((a, b) => b.timestamp - a.timestamp);
+    async function loadSeries() {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        document.getElementById("overview").innerText = data.overview;
+        if (data.backdrop_path) {
+            document.getElementById("hero").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`;
+        }
+        
+        const menu = document.getElementById("seasonMenu");
+        menu.innerHTML = "";
+        for(let i=1; i<=data.number_of_seasons; i++) {
+            const d = document.createElement("div"); d.innerText = "Saison "+i;
+            d.onclick = () => { currentS = i; document.getElementById("seasonBtn").innerText = "Saison "+i+" ▼"; loadEpisodes(i); menu.classList.remove("show"); };
+            menu.appendChild(d);
+        }
+        loadEpisodes(1);
+    }
 
-    if (items.length > 0) {
-        section.style.display = "block";
-        items.forEach(item => {
-            const imgUrl = item.img.startsWith('http') ? item.img : `https://image.tmdb.org/t/p/w300${item.img}`;
-            
-            let finalLink = item.link;
-            // Redirection automatique dans "Reprendre la lecture" si débloqué
-            if(item.serieName === "Le Clown" && (unlocked.includes("LECLOWN") || unlocked.includes("vipclown"))) finalLink = "vipleclown.html";
-            if(item.serieName === "Medicopter 117" && unlocked.includes("MEDICOPTER")) finalLink = "vipmedicopter.html";
-            if(item.serieName === "Les Flics de Shanghai" && unlocked.includes("MARTIAL_LAW")) finalLink = "vipflicdeshanghai.html";
-            if(item.serieName === "Le Rebelle" && unlocked.includes("LE_REBELLE")) finalLink = "viplerebelle.html";
+    async function loadEpisodes(s) {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${s}?api_key=${apiKey}&language=fr-FR`);
+        const data = await res.json();
+        currentEpisodes = data.episodes || [];
+        renderEpisodes();
+    }
 
-            const card = document.createElement("a");
-            card.href = finalLink;
-            card.className = "continue-card";
+    function renderEpisodes() {
+        const container = document.getElementById("episodes");
+        container.innerHTML = "";
+        currentEpisodes.forEach(ep => {
+            const epKey = `${serieId}-S${currentS}E${ep.episode_number}`;
+            const isWatched = userProgress.watched.includes(epKey);
+            const card = document.createElement("div");
+            card.className = "card";
+            const posterSrc = ep.still_path 
+                ? `https://image.tmdb.org/t/p/w300${ep.still_path}` 
+                : 'https://via.placeholder.com/300x140/222/fff?text=Pas+d%27image';
+
             card.innerHTML = `
-                <div class="img-container">
-                    <img src="${imgUrl}">
-                    <div class="progress-bar"></div>
-                </div>
-                <div style="margin-top:10px;">
-                    <b>${item.serieName}</b><br>
-                    <span style="font-size:12px; color:#aaa;">S${item.s} : E${item.e} - ${item.title}</span>
-                </div>`;
+                <img src="${posterSrc}">
+                ${isWatched ? '<div class="watched-tag">VU</div>' : ''}
+                <div class="progress-bar" style="width: ${isWatched ? '100%' : '0%'}"></div>
+                <div style="padding:10px;"><b>E${ep.episode_number}</b> - ${ep.name}</div>
+            `;
+            card.onclick = () => window.openVideo(currentS, ep.episode_number, ep.name, ep.still_path);
             container.appendChild(card);
         });
     }
-}
+
+    window.openVideo = (s, e, title, img) => {
+        const url = videasSources[s] ? videasSources[s][e] : null;
+        if(url) {
+            document.getElementById("video-iframe").src = url;
+            document.getElementById("video-overlay").style.display = "flex";
+            window.saveProgress(s, e, title, img);
+        } else {
+            alert("Lecteur vidéo non configuré pour cet épisode.");
+        }
+    };
+
+    window.closeVideo = () => { document.getElementById("video-overlay").style.display="none"; document.getElementById("video-iframe").src=""; };
+    document.getElementById("seasonBtn").onclick = () => document.getElementById("seasonMenu").classList.toggle("show");
 </script>
 </body>
 </html>
